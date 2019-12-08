@@ -1,10 +1,6 @@
 import * as React from "react";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
-import styled from "styled-components";
-
-const Input = styled.input`
-  display: none;
-`;
+import FileInput from "./FileInput";
 
 export interface UploadDialogProps {
   open: boolean;
@@ -29,12 +25,7 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
         <DialogTitle>Upload CSV File</DialogTitle>
         <DialogContent>
           <DialogContentText>{this.state.selectedFile ? this.state.selectedFile.name : "No file selected"}</DialogContentText>
-          <Input accept=".csv" id="uploadInput" type="file" onChange={event => this.handleFileSelected(event.target.files![0])} />
-          <label htmlFor="uploadInput">
-            <Button color="primary" component="span">
-              Select File
-            </Button>
-          </label>
+          <FileInput handleFileSelected={this.handleFileSelected} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => this.props.handleClose()} color="primary">
