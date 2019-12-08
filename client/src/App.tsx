@@ -4,21 +4,25 @@ import "typeface-roboto";
 import UploadDialog from "./components/UploadDialog";
 
 export interface AppState {
-  openUploadDialog: boolean;
+  uploadDialogOpened: boolean;
 }
 
 export default class App extends React.Component<any, AppState> {
   state = {
-    openUploadDialog: true
+    uploadDialogOpened: false
   };
   closeUploadDialog = () => {
-    this.setState({ openUploadDialog: false });
+    this.setState({ uploadDialogOpened: false });
   };
+  openUploadDialog = () => {
+    this.setState({ uploadDialogOpened: true });
+  };
+
   render() {
     return (
       <React.Fragment>
-        <AddButton />
-        <UploadDialog open={this.state.openUploadDialog} handleClose={this.closeUploadDialog} />
+        <AddButton handleClick={this.openUploadDialog} />
+        <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
       </React.Fragment>
     );
   }

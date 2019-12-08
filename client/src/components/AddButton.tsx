@@ -8,10 +8,14 @@ const StyledButton = styled(Button)({
   width: 50
 });
 
-export default class AddButton extends React.Component {
+export interface UploadDialogProps {
+  handleClick: Function;
+}
+
+export default class AddButton extends React.Component<UploadDialogProps, any> {
   render() {
     return (
-      <StyledButton>
+      <StyledButton onClick={() => this.props.handleClick()}>
         <AddIcon fill="grey" height="75%" width="75%" />
       </StyledButton>
     );
