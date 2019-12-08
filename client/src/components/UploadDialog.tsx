@@ -19,16 +19,23 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
     this.setState({ selectedFile: selectedFile });
   };
 
+  handleClose = () => {
+    this.props.handleClose();
+    this.setState({ selectedFile: null });
+  };
+
+  NO_FILE_SELECTED = (<i>No file selected</i>);
+
   render() {
     return (
-      <Dialog fullWidth maxWidth="xs" onClose={() => this.props.handleClose()} open={this.props.open}>
+      <Dialog fullWidth maxWidth="xs" onClose={() => this.handleClose()} open={this.props.open}>
         <DialogTitle>Upload CSV File</DialogTitle>
         <DialogContent>
-          <DialogContentText>{this.state.selectedFile ? this.state.selectedFile.name : "No file selected"}</DialogContentText>
+          <DialogContentText>{this.state.selectedFile ? this.state.selectedFile.name : this.NO_FILE_SELECTED}</DialogContentText>
           <FileInput handleFileSelected={this.handleFileSelected} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => this.props.handleClose()} color="primary">
+          <Button onClick={() => this.handleClose()} color="primary">
             Cancel
           </Button>
           <Button color="primary">Upload</Button>
