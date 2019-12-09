@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
 import FileInput from "./FileInput";
+import axios from "axios";
 
 export interface UploadDialogProps {
   open: boolean;
@@ -55,7 +56,16 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
   }
 
   upload = (fileData: string) => {
-    console.log(fileData);
+    axios
+      .post("/csv", {
+        data: fileData
+      })
+      .then(function(response) {
+        console.log(response);
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   };
 
   render() {
