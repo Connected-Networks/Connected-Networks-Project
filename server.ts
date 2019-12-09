@@ -1,4 +1,4 @@
-import BackendProcessing from "./backend-processing";
+const backendProcessing = require("./backend-processing.ts");
 
 const express = require("express");
 const path = require("path");
@@ -12,14 +12,14 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
-app.post("/csv",(req,res)=>{
-  const data = req.body.data
+app.post("/csv", (req, res) => {
+  const data = req.body.data;
   try {
-    let be = new BackendProcessing()
-    be.processRawCSV(data)
-    res.sendStatus(200)
+    let be = new backendProcessing();
+    be.processRawCSV(data);
+    res.sendStatus(200);
   } catch (error) {
-    console.log("error")
-    res.sendStatus(500)
+    console.log("error");
+    res.sendStatus(500);
   }
-})
+});
