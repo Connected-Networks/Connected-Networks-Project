@@ -15,6 +15,8 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
   state: UploadDialogState = {
     selectedFile: null
   };
+  NO_FILE_SELECTED = (<i>No file selected</i>);
+
   handleFileSelected = (selectedFile: File) => {
     this.setState({ selectedFile: selectedFile });
   };
@@ -24,7 +26,37 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
     this.setState({ selectedFile: null });
   };
 
-  NO_FILE_SELECTED = (<i>No file selected</i>);
+  handleUpload = () => {
+    if (this.state.selectedFile) {
+      try {
+        this.readFile(this.state.selectedFile).then(fileData => {
+          this.upload(fileData);
+          this.handleClose();
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  async readFile(file: File): Promise<string> {
+    let reader = new FileReader();
+    return new Promise<string>((resolve, reject) => {
+      reader.onerror = () => {
+        reader.abort();
+      };
+
+      reader.onload = () => {
+        resolve(reader.result as string);
+      };
+
+      reader.readAsText(file);
+    });
+  }
+
+  upload = (fileData: string) => {
+    console.log(fileData);
+  };
 
   render() {
     return (
@@ -38,7 +70,9 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
           <Button onClick={() => this.handleClose()} color="primary">
             Cancel
           </Button>
-          <Button color="primary">Upload</Button>
+          <Button color="primary" onClick={() => this.handleUpload()}>
+            Upload
+          </Button>
         </DialogActions>
       </Dialog>
     );
