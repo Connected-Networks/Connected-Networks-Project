@@ -1,4 +1,4 @@
-import backendProcessing from "./backend-processing";
+import BackendProcessing from "./backend-processing";
 
 const express = require("express");
 const path = require("path");
@@ -14,10 +14,12 @@ app.get("*", (req, res) => {
 
 app.post("/csv",(req,res)=>{
   const data = req.body.data
-  backendProcessing.processRawCSV(data)
-
-
-
-
-
+  try {
+    let be = new BackendProcessing()
+    be.processRawCSV(data)
+    res.sendStatus(200)
+  } catch (error) {
+    console.log("error")
+    res.sendStatus(500)
+  }
 })

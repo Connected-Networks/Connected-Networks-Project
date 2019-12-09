@@ -20,7 +20,7 @@ interface DisplayPerson{
     name:String
     comment:String
 }
-export default class backendProcessing{
+export default class BackendProcessing{
 
 
 
