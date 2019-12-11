@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import * as React from "react";
+import AddButton from "./components/AddButton";
+import "typeface-roboto";
+import UploadDialog from "./components/UploadDialog";
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export interface AppState {
+  uploadDialogOpened: boolean;
 }
 
-export default App;
+export default class App extends React.Component<any, AppState> {
+  state = {
+    uploadDialogOpened: false
+  };
+  closeUploadDialog = () => {
+    this.setState({ uploadDialogOpened: false });
+  };
+  openUploadDialog = () => {
+    this.setState({ uploadDialogOpened: true });
+  };
+
+  render() {
+    return (
+      <React.Fragment>
+        <AddButton handleClick={this.openUploadDialog} />
+        <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
+      </React.Fragment>
+    );
+  }
+}
