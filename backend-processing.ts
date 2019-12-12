@@ -1,10 +1,14 @@
+const denv = require('dotenv').config()
 const mysql = require("mysql");
 const papa = require("Papaparse");
+let result = require('dotenv').config()
+console.log(result)
+console.log(`${process.env.DATABASE} ${process.env.HOST} ${process.env.USER} ${process.env.PASSWORD}`)
 const con = mysql.createConnection({
-  database: "localDatabase",
-  host: "localhost",
-  user: "root",
-  password: "ConnectedNetwork1"
+  database: process.env.DATABASE,
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASSWORD
 });
 con.connect(err => {
   if (err) {
@@ -58,10 +62,8 @@ export default class BackendProcessing {
         console.log(rows)
     })
   }
+
+  end_connection(){
+    con.end()
+  }
 }
-
-let input:string = ",,,,,,Periodic Updates for 2019 (Any Job Changes?),,,,\nName,Position,Employment Term,Current Employer,Position,Hyperlink Url,Q1 2019,Q2 2019,Q3 2019,Q4 2019,Comments\nStephen Schwarzman,Managing Investor,June-Dec 2017,The Blackstone Group,Co founder,https://www.linkedin.com/in/stephenschwarzman/,,\"Chairman, The Blackstone Group\",,,Would hire again at any point"
-
-let be = new BackendProcessing()
-be.processRawCSV(input)
-con.end()
