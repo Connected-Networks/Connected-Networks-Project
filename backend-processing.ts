@@ -1,20 +1,18 @@
-// const mysql = require("mysql");
- const papa = require("Papaparse");
-// const con = mysql.createConnection({
-//   //todo: replace later
-//   host: "localhost",
-//   user: "user",
-//   password: "password"
-// });
-// con.connect(err => {
-//   if (err) {
-//     console.log("Error connecting to database");
-//     return;
-//   }
-//  console.log("Connection established");
-//});
-//let input:string = ",,,,,,Periodic Updates for 2019 (Any Job Changes?),,,,\nName,Position,Employment Term,Current Employer,Position,Hyperlink Url,Q1 2019,Q2 2019,Q3 2019,Q4 2019,Comments\nStephen Schwarzman,Managing Investor,June-Dec 2017,The Blackstone Group,Co founder,https://www.linkedin.com/in/stephenschwarzman/,,\"Chairman, The Blackstone Group\",,,Would hire again at any point"
-//processRawCSV(input)
+const mysql = require("mysql");
+const papa = require("Papaparse");
+const con = mysql.createConnection({
+  database: "localDatabase",
+  host: "localhost",
+  user: "root",
+  password: "ConnectedNetwork1"
+});
+con.connect(err => {
+  if (err) {
+    console.log("Error connecting to database");
+    return;
+  }
+ console.log("Connection established");
+});
 
 interface DisplayPerson {
   name: String;
@@ -46,11 +44,24 @@ export default class BackendProcessing {
   }
   //Papaparse gives (maps?) with fields: Name,Position, Employment Term, etc.
   createCallForCSV(entry) {
-    let name = entry.Name;
-    let position = entry.Position;
-    let employer = entry["Current Employer"];
-    let term = entry["Employment Term"]
-    let call = `Recieved ${name} at ${employer} doing ${position} during ${term}`;
-    console.log(call);
+    // let name = entry.Name;
+    // let position = entry.Position;
+    // let employer = entry["Current Employer"];
+    // let term = entry["Employment Term"]
+    // let call = `Recieved ${name} at ${employer} doing ${position} during ${term}`;
+    // console.log(call);
+    let call = 'SELECT * FROM individuals'
+    con.query(call,(err,rows)=>{
+      if (err)
+        console.log('error from database: '+err)
+      else
+        console.log(rows)
+    })
   }
 }
+
+let input:string = ",,,,,,Periodic Updates for 2019 (Any Job Changes?),,,,\nName,Position,Employment Term,Current Employer,Position,Hyperlink Url,Q1 2019,Q2 2019,Q3 2019,Q4 2019,Comments\nStephen Schwarzman,Managing Investor,June-Dec 2017,The Blackstone Group,Co founder,https://www.linkedin.com/in/stephenschwarzman/,,\"Chairman, The Blackstone Group\",,,Would hire again at any point"
+
+let be = new BackendProcessing()
+be.processRawCSV(input)
+con.end()
