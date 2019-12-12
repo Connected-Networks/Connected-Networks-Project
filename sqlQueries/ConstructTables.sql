@@ -1,8 +1,7 @@
 CREATE TABLE Individuals (
 	IndividualID int NOT NULL AUTO_INCREMENT,
 	IndividualName varchar(255),
-	CurrentCompany varchar(255),
-	CurrentPosition varchar(255),
+    OriginalPostion varchar(255),
 	LinkedInUrl varchar(500),
 	Comments varchar(500),
     PRIMARY KEY (IndividualID)
