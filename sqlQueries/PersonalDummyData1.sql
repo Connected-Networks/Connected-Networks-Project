@@ -35,3 +35,13 @@ INSERT INTO FundCompanies (FundID, CompanyID) VALUES (1,1);
 INSERT INTO FundCompanies (FundID, CompanyID) VALUES (2,2);
 
 INSERT INTO FundCompanies (FundID, CompanyID) VALUES (2,3);
+
+/* -- This section was meant to be as test to see if duplicate ids were allowed. 
+INSERT INTO Individuals (
+	IndividualID,
+	IndividualName,
+    OriginalPostion,
+	LinkedInUrl,
+	Comments
+) VALUES (1, "Brain M", "Developer", "individualsUrl",  "No Comment");
+*/
