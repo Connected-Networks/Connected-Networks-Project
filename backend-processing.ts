@@ -2,8 +2,8 @@ const denv = require('dotenv').config()
 const mysql = require("mysql");
 const papa = require("Papaparse");
 let result = require('dotenv').config()
-console.log(result)
-console.log(`${process.env.DATABASE} ${process.env.HOST} ${process.env.USER} ${process.env.PASSWORD}`)
+//console.log(result)
+//console.log(`${process.env.DATABASE} ${process.env.HOST} ${process.env.USER} ${process.env.PASSWORD}`)
 const con = mysql.createConnection({
   database: process.env.DATABASE,
   host: process.env.HOST,
@@ -15,7 +15,7 @@ con.connect(err => {
     console.log("Error connecting to database");
     return;
   }
- console.log("Connection established");
+ console.log("Database connection established");
 });
 
 interface DisplayPerson {
