@@ -22,6 +22,24 @@ app.post("/csv", (req, res) => {
   }
 });
 
+app.post("/allPeople",(req,res)=>{
+  try {
+    let be = new BackendProcessing()
+    let data = be.retrievePeopleFromDatabase()
+    if (data==null){
+      res.sendStatus(500)
+      return
+    }
+    res.sendFile(data)
+    res.sendStatus(200)
+  }
+  catch (error){
+    console.log(error)
+    res.sendStatus(500)
+  }
+  
+})
+
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
