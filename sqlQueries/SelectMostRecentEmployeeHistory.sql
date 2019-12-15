@@ -4,10 +4,10 @@ FROM (
 	FROM employeehistory
 	ORDER BY IndividualID, EndDate DESC)
 AS TempOrderedTable
-GROUP BY TempOrderedTable.IndividualId;
+GROUP BY IndividualId;
 
 SELECT * 
 FROM employeehistory
-ORDER BY IndividualID, EndDate DESC;
-    
-SELECT * FROM employeeHistory;
+ORDER BY IndividualID, EndDate DESC
+GROUP BY IndividualID;
+
