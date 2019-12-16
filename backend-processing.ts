@@ -1,9 +1,10 @@
+import { MysqlError } from "mysql";
+
 const denv = require('dotenv').config()
 const mysql = require("mysql");
 const papa = require("Papaparse");
 let result = require('dotenv').config()
-//console.log(result)
-//console.log(`${process.env.DATABASE} ${process.env.HOST} ${process.env.USER} ${process.env.PASSWORD}`)
+//console.log(`${process.env.DATABASE},${process.env.HOST},${process.env.USER},${process.env.PASSWORD}`)
 const con = mysql.createConnection({
   database: process.env.DATABASE,
   host: process.env.HOST,
@@ -13,14 +14,18 @@ const con = mysql.createConnection({
 con.connect(err => {
   if (err) {
     console.log("Error connecting to database");
+    console.log(err)
     return;
   }
  console.log("Database connection established");
 });
 
 interface DisplayPerson {
-  name: String;
-  comment: String;
+  name: string;
+  company: string;
+  position: string;
+  comment: string;
+  hyperlink: string;
 }
 
 export default class BackendProcessing {
@@ -42,29 +47,28 @@ export default class BackendProcessing {
     });
   }
 
-  retrievePeopleFromDatabase():DisplayPerson[] {
-    let response: DisplayPerson[];
-    let done = false
-    let error = false
-    con.query("CALL <fill in later>", (err, rows) => {
-      if (err){
-        done = true
-        error = true
-        return
+  async retrievePeopleFromDatabase():Promise<DisplayPerson[]> {
+    return new Promise<DisplayPerson[]>((resolve,reject)=>{
+      let response = new Array<DisplayPerson>();
+      let done = false;
+      con.query("CALL DisplayAllEmployeeCurrents()",(err,rows)=>{
+      console.log(rows)
+      let place = -1
+      for (let row of rows[0]){
+        place += 1
+        console.log("row: "+row)
+        let dp = {
+        name : row.IndividualName,
+        company : row.CompanyName,
+        position : row.PositionName,
+        hyperlink : row.LinkedInUrl,
+        comment : row.Comments,
       }
-      rows[0].foreach(row => {
-        let dp: DisplayPerson;
-        dp.name = row.name;
-        //fill in lines
-        dp.comment = row.comment;
-        response.push(dp);
-      });
-      done = true
-    });
-    while (!done){}
-    if (error)
-      return null
-    return response
+        response[place] = dp;
+      
+      }
+      resolve(response)})
+    })
   }
   //Papaparse gives (maps?) with fields: Name,Position, Employment Term, etc.
   createCallForCSV(entry):string {
@@ -135,6 +139,7 @@ export default class BackendProcessing {
 
 
   end_connection(){
+    console.log("attempt to close connection")
     con.end()
   }
 }

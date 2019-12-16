@@ -22,16 +22,18 @@ app.post("/csv", (req, res) => {
   }
 });
 
-app.post("/allPeople",(req,res)=>{
+app.post("/people",(req,res)=>{
   try {
     let be = new BackendProcessing()
-    let data = be.retrievePeopleFromDatabase()
-    if (data==null){
-      res.sendStatus(500)
-      return
-    }
-    res.sendFile(data)
-    res.sendStatus(200)
+    let data = be.retrievePeopleFromDatabase().then(results=>{
+      if (!results){
+        res.sendStatus(500)
+      }
+      else{
+        res.json({data:results})
+        res.sendStatus(200)
+      }
+    })
   }
   catch (error){
     console.log(error)

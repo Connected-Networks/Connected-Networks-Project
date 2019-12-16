@@ -5,7 +5,7 @@ import BackendProcessing from './backend-processing'
 
 
 
-function connect_to_database(){
+function test_connect_to_database(){
     let input:string = ",,,,,,Periodic Updates for 2019 (Any Job Changes?),,,,\nName,Position,Employment Term,Current Employer,Position2,Hyperlink Url,Q1 2019,Q2 2019,Q3 2019,Q4 2019,Comments\nStephen Schwarzman,Managing Investor,June-Dec 2017,The Blackstone Group,Co founder,https://www.linkedin.com/in/stephenschwarzman/,,\"Chairman, The Blackstone Group\",,,Would hire again at any point"
     let be = new BackendProcessing()
     be.processRawCSV(input)
@@ -19,4 +19,12 @@ function test_date_parser(){
     be.end_connection()
     console.log(answer)
 }
-connect_to_database()
+
+function test_retrieve_from_database(){
+    let be = new BackendProcessing()
+    be.retrievePeopleFromDatabase().then(result=>{
+    console.log("result: "+result)
+    be.end_connection()
+    })
+}
+test_retrieve_from_database()
