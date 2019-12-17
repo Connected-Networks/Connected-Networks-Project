@@ -11,29 +11,70 @@ interface TableState {
     columns: Array<Column<Row>>;
     data: Row[];
 }
+
+interface DisplayPerson {
+  name: string;
+  company: string;
+  position: string;
+  comment: string;
+  hyperlink: string;
+}
+
+interface TableState {
+  people: DisplayPerson[];
+  columns: Array<Column<Row>>;
+  data: Row[];
+}
+
   
 export default class PeopleTable extends React.Component<any, TableState> {
 
     state: TableState = {
-        columns: [
-            { title: 'Name', field: 'name' },
-            { title: 'Company', field: 'companyAndPosition' }
-          ],
-          data: []
+      people: [],
+      columns: [
+          { title: 'Name', field: 'name' },
+          { title: 'Company', field: 'companyAndPosition' }
+        ],
+        data: []
     };
 
-    getPeople = () => {
+
+    /**
+     * This method sends an AJAX get request to get people
+     */
+    async getPeople() {
         axios
           .get("/people")
-          .then(function(response) {
-            
+          .then( (response) => {
+            let people: DisplayPerson[] = response.data;
+
+            this.setState( {people: people});
+
             console.log(response);
+
+            return people;
           })
           .catch(function(error) {
             console.log(error);
           });
       };
 
+    /**
+     * This takes in the local data state on poeple and refreshes the table based on that.
+     */
+    refreshTable() {
+      // Clear data
+      this.setState( { data: [] } );
+
+      this.state.people.forEach( person => {
+        let r: Row = {
+          name: person.name,
+          companyAndPosition: person.company.concat(" | " + person.position)
+      }
+        this.addRow(r);
+      });
+
+    }
       /**
        * This method takes two rows and updates the old row on the table with the new one
        * 
@@ -83,7 +124,14 @@ export default class PeopleTable extends React.Component<any, TableState> {
                   }, 1000)
                 })
       }
-      
+
+      /**
+       * Once this loaded, this code will run.
+       */
+      componentDidMount() {
+        this.getPeople();
+        this.refreshTable();
+      }
 
     render() {
       return (
