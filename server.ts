@@ -22,7 +22,7 @@ app.post("/csv", (req, res) => {
   }
 });
 
-app.post("/people",(req,res)=>{
+app.get("/people",(req,res)=>{
   try {
     let be = new BackendProcessing()
     let data = be.retrievePeopleFromDatabase().then(results=>{
