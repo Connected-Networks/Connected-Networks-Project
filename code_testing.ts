@@ -27,4 +27,4 @@ function test_retrieve_from_database(){
     be.end_connection()
     })
 }
-test_retrieve_from_database()
+//test_retrieve_from_database()
