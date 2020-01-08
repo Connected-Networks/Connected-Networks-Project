@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const papa = require("Papaparse");
+const papa = require("papaparse");
 const app = express();
 const port = process.env.PORT || 5000;
 
