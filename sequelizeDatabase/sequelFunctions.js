@@ -11,5 +11,3 @@ insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
         console.log('Individual Created: ',user);
     }).catch(err => console.error('Error in insertPerson', err));
 }
-
-insertPerson('FunctionTest','Position','A LinkedIn Url', 'Comments from insertPerson');

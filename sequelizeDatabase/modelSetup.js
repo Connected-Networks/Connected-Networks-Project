@@ -44,7 +44,8 @@ sequelize.authenticate()
     CompanyID: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      primaryKey : true
+      primaryKey : true,
+      autoIncrement: true
     },
     CompanyName: {
       type: Sequelize.STRING
@@ -58,7 +59,8 @@ sequelize.authenticate()
     FundID: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
       },
     FundName: {
       type: Sequelize.STRING
@@ -72,7 +74,8 @@ sequelize.authenticate()
     HistoryID: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     IndividualID: {
       type: Sequelize.INTEGER,
@@ -107,7 +110,8 @@ sequelize.authenticate()
       FundCompanyID: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
       FundID: {
         type: Sequelize.INTEGER,
