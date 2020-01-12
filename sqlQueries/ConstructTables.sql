@@ -13,13 +13,15 @@ CREATE TABLE Companies (
     PRIMARY KEY (CompanyID)
 );
 CREATE TABLE EmployeeHistory (
+	HistoryID int NOT NULL AUTO_INCREMENT,
 	IndividualID int NOT NULL,
 	CompanyID int NOT NULL,
 	PositionName varchar(255),
 	StartDate date,
 	EndDate date,
     FOREIGN KEY (IndividualID) REFERENCES Individuals (IndividualID),
-    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID)
+    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID),
+	PRIMARY KEY (HistoryID)
 );
 
 CREATE TABLE Funds (
@@ -29,8 +31,10 @@ CREATE TABLE Funds (
 );
 
 CREATE TABLE FundCompanies (
+	FundCompanyID int NOT NULL AUTO_INCREMENT,
 	FundID int NOT NULL,
 	CompanyID int NOT NULL,
     FOREIGN KEY (FundID) REFERENCES Funds(FundID),
-    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID)
+    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID),
+	PRIMARY KEY (FundCompanyID)
 );
