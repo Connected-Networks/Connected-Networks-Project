@@ -124,4 +124,12 @@ sequelize.authenticate()
             key: 'CompanyID'
         }
       },
-  })
+  });
+
+  module.exports = { //This determines what can be used from this custom module.
+    Individuals,
+    Companies,
+    Funds,
+    EmployeeHistory,
+    FundCompany
+  }
