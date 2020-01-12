@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node server.ts"
+    "start": "ts-node server.ts",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
@@ -29,9 +30,11 @@
     "express": "^4.17.1",
     "material-table": "^1.54.2",
     "mysql": "^2.17.1",
+    "mysql2": "^2.1.0",
     "papaparse": "^5.1.0",
     "react-script": "^2.0.5",
     "react-scripts": "^3.3.0",
+    "sequelize": "^5.21.3",
     "styled-components": "^4.4.1",
     "ts-node": "^8.5.4",
     "tsc": "^1.20150623.0",
