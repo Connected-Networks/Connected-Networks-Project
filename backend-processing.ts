@@ -4,21 +4,7 @@ const denv = require('dotenv').config()
 const mysql = require("mysql");
 const papa = require("Papaparse");
 let result = require('dotenv').config()
-//console.log(`${process.env.DATABASE},${process.env.HOST},${process.env.USER},${process.env.PASSWORD}`)
-const con = mysql.createConnection({
-  database: process.env.DATABASE,
-  host: process.env.HOST,
-  user: process.env.USER,
-  password: process.env.PASSWORD
-});
-con.connect(err => {
-  if (err) {
-    console.log("Error connecting to database");
-    console.log(err)
-    return;
-  }
- console.log("Database connection established");
-});
+
 
 interface DisplayPerson {
   name: string;
@@ -29,25 +15,57 @@ interface DisplayPerson {
 }
 
 export default class BackendProcessing {
-  processRawCSV(data: string) {
-    //First line is commented and ignored
-    //Second line is treated as header
-    var results = papa.parse("#" + data, { header: true, comments: "#" });
-    results.data.forEach(element => {
-      let pcall = this.createCallForCSV(element);
-      if (pcall!=null){
-        console.log(`Sending to db: ${pcall}`)
-        con.query(pcall,(err,rows)=>{
-        if (err)
-          console.log('error from database: '+err)
-        else
-          console.log(rows)
-        })
-      }
+
+  async create_connection_to_database():Promise<any>{
+    let con = mysql.createConnection({
+      database: process.env.DATABASE,
+      host: process.env.HOST,
+      user: process.env.USER,
+      password: process.env.PASSWORD
     });
+    return new Promise((resolve,reject)=>
+      con.connect((err) => {
+        if (err) {
+          console.log("Error connecting to database");
+          console.log(err)
+          reject(err)
+        }
+        else{
+          console.log("Database connection established");
+          console.log()
+          resolve(con)
+        }
+    })
+    )
   }
 
+  async processRawCSV(data: string) {
+    //First line is commented and ignored
+    //Second line is treated as header
+    let con = await (this.create_connection_to_database())
+    var results = papa.parse("#" + data, { header: true, comments: "#" });
+    await (results.data.forEach(element => {
+      this.call_from_csv_line(element,con)
+    }))
+    this.end_connection(con)
+  }
+  
+  async call_from_csv_line(element,con){
+    let pcall = this.createCallForCSV(element);
+    if (pcall!=null){
+      console.log(`Sending to db: ${pcall}`)
+      con.query(pcall,(err,rows)=>{
+      if (err)
+        console.log('error from database: '+err)
+      else
+        console.log(rows)
+      })
+    }
+  }
+
+
   async retrievePeopleFromDatabase():Promise<DisplayPerson[]> {
+    let con = await this.create_connection_to_database()
     return new Promise<DisplayPerson[]>((resolve,reject)=>{
       let response = new Array<DisplayPerson>();
       let done = false;
@@ -67,6 +85,7 @@ export default class BackendProcessing {
         response[place] = dp;
       
       }
+      this.end_connection(con)
       resolve(response)})
     })
   }
@@ -134,11 +153,22 @@ export default class BackendProcessing {
     return `${s[s.length-1]}-${mis}-01`
   }
 
+  async check_connection():Promise<boolean> {
+    let con = (await this.create_connection_to_database())
+    return new Promise<boolean>((resolve,reject)=>{
+      con.query("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'heroku_2396736b79200ba'",(err,rows)=>{
+        if (err){
+          this.end_connection(con)
+          reject(err)
+        }
+        this.end_connection(con)
+        resolve(true)
+      })
+    })
+  }
 
 
-
-
-  end_connection(){
+  end_connection(con){
     console.log("attempt to close connection")
     con.end()
   }
