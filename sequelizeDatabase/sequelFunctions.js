@@ -1,4 +1,4 @@
-const models = require('/modelSetup.js');
+const models = require('./modelSetup');
 
 //This function inserts an individual into the Individuals Table.
 insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
@@ -12,3 +12,4 @@ insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
     }).catch(err => console.error('Error in insertPerson', err));
 }
 
+insertPerson('FunctionTest','Position','A LinkedIn Url', 'Comments from insertPerson');
