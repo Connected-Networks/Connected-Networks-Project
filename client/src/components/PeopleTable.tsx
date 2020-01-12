@@ -59,8 +59,8 @@ export default class PeopleTable extends React.Component<any, TableState> {
 
     this.state.people.forEach(person => {
       let r: Row = {
-        name: person.IndividualName,
-        companyAndPosition: person.CompanyName.concat(" | " + person.PositionName)
+        name: person.name,
+        companyAndPosition: person.company.concat(" | " + person.position)
       };
       this.addRow(r);
     });
