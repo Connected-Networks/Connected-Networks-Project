@@ -4,7 +4,7 @@ const models = require('./modelSetup');
 insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
     models.Individuals.create({
         IndividualName: IndividualName,
-        OriginalPosition: OriginalPosition,
+        OriginalPostion: OriginalPosition,
         LinkedInUrl: LinkedInUrl,
         Comments: Comments
     }).then((user) => {

@@ -20,7 +20,8 @@ sequelize.authenticate()
     IndividualID: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      primaryKey : true
+      primaryKey : true,
+      autoIncrement: true
     },
     IndividualName: {
       type: Sequelize.STRING
