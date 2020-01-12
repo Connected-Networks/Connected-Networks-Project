@@ -43,7 +43,7 @@ export default class PeopleTable extends React.Component<any, TableState> {
     return new Promise<DisplayPerson[]>(resolve => {
       axios
         .get("/people")
-        .then(response => resolve(response.data))
+        .then(response => resolve(response.data.data))
         .catch(function(error) {
           console.log(error);
         });
@@ -117,10 +117,12 @@ export default class PeopleTable extends React.Component<any, TableState> {
    * Once this loaded, this code will run.
    */
   componentDidMount() {
-    this.getPeople().then(people => {
-      this.setState({ people });
-      this.refreshTable();
-    });
+    this.getPeople()
+      .then(people => {
+        this.setState({ people });
+        this.refreshTable();
+      })
+      .catch(() => {});
   }
 
   render() {
