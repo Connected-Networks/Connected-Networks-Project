@@ -13,11 +13,11 @@ interface TableState {
 }
 
 interface DisplayPerson {
-  IndividualName: string;
-  CompanyName: string;
-  PositionName: string;
-  Comments: string;
-  LinkedInUrl: string;
+  name: string;
+  company: string;
+  position: string;
+  comment: string;
+  hyperlink: string;
 }
 
 interface TableState {
@@ -41,42 +41,17 @@ export default class PeopleTable extends React.Component<any, TableState> {
    */
   getPeople = async () => {
     return new Promise<DisplayPerson[]>(resolve => {
-      resolve([
-        {
-          IndividualName: "Riley Mongoven",
-          CompanyName: "Currently at KU",
-          PositionName: "Currently a sophmore",
-          Comments: "This would be the comments",
-          LinkedInUrl: "This would be a URL"
-        },
-        {
-          IndividualName: "Stephen Schwarzman",
-          CompanyName: "The Blackstone Group",
-          PositionName: "Co founder",
-          Comments: "Would hire again at any point",
-          LinkedInUrl: "https://www.linkedin.com/in/stephenschwarzman/"
-        }
-      ]);
+      axios
+        .get("/people")
+        .then(response => resolve(response.data))
+        .catch(function(error) {
+          console.log(error);
+        });
     });
-
-    // axios
-    //   .get("/people")
-    //   .then(response => {
-    //     let people: DisplayPerson[] = response.data;
-
-    //     this.setState({ people: people });
-
-    //     console.log(response);
-
-    //     return people;
-    //   })
-    //   .catch(function(error) {
-    //     console.log(error);
-    //   });
   };
 
   /**
-   * This takes in the local data state on poeple and refreshes the table based on that.
+   * This takes in the local data state on people and refreshes the table based on that.
    */
   refreshTable() {
     // Clear data
