@@ -77,7 +77,7 @@ export default class PeopleTable extends React.Component<any, TableState> {
    * @param newData
    * @param oldData
    */
-  async updateRow(newData: Row, oldData?: Row | undefined): Promise<void> {
+  updateRow = async (newData: Row, oldData?: Row | undefined): Promise<void> => {
     return new Promise(resolve => {
       setTimeout(() => {
         resolve();
@@ -90,7 +90,7 @@ export default class PeopleTable extends React.Component<any, TableState> {
         }
       }, 600);
     });
-  }
+  };
 
   addRow = async (newRow: Row): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
@@ -105,11 +105,11 @@ export default class PeopleTable extends React.Component<any, TableState> {
     });
   };
 
-  async deleteRow(oldData: Row): Promise<void> {
+  deleteRow = async (oldData: Row): Promise<void> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         {
-          let data = this.state.data;
+          let data = this.state.data.slice();
           const index = data.indexOf(oldData);
           data.splice(index, 1);
           this.setState({ data }, () => resolve());
@@ -117,7 +117,7 @@ export default class PeopleTable extends React.Component<any, TableState> {
         resolve();
       }, 1000);
     });
-  }
+  };
 
   /**
    * Once this loaded, this code will run.
