@@ -27,4 +27,44 @@ function test_retrieve_from_database(){
     be.end_connection()
     })
 }
-//test_retrieve_from_database()
+
+async function test_continuous_connection(){
+    let be = new BackendProcessing()
+    let wait = 57
+    console.log("testing connection with increasing wait time")
+    let b = true
+    while (b){
+        b = (await check_connection_once(be))
+        wait+=1
+        console.log("wait: "+String(wait) + " seconds")
+        await delay(wait*1000)
+    }
+
+
+}
+async function check_connection_once(be:BackendProcessing):Promise<boolean>{
+    return new Promise<boolean>((resolve,reject)=>{
+        let p = be.check_connection()
+        p.then(b=>{
+            if (b){
+                console.log("successful connection")
+                resolve(true)
+            }
+            else{
+                console.log("no successul connection")
+                resolve(false)
+            }
+        })
+        p.catch(err=>{
+            console.log("error from database: "+String(err))
+            resolve(false)
+        })
+    })
+}
+
+function delay(ms: number)
+{
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+test_continuous_connection()

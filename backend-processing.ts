@@ -134,9 +134,17 @@ export default class BackendProcessing {
     return `${s[s.length-1]}-${mis}-01`
   }
 
-
-
-
+  async check_connection():Promise<boolean> {
+    return new Promise<boolean>((resolve,reject)=>{
+      con.query("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'heroku_2396736b79200ba'",(err,rows)=>{
+        if (err){
+          reject(err)
+        }
+        //console.log(rows)
+        resolve(true)
+      })
+    })
+  }
 
   end_connection(){
     console.log("attempt to close connection")
