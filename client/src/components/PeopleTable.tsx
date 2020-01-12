@@ -13,11 +13,11 @@ interface TableState {
 }
 
 interface DisplayPerson {
-  name: string;
-  company: string;
-  position: string;
-  comment: string;
-  hyperlink: string;
+  IndividualName: string;
+  CompanyName: string;
+  PositionName: string;
+  Comments: string;
+  LinkedInUrl: string;
 }
 
 interface TableState {
@@ -39,22 +39,41 @@ export default class PeopleTable extends React.Component<any, TableState> {
   /**
    * This method sends an AJAX get request to get people
    */
-  async getPeople() {
-    axios
-      .get("/people")
-      .then(response => {
-        let people: DisplayPerson[] = response.data;
+  getPeople = async () => {
+    return new Promise<DisplayPerson[]>(resolve => {
+      resolve([
+        {
+          IndividualName: "Riley Mongoven",
+          CompanyName: "Currently at KU",
+          PositionName: "Currently a sophmore",
+          Comments: "This would be the comments",
+          LinkedInUrl: "This would be a URL"
+        },
+        {
+          IndividualName: "Stephen Schwarzman",
+          CompanyName: "The Blackstone Group",
+          PositionName: "Co founder",
+          Comments: "Would hire again at any point",
+          LinkedInUrl: "https://www.linkedin.com/in/stephenschwarzman/"
+        }
+      ]);
+    });
 
-        this.setState({ people: people });
+    // axios
+    //   .get("/people")
+    //   .then(response => {
+    //     let people: DisplayPerson[] = response.data;
 
-        console.log(response);
+    //     this.setState({ people: people });
 
-        return people;
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-  }
+    //     console.log(response);
+
+    //     return people;
+    //   })
+    //   .catch(function(error) {
+    //     console.log(error);
+    //   });
+  };
 
   /**
    * This takes in the local data state on poeple and refreshes the table based on that.
@@ -65,8 +84,8 @@ export default class PeopleTable extends React.Component<any, TableState> {
 
     this.state.people.forEach(person => {
       let r: Row = {
-        name: person.name,
-        companyAndPosition: person.company.concat(" | " + person.position)
+        name: person.IndividualName,
+        companyAndPosition: person.CompanyName.concat(" | " + person.PositionName)
       };
       this.addRow(r);
     });
@@ -123,8 +142,10 @@ export default class PeopleTable extends React.Component<any, TableState> {
    * Once this loaded, this code will run.
    */
   componentDidMount() {
-    this.getPeople();
-    this.refreshTable();
+    this.getPeople().then(people => {
+      this.setState({ people });
+      this.refreshTable();
+    });
   }
 
   render() {
