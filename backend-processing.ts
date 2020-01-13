@@ -45,6 +45,7 @@ export default class BackendProcessing {
     let con = await (this.create_connection_to_database())
     var results = papa.parse("#" + data, { header: true, comments: "#" });
     await (results.data.forEach(element => {
+      if (element["Name"]!=null)
       this.call_from_csv_line(element,con)
     }))
     this.end_connection(con)
@@ -91,19 +92,23 @@ export default class BackendProcessing {
   }
   //Papaparse gives (maps?) with fields: Name,Position, Employment Term, etc.
   createCallForCSV(entry):string {
-    let name : String = entry.Name;
+    let name : String = entry["Name"];
     if (name.length<1){
       return null
     }
-    let firstPosition = entry.Position;
-    let position = entry.Position2;
-    let employer = entry["Current Employer"];
+    let firstPosition = entry["Portfolio Company Position"];
+    let position = entry["New Position"]
+    let employer = entry["New Employer"];
     let term = entry["Employment Term"]
+    term = this.convertDates(term)
+    let sterm = ""
+    let eterm = ""
+    if (term!=null){
+      sterm = term[0]
+      eterm = term[1]
+    }
     let url = entry["Hyperlink Url"]
     let comments = entry["Comments"]
-    term = this.convertDates(term)
-    let sterm = term[0]
-    let eterm = term[1]
     let call = `CALL ImportFromCvsLine("${name}","${firstPosition}","${sterm}","${eterm}","${employer}","${position}","${url}","${comments}")`;
     //console.log(call);
     console.log(entry)
