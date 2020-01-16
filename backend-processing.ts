@@ -3,7 +3,7 @@ import { MysqlError } from "mysql";
 const denv = require("dotenv").config();
 const mysql = require("mysql");
 const papa = require("papaparse");
-let result = require("dotenv").config();
+const models = require('./sequelizeDatabase/modelSetup');
 
 interface DisplayPerson {
   name: string;
