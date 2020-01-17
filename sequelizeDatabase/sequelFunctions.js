@@ -13,31 +13,32 @@ insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
 }
 
 //---------------FindAll: Get all data from the table --------------//
+//--------NOTE: These functions return Promises. Use ".then()" after calling them.
 
 getAllIndividuals = () => {
-    models.Individuals.findAll().then((individuals) => {
+    return models.Individuals.findAll().then((individuals) => {
         return individuals;
-    });
+    }).catch(err => console.error(err));
 };
 getAllCompanies = () => {
-    models.Companies.findAll().then((companies) => {
+    return models.Companies.findAll().then((companies) => {
         return companies;
-    });
+    }).catch(err => console.error(err));
 };
 getAllFunds = () => {
-    models.Funds.findAll().then((funds) => {
+    return models.Funds.findAll().then((funds) => {
         return funds;
-    });
+    }).catch(err => console.error(err));
 };
 getAllEmployeeHistory = () => {
-    models.EmployeeHistory.findAll().then((employeeHistory) => {
+    return models.EmployeeHistory.findAll().then((employeeHistory) => {
         return employeeHistory;
-    });
+    }).catch(err => console.error(err));
 };
 getAllFundCompany = () => {
-    models.FundCompany.findAll().then((fundCompany) => {
+    return models.FundCompany.findAll().then((fundCompany) => {
         return fundCompany;
-    });
+    }).catch(err => console.error(err));
 };
 
 module.exports = {
