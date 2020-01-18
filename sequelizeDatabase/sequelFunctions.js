@@ -1,17 +1,5 @@
 const models = require('./modelSetup');
 
-//This function inserts an individual into the Individuals Table.
-insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
-    models.Individuals.create({
-        IndividualName: IndividualName,
-        OriginalPostion: OriginalPosition,
-        LinkedInUrl: LinkedInUrl,
-        Comments: Comments
-    }).then((user) => {
-        console.log('Individual Created: ',user);
-    }).catch(err => console.error('Error in insertPerson', err));
-}
-
 //---------------FindAll: Get all data from the table --------------//
 //--------NOTE: These functions return Promises. Use ".then()" after calling them.
 
@@ -41,6 +29,31 @@ getAllFundCompany = () => {
     }).catch(err => console.error(err));
 };
 
+//--------------------Insert into Table Functions-----------//
+
+insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
+    models.Individuals.create({
+        IndividualName: IndividualName,
+        OriginalPostion: OriginalPosition,
+        LinkedInUrl: LinkedInUrl,
+        Comments: Comments
+    }).then((user) => {
+        console.log('Individual Created: ',user);
+    }).catch(err => console.error('Error in insertPerson', err));
+}
+
+insertCompany = (CompanyName) => {
+    models.Companies.create({
+        CompanyName: CompanyName
+    }).then((company) => {
+        console.log('Company Created: ', company);
+    }).catch(err => console.error('Error in insertCompany',err));
+}
+
+
+
+
+getAllIndividuals().then((test) => {console.log(JSON.stringify(test,null,4))});
 module.exports = {
     getAllIndividuals,
     getAllCompanies,
