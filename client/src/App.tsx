@@ -24,8 +24,8 @@ export default class App extends React.Component<any, AppState> {
     return (
       <React.Fragment>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
-        <AddButton handleClick={this.openUploadDialog} />
         <PeopleTable />
+        <AddButton handleClick={this.openUploadDialog} />
         <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
       </React.Fragment>
     );
