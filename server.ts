@@ -45,6 +45,12 @@ app.put("/people", (req, res) => {
   res.sendStatus(200);
 });
 
+app.delete("/people/:id", (req, res) => {
+  //delete person
+  console.log("person deleted with id: " + req.params.id);
+  res.sendStatus(200);
+});
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });

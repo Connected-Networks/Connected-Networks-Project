@@ -127,14 +127,31 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
   deleteRow = async (oldData: Row): Promise<void> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        {
+        this.deletePersonOnServer(oldData).then(() => {
           let data = this.state.data.slice();
           const index = data.indexOf(oldData);
           data.splice(index, 1);
           this.setState({ data }, () => resolve());
-        }
-        resolve();
+        });
       }, 1000);
+    });
+  };
+
+  deletePersonOnServer = async (oldData: Row) => {
+    return new Promise((resolve, reject) => {
+      const randomID = 5; //Temp until we make ids for people
+      axios
+        .delete(`/people/${randomID}`)
+        .then(response => {
+          if (response.status === 200) {
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     });
   };
 
