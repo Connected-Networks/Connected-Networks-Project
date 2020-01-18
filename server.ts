@@ -39,6 +39,12 @@ app.get("/people", (req, res) => {
   }
 });
 
+app.put("/people", (req, res) => {
+  //update person
+  console.log("person updated");
+  res.sendStatus(200);
+});
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
