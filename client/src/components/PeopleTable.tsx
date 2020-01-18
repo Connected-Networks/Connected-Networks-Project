@@ -1,6 +1,7 @@
 import React from "react";
 import MaterialTable, { Column } from "material-table";
 import axios from "axios";
+import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 
 interface Row {
   name: string;
@@ -20,13 +21,17 @@ interface DisplayPerson {
   hyperlink: string;
 }
 
+interface TableProps {
+  uploadHandler: Function;
+}
+
 interface TableState {
   people: DisplayPerson[];
   columns: Array<Column<Row>>;
   data: Row[];
 }
 
-export default class PeopleTable extends React.Component<any, TableState> {
+export default class PeopleTable extends React.Component<TableProps, TableState> {
   state: TableState = {
     people: [],
     columns: [
@@ -86,6 +91,10 @@ export default class PeopleTable extends React.Component<any, TableState> {
     });
   };
 
+  showAddOptions = (newRow: Row): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {});
+  };
+
   addRow = async (newRow: Row): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
@@ -131,35 +140,18 @@ export default class PeopleTable extends React.Component<any, TableState> {
         columns={this.state.columns}
         data={this.state.data}
         editable={{
-          onRowAdd: this.addRow,
+          onRowAdd: this.showAddOptions,
           onRowUpdate: this.updateRow,
           onRowDelete: this.deleteRow
         }}
-        // editable={{
-        //   onRowAdd: newData =>
-        //     new Promise(resolve => {
-        //       setTimeout(() => {
-        //         resolve();
-        //         this.setState(prevState => {
-        //           const data = [...prevState.data];
-        //           data.push(newData);
-        //           return { ...prevState, data };
-        //         });
-        //       }, 600);
-        //     }),
-        //   onRowUpdate: this.updateRow,
-        //   onRowDelete: oldData =>
-        //     new Promise(resolve => {
-        //       setTimeout(() => {
-        //         resolve();
-        //         this.setState(prevState => {
-        //           const data = [...prevState.data];
-        //           data.splice(data.indexOf(oldData), 1);
-        //           return { ...prevState, data };
-        //         });
-        //       }, 600);
-        //     }),
-        // }}
+        actions={[
+          {
+            icon: () => <ImportIcon fill={"grey"} />,
+            tooltip: "Upload CSV",
+            isFreeAction: true,
+            onClick: (event, rowData) => this.props.uploadHandler()
+          }
+        ]}
       />
     );
   }
