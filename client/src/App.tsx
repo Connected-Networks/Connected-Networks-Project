@@ -1,7 +1,5 @@
 import * as React from "react";
 import "typeface-roboto";
-
-import AddButton from "./components/AddButton";
 import UploadDialog from "./components/UploadDialog";
 import PeopleTable from "./components/PeopleTable";
 
@@ -24,8 +22,7 @@ export default class App extends React.Component<any, AppState> {
     return (
       <React.Fragment>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
-        <PeopleTable />
-        <AddButton handleClick={this.openUploadDialog} />
+        <PeopleTable uploadHandler={this.openUploadDialog} />
         <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
       </React.Fragment>
     );
