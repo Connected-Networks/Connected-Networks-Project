@@ -45,6 +45,12 @@ app.put("/people", (req, res) => {
   res.sendStatus(200);
 });
 
+app.post("/people", (req, res) => {
+  //add person
+  console.log("person added");
+  res.sendStatus(200);
+});
+
 app.delete("/people/:id", (req, res) => {
   //delete person
   console.log("person deleted with id: " + req.params.id);

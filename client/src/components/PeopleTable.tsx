@@ -68,7 +68,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
         name: person.name,
         companyAndPosition: person.company.concat(" | " + person.position)
       };
-      this.addRow(r);
+      this.addPersonToTable(r);
     });
   }
   /**
@@ -115,12 +115,35 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         if (newRow) {
-          const data = this.state.data.slice();
-          data.push(newRow);
-          this.setState({ data }, () => resolve());
+          this.addPersonOnServer(newRow).then(() => {
+            this.addPersonToTable(newRow);
+            resolve();
+          });
         }
-        resolve();
       }, 1000);
+    });
+  };
+
+  addPersonToTable = (newRow: Row) => {
+    const data = this.state.data.slice();
+    data.push(newRow);
+    this.setState({ data });
+  };
+
+  addPersonOnServer = async (newRow: Row) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .post(`/people`, { newRow })
+        .then(response => {
+          if (response.status === 200) {
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     });
   };
 
