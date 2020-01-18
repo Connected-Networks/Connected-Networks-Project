@@ -32,32 +32,57 @@ getAllFundCompany = () => {
 //--------------------Insert into Table Functions-----------//
 
 insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
-    models.Individuals.create({
+    return models.Individuals.create({
         IndividualName: IndividualName,
         OriginalPostion: OriginalPosition,
         LinkedInUrl: LinkedInUrl,
         Comments: Comments
     }).then((user) => {
-        console.log('Individual Created: ',user);
+        //console.log('Individual Created: ',user);
+        return user;
     }).catch(err => console.error('Error in insertPerson', err));
 }
 
 insertCompany = (CompanyName) => {
-    models.Companies.create({
+    return models.Companies.create({
         CompanyName: CompanyName
     }).then((company) => {
-        console.log('Company Created: ', company);
+        //console.log('Company Created: ', company);
+        return company;
     }).catch(err => console.error('Error in insertCompany',err));
 }
 
+insertEmployeeHistory = (IndividualID, CompanyID, PositionName, StartDate, EndDate) => {
+    return models.EmployeeHistory.create({
+        IndividualID: IndividualID,
+        CompanyID: CompanyID,
+        PositionName: PositionName,
+        StartDate: StartDate,
+        EndDate: EndDate
+    }).then((history) =>{
+        //console.log('History Added: ', history);
+        return history;
+    }).catch(err => console.error('Error in insertEmployeeHistory',err));
+}
+
+insertFromCsvLine = (EmployeeName, OriginalPostion, OriginalStartDate, OriginalEndDate, CurrentEmployer, CurrentPostion, LinkedInUrl, Comments) =>{
+    insertPerson(EmployeeName, OriginalPostion, LinkedInUrl, Comments).then((newPerson) => {
+        insertCompany(CurrentEmployer).then((newCompany) => {
+            insertEmployeeHistory(newPerson.IndividualID, newCompany.CompanyID, CurrentPostion, OriginalStartDate, OriginalEndDate)
+        })
+    });
+}
 
 
-
-getAllIndividuals().then((test) => {console.log(JSON.stringify(test,null,4))});
+//getAllIndividuals().then((test) => {console.log(JSON.stringify(test,null,4))});
 module.exports = {
     getAllIndividuals,
     getAllCompanies,
     getAllFunds,
     getAllEmployeeHistory,
-    getAllFundCompany
+    getAllFundCompany,
+    insertPerson,
+    insertCompany,
+    insertEmployeeHistory,
+    insertFromCsvLine
 }
