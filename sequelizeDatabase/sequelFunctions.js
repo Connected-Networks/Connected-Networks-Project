@@ -71,8 +71,19 @@ insertFromCsvLine = (EmployeeName, OriginalPostion, OriginalStartDate, OriginalE
     });
 }
 
+getIndividualEmployeeHistory = (IndividualID) => {
+    return models.EmployeeHistory.findAll({
+        where: {IndividualID: IndividualID},
+        order: [['EndDate', 'DESC']]
+    });
+}
 
-//getAllIndividuals().then((test) => {console.log(JSON.stringify(test,null,4))});
+getIndividualCurrentEmployement = (IndividualID) => {
+    return getIndividualEmployeeHistory(IndividualID).then((IndividualHistory) => {
+        return IndividualHistory[0];
+    })
+}
+
 module.exports = {
     getAllIndividuals,
     getAllCompanies,
@@ -82,5 +93,7 @@ module.exports = {
     insertPerson,
     insertCompany,
     insertEmployeeHistory,
-    insertFromCsvLine
+    insertFromCsvLine,
+    getIndividualEmployeeHistory,
+    getIndividualCurrentEmployement
 }
