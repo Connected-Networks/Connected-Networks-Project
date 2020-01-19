@@ -40,9 +40,22 @@ export default class BackendProcessing {
     //First line is commented and ignored
     //Second line is treated as header
     let con = await this.create_connection_to_database();
-    var results = papa.parse("#" + data, { header: true, comments: "#" });
+    var results = papa.parse("#" + data, {//Adding a # causes the parser to skip the first row, treat the second row as header
+      header: true,
+      comments: "#",
+      beforeFirstChunk:function(chunk){
+        let fi = chunk.indexOf("\n");
+        let si = chunk.indexOf("\n",fi+1);
+        let fs = chunk.substring(0,fi);
+        let ms = chunk.substring(fi,si);
+        let ls = chunk.substring(si,chunk.length);
+        chunk = fs + ms.toLowerCase() + ls;
+        console.log("chunk: "+chunk);
+        return chunk;
+      }});
+    console.log("result: "+JSON.stringify(result))
     await results.data.forEach(element => {
-      if (element["Name"] != null) this.call_from_csv_line(element, con);
+      if (element["name"] != null) this.call_from_csv_line(element, con);
     });
     this.end_connection(con);
   }
@@ -83,16 +96,17 @@ export default class BackendProcessing {
       });
     });
   }
-  //Papaparse gives (maps?) with fields: Name,Position, Employment Term, etc.
+  //Papaparse creates JSON objects with fields: name,position, employment term, etc.
+  //Assume all fields will be entirely lowercase
   createCallForCSV(entry): string {
-    let name: String = entry["Name"];
+    let name: String = entry["name"];
     if (name.length < 1) {
       return null;
     }
-    let firstPosition = entry["Portfolio Company Position"];
-    let position = entry["New Position"];
-    let employer = entry["New Employer"];
-    let term = entry["Employment Term"];
+    let firstPosition = entry["portfolio company position"];
+    let position = entry["new position"];
+    let employer = entry["new employer"];
+    let term = entry["employment term"];
     term = this.convertDates(term);
     let sterm = "";
     let eterm = "";
@@ -100,8 +114,8 @@ export default class BackendProcessing {
       sterm = term[0];
       eterm = term[1];
     }
-    let url = entry["Hyperlink Url"];
-    let comments = entry["Comments"];
+    let url = entry["hyperlink url"];
+    let comments = entry["comments"];
     let call = `CALL ImportFromCvsLine("${name}","${firstPosition}","${sterm}","${eterm}","${employer}","${position}","${url}","${comments}")`;
     //console.log(call);
     console.log(entry);
