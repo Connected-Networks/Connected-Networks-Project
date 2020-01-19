@@ -82,6 +82,5 @@ module.exports = {
     insertPerson,
     insertCompany,
     insertEmployeeHistory,
-    insertFromCsvLine,
-    insertFindOrCreate
+    insertFromCsvLine
 }
