@@ -32,21 +32,19 @@ getAllFundCompany = () => {
 //--------------------Insert into Table Functions-----------//
 
 insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
-    return models.Individuals.create({
-        IndividualName: IndividualName,
-        OriginalPostion: OriginalPosition,
-        LinkedInUrl: LinkedInUrl,
-        Comments: Comments
-    }).then((user) => {
-        //console.log('Individual Created: ',user);
+    return models.Individuals.findOrCreate({where:{IndividualName: IndividualName}, 
+        defaults: {
+            OriginalPostion: OriginalPosition,
+            LinkedInUrl: LinkedInUrl,
+            Comments: Comments}    
+    }).spread((user,createdBoolean) => {
         return user;
     }).catch(err => console.error('Error in insertPerson', err));
 }
 
 insertCompany = (CompanyName) => {
-    return models.Companies.create({
-        CompanyName: CompanyName
-    }).then((company) => {
+    return models.Companies.findOrCreate({where: {CompanyName: CompanyName}
+    }).spread((company, createdBoolean) => {
         //console.log('Company Created: ', company);
         return company;
     }).catch(err => console.error('Error in insertCompany',err));
@@ -84,5 +82,6 @@ module.exports = {
     insertPerson,
     insertCompany,
     insertEmployeeHistory,
-    insertFromCsvLine
+    insertFromCsvLine,
+    insertFindOrCreate
 }
