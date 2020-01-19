@@ -2,7 +2,7 @@
 //this is for code meant to be executed to test the functionality of code being developed
 
 import BackendProcessing from './backend-processing'
-
+const moment = require("moment")
 
 
 function test_connect_to_database(){
@@ -73,5 +73,8 @@ function call_retrieve_people(){
         console.log(result)
     })
 }
-
-call_retrieve_people()
+function test_moment(){
+    moment("August 2020")
+}
+test_moment()
+//call_retrieve_people()
