@@ -89,6 +89,23 @@ getIndividualCurrentEmployement = (IndividualID) => {
     })
 }
 
+//---------------Modify Existing Data Functions----------//
+modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
+    return models.Individuals.findOne({
+        where: {
+            IndividualID: IndividualID
+        }
+    }).then(individual => {
+        individual.update({
+            IndividualName: newName,
+            OriginalPostion: newPosition,
+            LinkedInUrl: newUrl,
+            Comments: newComments
+        })
+        return individual;
+    }).catch(err => console.error(err));
+}
+
 module.exports = {
     getAllIndividuals,
     getAllCompanies,
@@ -100,5 +117,6 @@ module.exports = {
     insertEmployeeHistory,
     insertFromCsvLine,
     getIndividualEmployeeHistory,
-    getIndividualCurrentEmployement
+    getIndividualCurrentEmployement,
+    modifyIndividual
 }
