@@ -89,6 +89,43 @@ getIndividualCurrentEmployement = (IndividualID) => {
     })
 }
 
+//---------------Modify Existing Data Functions----------//
+modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
+    return models.Individuals.findOne({
+        where: {
+            IndividualID: IndividualID
+        }
+    }).then(individual => {
+        individual.update({
+            IndividualName: newName,
+            OriginalPostion: newPosition,
+            LinkedInUrl: newUrl,
+            Comments: newComments
+        })
+        return individual;
+    }).catch(err => console.error(err));
+}
+
+deleteIndividual = (IndividualID) => {
+    // I can't get the delete for an individual to in turn
+    //   delete rows from EmployeeHistory, so I'm doing 
+    //   this the long way until I can ask about Sequelize
+    //   Cascade.
+    return models.EmployeeHistory.destroy({
+        where: {
+            IndividualID: IndividualID
+        }
+    }).then((deletedHistory) => {
+        models.Individuals.destroy({
+            where: {
+                IndividualID: IndividualID
+            }
+        }).then((deletedIndividual) =>{
+            return deletedIndividual;
+        })
+    }).catch(err => console.error(err));
+}
+
 module.exports = {
     getAllIndividuals,
     getAllCompanies,
@@ -100,5 +137,7 @@ module.exports = {
     insertEmployeeHistory,
     insertFromCsvLine,
     getIndividualEmployeeHistory,
-    getIndividualCurrentEmployement
+    getIndividualCurrentEmployement,
+    modifyIndividual,
+    deleteIndividual
 }
