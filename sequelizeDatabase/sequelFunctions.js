@@ -106,6 +106,26 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
     }).catch(err => console.error(err));
 }
 
+deleteIndividual = (IndividualID) => {
+    // I can't get the delete for an individual to in turn
+    //   delete rows from EmployeeHistory, so I'm doing 
+    //   this the long way until I can ask about Sequelize
+    //   Cascade.
+    return models.EmployeeHistory.destroy({
+        where: {
+            IndividualID: IndividualID
+        }
+    }).then((deletedHistory) => {
+        models.Individuals.destroy({
+            where: {
+                IndividualID: IndividualID
+            }
+        }).then((deletedIndividual) =>{
+            return deletedIndividual;
+        })
+    }).catch(err => console.error(err));
+}
+
 module.exports = {
     getAllIndividuals,
     getAllCompanies,
@@ -118,5 +138,6 @@ module.exports = {
     insertFromCsvLine,
     getIndividualEmployeeHistory,
     getIndividualCurrentEmployement,
-    modifyIndividual
+    modifyIndividual,
+    deleteIndividual
 }
