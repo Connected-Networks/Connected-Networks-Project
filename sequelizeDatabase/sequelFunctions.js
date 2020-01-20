@@ -74,7 +74,12 @@ insertFromCsvLine = (EmployeeName, OriginalPostion, OriginalStartDate, OriginalE
 getIndividualEmployeeHistory = (IndividualID) => {
     return models.EmployeeHistory.findAll({
         where: {IndividualID: IndividualID},
-        order: [['EndDate', 'DESC']]
+        order: [['EndDate', 'DESC']],
+        include: [{
+            model: models.Companies
+        }]
+    }).then((wholeHistory) => {
+        return wholeHistory;
     });
 }
 
