@@ -45,39 +45,39 @@ app.put("/people", (req, res) => {
   let be = new BackendProcessing();
   //console.log("body: "+JSON.stringify(req.body))
   let person = req.body;
-  let update = be.update_person(person)
-  update.then(()=>{
+  let update = be.update_person(person);
+  update.then(() => {
     console.log("person updated");
     res.sendStatus(200);
-  })
-  update.catch(()=>{
+  });
+  update.catch(() => {
     res.sendStatus(500);
-  })
+  });
 });
 
 app.post("/people", (req, res) => {
   //add person
   let be = new BackendProcessing();
   let person = req.body.newData;
-  let i = be.insert_person(person)
-  i.then(()=>{
+  let i = be.insert_person(person);
+  i.then(() => {
     console.log("person added");
-    res.sendStatus(500)
-  })
-  i.catch(res.sendStatus(200))
+    res.sendStatus(500);
+  });
+  i.catch(res.sendStatus(200));
 });
 
 app.delete("/people/:id", (req, res) => {
   //delete person
   let be = new BackendProcessing();
-  console.log("thing: "+JSON.stringify(req.params.id))
+  console.log("thing: " + JSON.stringify(req.params.id));
   let person = req.params.id;
-  let d = be.delete_person(person)
-  d.then(()=>{
+  let d = be.delete_person(person);
+  d.then(() => {
     console.log("person deleted with id: " + req.params.id);
-    res.sendStatus(500)
-  })
-  d.catch(res.sendStatus(200));
+    res.sendStatus(200);
+  });
+  d.catch(res.sendStatus(500));
 });
 
 app.get("*", (req, res) => {
