@@ -66,18 +66,8 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     return new Promise(resolve => {
       setTimeout(() => {
         if (oldData) {
-          const people = this.state.people;
-          const personIndex = people.findIndex(person => {
-            return person.name === oldData.name;
-          });
-          const person = people[personIndex];
-          person.name = newData.name;
-          person.company = newData.name;
-          person.position = newData.position;
-          this.updatePersonOnServer(person).then(() => {
-            this.setState(prevState => {
-              return { ...prevState, people };
-            });
+          this.updatePersonOnServer(newData).then(() => {
+            this.refreshTable();
             resolve();
           });
         }
@@ -135,10 +125,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         this.deletePersonOnServer(oldData).then(() => {
-          let people = this.state.people.slice();
-          const index = people.indexOf(oldData);
-          people.splice(index, 1);
-          this.setState({ people }, () => resolve());
+          this.refreshTable();
         });
       }, 1000);
     });
