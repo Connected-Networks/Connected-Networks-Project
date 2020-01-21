@@ -62,15 +62,14 @@ app.post("/people", (req, res) => {
   let i = be.insert_person(person);
   i.then(() => {
     console.log("person added");
-    res.sendStatus(500);
+    res.sendStatus(200);
   });
-  i.catch(res.sendStatus(200));
+  i.catch(res.sendStatus(500));
 });
 
 app.delete("/people/:id", (req, res) => {
   //delete person
   let be = new BackendProcessing();
-  console.log("thing: " + JSON.stringify(req.params.id));
   let person = req.params.id;
   let d = be.delete_person(person);
   d.then(() => {
