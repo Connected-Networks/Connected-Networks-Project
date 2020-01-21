@@ -40,6 +40,24 @@ app.get("/people", (req, res) => {
   }
 });
 
+app.put("/people", (req, res) => {
+  //update person
+  console.log("person updated");
+  res.sendStatus(200);
+});
+
+app.post("/people", (req, res) => {
+  //add person
+  console.log("person added");
+  res.sendStatus(200);
+});
+
+app.delete("/people/:id", (req, res) => {
+  //delete person
+  console.log("person deleted with id: " + req.params.id);
+  res.sendStatus(200);
+});
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
