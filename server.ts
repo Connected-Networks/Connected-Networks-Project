@@ -26,6 +26,7 @@ app.get("/people", (req, res) => {
   try {
     let be = new BackendProcessing();
     let data = be.retrievePeopleFromDatabase().then(results => {
+      console.log("result: "+JSON.stringify(results))
       if (!results) {
         res.sendStatus(500);
       } else {

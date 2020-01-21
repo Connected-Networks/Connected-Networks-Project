@@ -1,3 +1,4 @@
+import { resolve } from "dns";
 
 const denv = require("dotenv").config();
 const mysql = require("mysql");
@@ -5,6 +6,7 @@ const papa = require("papaparse");
 const database = require('./sequelizeDatabase/sequelFunctions');
 
 interface DisplayPerson {
+  id: Int16Array;
   name: string;
   company: string;
   position: string;
@@ -61,28 +63,51 @@ export default class BackendProcessing {
 
   async retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {
     return new Promise<DisplayPerson[]>((resolve, reject) => {
-      let response = new Array<DisplayPerson>();
-      let done = false;
-      // con.query("CALL DisplayAllEmployeeCurrents()", (err, rows) => {
-      //   console.log(rows);
-      //   let place = -1;
-      //   for (let row of rows[0]) {
-      //     place += 1;
-      //     console.log("row: " + row);
-      //     let dp = {
-      //       name: row.IndividualName,
-      //       company: row.CompanyName,
-      //       position: row.PositionName,
-      //       hyperlink: row.LinkedInUrl,
-      //       comment: row.Comments
-      //     };
-      //     response[place] = dp;
-      //   }
-      //   this.end_connection(con);
-      //   resolve(response);
-      // });
+      database.getAllIndividuals().then(async (individuals)=>{
+        this.build_response_from_individuals(individuals).then((response)=>{
+          resolve(response)
+        })
+      })
     });
   }
+  async build_response_from_individuals(individuals):Promise<DisplayPerson[]>{
+    return new Promise<DisplayPerson[]>(async (resolve,reject)=>{
+      let response = new Array<DisplayPerson>();
+      let place = 0;
+      let remaining = individuals.length
+      individuals.forEach((individual) => {
+        this.processIndividualForDisplay(individual).then((dp)=>{
+          response[place] = dp;
+          place += 1;
+          remaining --;
+          if (remaining==0)
+            resolve(response)
+        })
+      })
+    })
+  }
+  async processIndividualForDisplay(individual):Promise<DisplayPerson>{
+    return new Promise<DisplayPerson>((resolve,reject)=>{
+      database.getIndividualCurrentEmployement(individual.IndividualID).then((employment)=>{
+        console.log("employment: "+JSON.stringify(employment))
+        let dp = {
+          id: individual.IndividualID,
+          name: individual.IndividualName,
+          company: employment.company.CompanyName,
+          position: employment.PositionName,
+          hyperlink: individual.LinkedInUrl,
+          comment: individual.comments
+        }
+        console.log("created entry: "+JSON.stringify(dp))
+        resolve(dp)
+      })
+    })
+  }
+
+
+
+
+
 
   convertDates(dates: String): string[] {
     console.log(`Parsing date: ${dates}`);
