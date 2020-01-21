@@ -66,6 +66,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     return new Promise(resolve => {
       setTimeout(() => {
         if (oldData) {
+          console.log(newData);
           this.updatePersonOnServer(newData).then(() => {
             this.refreshTable();
             resolve();
@@ -96,6 +97,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         if (newData) {
+          console.log(newData);
           this.addPersonOnServer(newData).then(() => {
             resolve();
           });
@@ -124,9 +126,15 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
   deleteRow = async (oldData: DisplayPerson): Promise<void> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        this.deletePersonOnServer(oldData).then(() => {
-          this.refreshTable();
-        });
+        this.deletePersonOnServer(oldData)
+          .then(() => {
+            this.refreshTable();
+            resolve();
+          })
+          .catch(() => {
+            this.refreshTable();
+            resolve();
+          });
       }, 1000);
     });
   };
@@ -137,15 +145,12 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
       axios
         .delete(`/people/${personID}`)
         .then(response => {
-          console.log("s: " +response.status);
-          if (response.status === 200) {
-            resolve();
-          } else {
-            reject();
-          }
+          console.log("status: " + response.status);
+          resolve();
         })
         .catch(function(error) {
           console.log(error);
+          reject();
         });
     });
   };
