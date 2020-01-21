@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize');
+let result = require("dotenv").config();
 
-const sequelize = new Sequelize('localDatabaseSean','root','ConnectedNetwork1',{
-    host: 'localhost',
+const sequelize = new Sequelize(process.env.DATABASE,process.env.USER,process.env.PASSWORD,{
+    host: process.env.HOST,
     dialect: 'mysql',
     define: {
       freezeTableName: true
@@ -130,6 +131,9 @@ sequelize.authenticate()
         }
       },
   });
+ 
+  // (If I used hasMany, then an issue arose where it would use HistoryID instead of CompanyID)
+  EmployeeHistory.belongsTo(Companies, {foreignKey: 'CompanyID'});
 
   module.exports = { //This determines what can be used from this custom module.
     Individuals,
