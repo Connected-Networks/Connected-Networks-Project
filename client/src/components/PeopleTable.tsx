@@ -137,6 +137,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
       axios
         .delete(`/people/${personID}`)
         .then(response => {
+          console.log("s: " +response.status);
           if (response.status === 200) {
             resolve();
           } else {

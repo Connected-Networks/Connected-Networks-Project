@@ -177,6 +177,7 @@ export default class BackendProcessing {
   }
   async delete_person(person){
     return new Promise<void>((resolve,reject)=>{
+      console.log("deleting: "+person)
       let del = database.deleteIndividual(person)
       del.then((person)=>{
         resolve();
@@ -184,9 +185,6 @@ export default class BackendProcessing {
       del.catch((error)=>{
         reject();
       })
-
-
-
     })
   }
 }
