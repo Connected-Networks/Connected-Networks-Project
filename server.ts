@@ -42,18 +42,27 @@ app.get("/people", (req, res) => {
 
 app.put("/people", (req, res) => {
   //update person
+  let be = new BackendProcessing();
+  let person = req.data;
+  be.update_person(person)
   console.log("person updated");
   res.sendStatus(200);
 });
 
 app.post("/people", (req, res) => {
   //add person
+  let be = new BackendProcessing();
+  let person = req.data;
+  be.insert_person(person);
   console.log("person added");
   res.sendStatus(200);
 });
 
 app.delete("/people/:id", (req, res) => {
   //delete person
+  let be = new BackendProcessing();
+  let person = req.data;
+  be.delete_person(person)
   console.log("person deleted with id: " + req.params.id);
   res.sendStatus(200);
 });

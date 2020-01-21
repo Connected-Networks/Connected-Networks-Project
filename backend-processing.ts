@@ -6,7 +6,7 @@ const papa = require("papaparse");
 const database = require('./sequelizeDatabase/sequelFunctions');
 
 interface DisplayPerson {
-  id: Int16Array;
+  id: number;
   name: string;
   company: string;
   position: string;
@@ -148,19 +148,13 @@ export default class BackendProcessing {
     if (mis.length == 1) mis = "0" + mi;
     return `${s[s.length - 1]}-${mis}-01`;
   }
-
-  // async check_connection(): Promise<boolean> {
-  //   let con = await this.create_connection_to_database();
-  //   return new Promise<boolean>((resolve, reject) => {
-  //     con.query("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'heroku_2396736b79200ba'", (err, rows) => {
-  //       if (err) {
-  //         this.end_connection(con);
-  //         reject(err);
-  //       }
-  //       this.end_connection(con);
-  //       resolve(true);
-  //     });
-  //   });
-  // }
-
+  insert_person(person:DisplayPerson){
+    database.insertPerson(person.name,person.position,person.hyperlink,person.comment)
+  }
+  update_person(person:DisplayPerson){
+    database.motifyIndividual(person.id,person.name,person.position,person.hyperlink,person.comment)
+  }
+  delete_person(person:DisplayPerson){
+    database.delete_individual(person.id)
+  }
 }
