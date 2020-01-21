@@ -2,17 +2,6 @@ import React from "react";
 import MaterialTable, { Column } from "material-table";
 import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-import { rejects } from "assert";
-
-interface Row {
-  name: string;
-  companyAndPosition: string;
-}
-
-interface TableState {
-  columns: Array<Column<Row>>;
-  data: Row[];
-}
 
 interface DisplayPerson {
   name: string;
@@ -28,8 +17,7 @@ interface TableProps {
 
 interface TableState {
   people: DisplayPerson[];
-  columns: Array<Column<Row>>;
-  data: Row[];
+  columns: Array<Column<DisplayPerson>>;
 }
 
 export default class PeopleTable extends React.Component<TableProps, TableState> {
@@ -37,9 +25,9 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     people: [],
     columns: [
       { title: "Name", field: "name" },
-      { title: "Company", field: "companyAndPosition" }
-    ],
-    data: []
+      { title: "Company", field: "company" },
+      { title: "Position", field: "position" }
+    ]
   };
 
   /**
@@ -56,36 +44,38 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  /**
-   * This takes in the local data state on people and refreshes the table based on that.
-   */
-  refreshTable() {
-    // Clear data
-    this.setState({ data: [] });
-
-    this.state.people.forEach(person => {
-      let r: Row = {
-        name: person.name,
-        companyAndPosition: person.company.concat(" | " + person.position)
-      };
-      this.addPersonToTable(r);
-    });
-  }
+  // /**
+  //  * This takes in the local data state on people and refreshes the table based on that.
+  //  */
+  // refreshTable() {
+  //   this.state.people.forEach(person => {
+  //     let r: Row = {
+  //       name: person.name,
+  //       companyAndPosition: !person.company && !person.position ? "" : person.company.concat(" | " + person.position)
+  //     };
+  //   });
+  // }
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *
    * @param newData
    * @param oldData
    */
-  updateRow = async (newData: Row, oldData?: Row | undefined): Promise<void> => {
+  updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
     return new Promise(resolve => {
       setTimeout(() => {
         if (oldData) {
-          this.updatePersonOnServer(newData, oldData).then(() => {
+          const people = this.state.people;
+          const personIndex = people.findIndex(person => {
+            return person.name === oldData.name;
+          });
+          const person = people[personIndex];
+          person.name = newData.name;
+          person.company = newData.name;
+          person.position = newData.position;
+          this.updatePersonOnServer(person).then(() => {
             this.setState(prevState => {
-              const data = [...prevState.data];
-              data[data.indexOf(oldData)] = newData;
-              return { ...prevState, data };
+              return { ...prevState, people };
             });
             resolve();
           });
@@ -94,10 +84,10 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  updatePersonOnServer = async (newData: Row, oldData?: Row | undefined) => {
+  updatePersonOnServer = async (person: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       axios
-        .put("/people", { newData, oldData })
+        .put("/people", person)
         .then(response => {
           if (response.status === 200) {
             resolve();
@@ -111,12 +101,11 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  addRow = async (newRow: Row): Promise<void> => {
+  addRow = async (newData: DisplayPerson): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
-        if (newRow) {
-          this.addPersonOnServer(newRow).then(() => {
-            this.addPersonToTable(newRow);
+        if (newData) {
+          this.addPersonOnServer(newData).then(() => {
             resolve();
           });
         }
@@ -124,16 +113,10 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  addPersonToTable = (newRow: Row) => {
-    const data = this.state.data.slice();
-    data.push(newRow);
-    this.setState({ data });
-  };
-
-  addPersonOnServer = async (newRow: Row) => {
+  addPersonOnServer = async (newData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       axios
-        .post(`/people`, { newRow })
+        .post(`/people`, { newData })
         .then(response => {
           if (response.status === 200) {
             resolve();
@@ -147,20 +130,20 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  deleteRow = async (oldData: Row): Promise<void> => {
+  deleteRow = async (oldData: DisplayPerson): Promise<void> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         this.deletePersonOnServer(oldData).then(() => {
-          let data = this.state.data.slice();
-          const index = data.indexOf(oldData);
-          data.splice(index, 1);
-          this.setState({ data }, () => resolve());
+          let people = this.state.people.slice();
+          const index = people.indexOf(oldData);
+          people.splice(index, 1);
+          this.setState({ people }, () => resolve());
         });
       }, 1000);
     });
   };
 
-  deletePersonOnServer = async (oldData: Row) => {
+  deletePersonOnServer = async (oldData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       const randomID = 5; //Temp until we make ids for people
       axios
@@ -185,7 +168,6 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     this.getPeople()
       .then(people => {
         this.setState({ people });
-        this.refreshTable();
       })
       .catch(() => {});
   }
@@ -194,7 +176,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     return (
       <MaterialTable
         columns={this.state.columns}
-        data={this.state.data}
+        data={this.state.people}
         editable={{
           onRowAdd: this.addRow,
           onRowUpdate: this.updateRow,
