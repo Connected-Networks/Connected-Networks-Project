@@ -26,7 +26,6 @@ app.get("/people", (req, res) => {
   try {
     let be = new BackendProcessing();
     let data = be.retrievePeopleFromDatabase().then(results => {
-      console.log("result: "+JSON.stringify(results))
       if (!results) {
         res.sendStatus(500);
       } else {
@@ -53,18 +52,24 @@ app.post("/people", (req, res) => {
   //add person
   let be = new BackendProcessing();
   let person = req.data;
-  be.insert_person(person);
-  console.log("person added");
-  res.sendStatus(200);
+  let i = be.insert_person(person)
+  i.then(()=>{
+    console.log("person added");
+    res.sendStatus(500)
+  })
+  i.catch(res.sendStatus(200))
 });
 
 app.delete("/people/:id", (req, res) => {
   //delete person
   let be = new BackendProcessing();
   let person = req.data;
-  be.delete_person(person)
-  console.log("person deleted with id: " + req.params.id);
-  res.sendStatus(200);
+  let d = be.delete_person(person)
+  d.then(()=>{
+    console.log("person deleted with id: " + req.params.id);
+    res.sendStatus(500)
+  })
+  d.catch(res.sendStatus(200));
 });
 
 app.get("*", (req, res) => {

@@ -89,7 +89,6 @@ export default class BackendProcessing {
   async processIndividualForDisplay(individual):Promise<DisplayPerson>{
     return new Promise<DisplayPerson>((resolve,reject)=>{
       database.getIndividualCurrentEmployement(individual.IndividualID).then((employment)=>{
-        console.log("employment: "+JSON.stringify(employment))
         let dp = {
           id: individual.IndividualID,
           name: individual.IndividualName,
@@ -148,13 +147,22 @@ export default class BackendProcessing {
     if (mis.length == 1) mis = "0" + mi;
     return `${s[s.length - 1]}-${mis}-01`;
   }
-  insert_person(person:DisplayPerson){
-    database.insertPerson(person.name,person.position,person.hyperlink,person.comment)
+  async insert_person(person:DisplayPerson){
+    let insert = database.insertPerson(person.name,person.position,person.hyperlink,person.comment)
+    insert.then((person)=>{
+      return
+    })
   }
   update_person(person:DisplayPerson){
-    database.motifyIndividual(person.id,person.name,person.position,person.hyperlink,person.comment)
+    let update = database.motifyIndividual(person.id,person.name,person.position,person.hyperlink,person.comment)
+    update.then((person)=>{
+      return
+    })
   }
-  delete_person(person:DisplayPerson){
-    database.delete_individual(person.id)
+  async delete_person(person:DisplayPerson){
+    let del = database.delete_individual(person.id)
+    del.then((person)=>{
+      return
+    })
   }
 }
