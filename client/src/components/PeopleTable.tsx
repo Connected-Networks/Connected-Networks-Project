@@ -4,6 +4,7 @@ import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 
 interface DisplayPerson {
+  id: number;
   name: string;
   company: string;
   position: string;
@@ -145,9 +146,9 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
 
   deletePersonOnServer = async (oldData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
-      const randomID = 5; //Temp until we make ids for people
+      const personID = oldData.id; //Temp until we make ids for people
       axios
-        .delete(`/people/${randomID}`)
+        .delete(`/people/${personID}`)
         .then(response => {
           if (response.status === 200) {
             resolve();

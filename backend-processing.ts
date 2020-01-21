@@ -92,10 +92,14 @@ export default class BackendProcessing {
         let dp = {
           id: individual.IndividualID,
           name: individual.IndividualName,
-          company: employment.company.CompanyName,
-          position: employment.PositionName,
+          company: "",
+          position: "",
           hyperlink: individual.LinkedInUrl,
           comment: individual.comments
+        }
+        if (employment!=null){
+          dp.company = employment.company.CompanyName;
+          dp.position = employment.PositionName;
         }
         console.log("created entry: "+JSON.stringify(dp))
         resolve(dp)
@@ -147,22 +151,42 @@ export default class BackendProcessing {
     if (mis.length == 1) mis = "0" + mi;
     return `${s[s.length - 1]}-${mis}-01`;
   }
-  async insert_person(person:DisplayPerson){
-    let insert = database.insertPerson(person.name,person.position,person.hyperlink,person.comment)
-    insert.then((person)=>{
-      return
+  async insert_person(person){
+    return new Promise<void>((resolve,reject)=>{
+      let insert = database.insertPerson(person.name,person.position,person.hyperlink,person.comment)
+      insert.then((person)=>{
+        resolve()
+      })
+      insert.catch((error)=>{
+        console.error(error)
+        reject()
+      })
     })
   }
-  update_person(person:DisplayPerson){
-    let update = database.motifyIndividual(person.id,person.name,person.position,person.hyperlink,person.comment)
-    update.then((person)=>{
-      return
+  async update_person(person){
+    return new Promise<void>((resolve,reject)=>{
+      let update = database.modifyIndividual(person.id,person.name,person.position,person.hyperlink,person.comment)
+      update.then((person)=>{
+        resolve()
+      })
+      update.catch((error)=>{
+        console.error(error)
+        reject()
+      })
     })
   }
-  async delete_person(person:DisplayPerson){
-    let del = database.delete_individual(person.id)
-    del.then((person)=>{
-      return
+  async delete_person(person){
+    return new Promise<void>((resolve,reject)=>{
+      let del = database.deleteIndividual(person)
+      del.then((person)=>{
+        resolve();
+      })
+      del.catch((error)=>{
+        reject();
+      })
+
+
+
     })
   }
 }
