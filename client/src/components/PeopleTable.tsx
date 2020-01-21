@@ -166,12 +166,16 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
    * Once this loaded, this code will run.
    */
   componentDidMount() {
+    this.refreshTable();
+  }
+
+  refreshTable = () => {
     this.getPeople()
       .then(people => {
         this.setState({ people });
       })
       .catch(() => {});
-  }
+  };
 
   render() {
     return (
