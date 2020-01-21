@@ -177,7 +177,7 @@ export default class BackendProcessing {
   }
   async delete_person(person){
     return new Promise<void>((resolve,reject)=>{
-      console.log("deleting: "+person)
+      console.log("starting deletion")
       let del = database.deleteIndividual(person)
       del.then((person)=>{
         resolve();

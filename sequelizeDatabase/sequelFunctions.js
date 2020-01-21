@@ -121,6 +121,7 @@ deleteIndividual = (IndividualID) => {
                 IndividualID: IndividualID
             }
         }).then((deletedIndividual) =>{
+            console.log("deletion finished")
             return deletedIndividual;
         })
     }).catch(err => console.error(err));

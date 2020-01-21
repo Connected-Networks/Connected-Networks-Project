@@ -73,7 +73,7 @@ app.delete("/people/:id", (req, res) => {
   let person = req.params.id;
   let d = be.delete_person(person)
   d.then(()=>{
-    console.log("person deleted with id: " + req.params.id);
+    console.log("ending deletion?");
     res.sendStatus(200)
   })
   d.catch(res.sendStatus(500));
