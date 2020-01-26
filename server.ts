@@ -49,9 +49,11 @@ app.put("/people", (req, res) => {
   //console.log("body: "+JSON.stringify(req.body))
   let person = req.body;
   let update = be.update_person(person);
-  update.then(() => {
-    console.log("person updated");
-    res.sendStatus(200);
+  update.then((boolean) => {
+    if (boolean)
+      res.sendStatus(200);
+    else
+      res.sendStatus(500);
   });
   update.catch(() => {
     res.sendStatus(500);
@@ -63,9 +65,11 @@ app.post("/people", (req, res) => {
   let be = new BackendProcessing();
   let person = req.body.newData;
   let i = be.insert_person(person);
-  i.then(() => {
-    console.log("person added");
-    res.sendStatus(200);
+  i.then((boolean) => {
+    if (boolean)
+      res.sendStatus(200);
+    else
+      res.sendStatus(500);
   });
   i.catch(res.sendStatus(500));
 });
@@ -75,9 +79,11 @@ app.delete("/people/:id", (req, res) => {
   let be = new BackendProcessing();
   let person = req.params.id;
   let d = be.delete_person(person)
-  d.then(()=>{
-    console.log("ending deletion?");
-    res.sendStatus(200)
+  d.then((boolean)=>{
+    if (boolean)
+      res.sendStatus(200)
+    else
+      res.sendStatus(500)
   })
   d.catch(res.sendStatus(500));
 });
