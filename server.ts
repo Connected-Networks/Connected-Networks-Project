@@ -15,8 +15,9 @@ app.post("/csv", (req, res) => {
   try {
     let data = req.body.data;
     let be = new BackendProcessing();
-    be.processRawCSV(data);
-    res.sendStatus(200);
+    be.processRawCSV(data).then((results)=>{
+      res.sendStatus(200);
+    })
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -26,7 +27,9 @@ app.post("/csv", (req, res) => {
 app.get("/people", (req, res) => {
   try {
     let be = new BackendProcessing();
+    console.log("starting retrieval")
     let data = be.retrievePeopleFromDatabase().then(results => {
+      console.log("results 2: "+results)
       if (!results) {
         res.sendStatus(500);
       } else {
@@ -35,7 +38,7 @@ app.get("/people", (req, res) => {
       }
     });
   } catch (error) {
-    console.log(error);
+    console.log("error retrieving people: "+error);
     res.sendStatus(500);
   }
 });
