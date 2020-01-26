@@ -1,11 +1,12 @@
-import { MysqlError } from "mysql";
+import { resolve } from "dns";
 
 const denv = require("dotenv").config();
 const mysql = require("mysql");
 const papa = require("papaparse");
-let result = require("dotenv").config();
+const database = require('./sequelizeDatabase/sequelFunctions');
 
 interface DisplayPerson {
+  id: number;
   name: string;
   company: string;
   position: string;
@@ -14,99 +15,103 @@ interface DisplayPerson {
 }
 
 export default class BackendProcessing {
-  async create_connection_to_database(): Promise<any> {
-    let con = mysql.createConnection({
-      database: process.env.DATABASE,
-      host: process.env.HOST,
-      user: process.env.USER,
-      password: process.env.PASSWORD
-    });
-    return new Promise((resolve, reject) =>
-      con.connect(err => {
-        if (err) {
-          console.log("Error connecting to database");
-          console.log(err);
-          reject(err);
-        } else {
-          console.log("Database connection established");
-          console.log();
-          resolve(con);
-        }
-      })
-    );
-  }
 
   async processRawCSV(data: string) {
     //First line is commented and ignored
     //Second line is treated as header
-    let con = await this.create_connection_to_database();
-    var results = papa.parse("#" + data, { header: true, comments: "#" });
-    await results.data.forEach(element => {
-      if (element["Name"] != null) this.call_from_csv_line(element, con);
-    });
-    this.end_connection(con);
-  }
-
-  async call_from_csv_line(element, con) {
-    let pcall = this.createCallForCSV(element);
-    if (pcall != null) {
-      console.log(`Sending to db: ${pcall}`);
-      con.query(pcall, (err, rows) => {
-        if (err) console.log("error from database: " + err);
-        else console.log(rows);
+    var results = papa.parse("#" + data, {//Adding a # causes the parser to skip the first row, treat the second row as header
+      header: true,
+      comments: "#",
+      beforeFirstChunk:function(chunk){
+        let fi = chunk.indexOf("\n");
+        let si = chunk.indexOf("\n",fi+1);
+        let fs = chunk.substring(0,fi);
+        let ms = chunk.substring(fi,si);
+        let ls = chunk.substring(si,chunk.length);
+        chunk = fs + ms.toLowerCase() + ls;
+        console.log("chunk: "+chunk);
+        return chunk;
+      }});
+      await results.data.forEach(element => {
+        if (element["name"] != null) this.call_from_csv_line(element);
       });
     }
+    
+    //Papaparse creates JSON objects with fields: name,position, employment term, etc.
+    //Assume all fields will be entirely lowercase
+    async call_from_csv_line(entry) {
+      let name: String = entry["name"];
+      if (name.length < 1) {
+        return;
+      }
+      let firstPosition = entry["portfolio company position"];
+      let position = entry["new position"];
+      let employer = entry["new employer"];
+      let term = entry["employment term"];
+      term = this.convertDates(term);
+      let sterm = "";
+      let eterm = "";
+      if (term != null) {
+        sterm = term[0];
+        eterm = term[1];
+      }
+      let url = entry["hyperlink url"];
+      let comments = entry["comments"];
+      database.insertFromCsvLine(name,firstPosition,sterm,eterm,employer,position,url,comments)
+      //let call = `CALL ImportFromCvsLine("${name}","${firstPosition}","${sterm}","${eterm}","${employer}","${position}","${url}","${comments}")`;
   }
 
   async retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {
-    let con = await this.create_connection_to_database();
     return new Promise<DisplayPerson[]>((resolve, reject) => {
-      let response = new Array<DisplayPerson>();
-      let done = false;
-      con.query("CALL DisplayAllEmployeeCurrents()", (err, rows) => {
-        console.log(rows);
-        let place = -1;
-        for (let row of rows[0]) {
-          place += 1;
-          console.log("row: " + row);
-          let dp = {
-            name: row.IndividualName,
-            company: row.CompanyName,
-            position: row.PositionName,
-            hyperlink: row.LinkedInUrl,
-            comment: row.Comments
-          };
-          response[place] = dp;
-        }
-        this.end_connection(con);
-        resolve(response);
-      });
+      database.getAllIndividuals().then(async (individuals)=>{
+        this.build_response_from_individuals(individuals).then((response)=>{
+          resolve(response)
+        })
+      })
     });
   }
-  //Papaparse gives (maps?) with fields: Name,Position, Employment Term, etc.
-  createCallForCSV(entry): string {
-    let name: String = entry["Name"];
-    if (name.length < 1) {
-      return null;
-    }
-    let firstPosition = entry["Portfolio Company Position"];
-    let position = entry["New Position"];
-    let employer = entry["New Employer"];
-    let term = entry["Employment Term"];
-    term = this.convertDates(term);
-    let sterm = "";
-    let eterm = "";
-    if (term != null) {
-      sterm = term[0];
-      eterm = term[1];
-    }
-    let url = entry["Hyperlink Url"];
-    let comments = entry["Comments"];
-    let call = `CALL ImportFromCvsLine("${name}","${firstPosition}","${sterm}","${eterm}","${employer}","${position}","${url}","${comments}")`;
-    //console.log(call);
-    console.log(entry);
-    return call;
+  async build_response_from_individuals(individuals):Promise<DisplayPerson[]>{
+    return new Promise<DisplayPerson[]>(async (resolve,reject)=>{
+      let response = new Array<DisplayPerson>();
+      let place = 0;
+      let remaining = individuals.length
+      individuals.forEach((individual) => {
+        this.processIndividualForDisplay(individual).then((dp)=>{
+          response[place] = dp;
+          place += 1;
+          remaining --;
+          if (remaining==0)
+            resolve(response)
+        })
+      })
+    })
   }
+  async processIndividualForDisplay(individual):Promise<DisplayPerson>{
+    return new Promise<DisplayPerson>((resolve,reject)=>{
+      database.getIndividualCurrentEmployement(individual.IndividualID).then((employment)=>{
+        let dp = {
+          id: individual.IndividualID,
+          name: individual.IndividualName,
+          company: "",
+          position: "",
+          hyperlink: individual.LinkedInUrl,
+          comment: individual.comments
+        }
+        if (employment!=null){
+          dp.company = employment.company.CompanyName;
+          dp.position = employment.PositionName;
+        }
+        console.log("created entry: "+JSON.stringify(dp))
+        resolve(dp)
+      })
+    })
+  }
+
+
+
+
+
+
   convertDates(dates: String): string[] {
     console.log(`Parsing date: ${dates}`);
     let answer: string[];
@@ -146,23 +151,40 @@ export default class BackendProcessing {
     if (mis.length == 1) mis = "0" + mi;
     return `${s[s.length - 1]}-${mis}-01`;
   }
-
-  async check_connection(): Promise<boolean> {
-    let con = await this.create_connection_to_database();
-    return new Promise<boolean>((resolve, reject) => {
-      con.query("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'heroku_2396736b79200ba'", (err, rows) => {
-        if (err) {
-          this.end_connection(con);
-          reject(err);
-        }
-        this.end_connection(con);
-        resolve(true);
-      });
-    });
+  async insert_person(person){
+    return new Promise<void>((resolve,reject)=>{
+      let insert = database.insertPerson(person.name,person.position,person.hyperlink,person.comment)
+      insert.then((person)=>{
+        resolve()
+      })
+      insert.catch((error)=>{
+        console.error(error)
+        reject()
+      })
+    })
   }
-
-  end_connection(con) {
-    console.log("attempt to close connection");
-    con.end();
+  async update_person(person){
+    return new Promise<void>((resolve,reject)=>{
+      let update = database.modifyIndividual(person.id,person.name,person.position,person.hyperlink,person.comment)
+      update.then((person)=>{
+        resolve()
+      })
+      update.catch((error)=>{
+        console.error(error)
+        reject()
+      })
+    })
+  }
+  async delete_person(person){
+    return new Promise<void>((resolve,reject)=>{
+      console.log("starting deletion")
+      let del = database.deleteIndividual(person)
+      del.then((person)=>{
+        resolve();
+      })
+      del.catch((error)=>{
+        reject();
+      })
+    })
   }
 }
