@@ -2,6 +2,11 @@ import React from "react";
 import MaterialTable, { Column } from "material-table";
 import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
+import styled from "styled-components";
+
+const Container = styled.div`
+  flex: 1;
+`;
 
 interface Row {
   name: string;
@@ -136,23 +141,25 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
 
   render() {
     return (
-      <MaterialTable
-        columns={this.state.columns}
-        data={this.state.data}
-        editable={{
-          onRowAdd: this.showAddOptions,
-          onRowUpdate: this.updateRow,
-          onRowDelete: this.deleteRow
-        }}
-        actions={[
-          {
-            icon: () => <ImportIcon fill={"grey"} />,
-            tooltip: "Upload CSV",
-            isFreeAction: true,
-            onClick: (event, rowData) => this.props.uploadHandler()
-          }
-        ]}
-      />
+      <Container>
+        <MaterialTable
+          columns={this.state.columns}
+          data={this.state.data}
+          editable={{
+            onRowAdd: this.showAddOptions,
+            onRowUpdate: this.updateRow,
+            onRowDelete: this.deleteRow
+          }}
+          actions={[
+            {
+              icon: () => <ImportIcon fill={"grey"} />,
+              tooltip: "Upload CSV",
+              isFreeAction: true,
+              onClick: (event, rowData) => this.props.uploadHandler()
+            }
+          ]}
+        />
+      </Container>
     );
   }
 }
