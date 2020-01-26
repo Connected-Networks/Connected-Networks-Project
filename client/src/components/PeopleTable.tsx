@@ -8,17 +8,8 @@ const Container = styled.div`
   flex: 1;
 `;
 
-interface Row {
-  name: string;
-  companyAndPosition: string;
-}
-
-interface TableState {
-  columns: Array<Column<Row>>;
-  data: Row[];
-}
-
 interface DisplayPerson {
+  id: number;
   name: string;
   company: string;
   position: string;
@@ -32,8 +23,7 @@ interface TableProps {
 
 interface TableState {
   people: DisplayPerson[];
-  columns: Array<Column<Row>>;
-  data: Row[];
+  columns: Array<Column<DisplayPerson>>;
 }
 
 export default class PeopleTable extends React.Component<TableProps, TableState> {
@@ -41,9 +31,9 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     people: [],
     columns: [
       { title: "Name", field: "name" },
-      { title: "Company", field: "companyAndPosition" }
-    ],
-    data: []
+      { title: "Company", field: "company" },
+      { title: "Position", field: "position" }
+    ]
   };
 
   /**
@@ -60,70 +50,113 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  /**
-   * This takes in the local data state on people and refreshes the table based on that.
-   */
-  refreshTable() {
-    // Clear data
-    this.setState({ data: [] });
-
-    this.state.people.forEach(person => {
-      let r: Row = {
-        name: person.name,
-        companyAndPosition: person.company.concat(" | " + person.position)
-      };
-      this.addRow(r);
-    });
-  }
+  // /**
+  //  * This takes in the local data state on people and refreshes the table based on that.
+  //  */
+  // refreshTable() {
+  //   this.state.people.forEach(person => {
+  //     let r: Row = {
+  //       name: person.name,
+  //       companyAndPosition: !person.company && !person.position ? "" : person.company.concat(" | " + person.position)
+  //     };
+  //   });
+  // }
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *
    * @param newData
    * @param oldData
    */
-  updateRow = async (newData: Row, oldData?: Row | undefined): Promise<void> => {
+  updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve();
         if (oldData) {
-          this.setState(prevState => {
-            const data = [...prevState.data];
-            data[data.indexOf(oldData)] = newData;
-            return { ...prevState, data };
+          console.log(newData);
+          this.updatePersonOnServer(newData).then(() => {
+            this.refreshTable();
+            resolve();
           });
         }
       }, 600);
     });
   };
 
-  showAddOptions = (newRow: Row): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {});
+  updatePersonOnServer = async (person: DisplayPerson) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .put("/people", person)
+        .then(response => {
+          if (response.status === 200) {
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    });
   };
 
-  addRow = async (newRow: Row): Promise<void> => {
+  addRow = async (newData: DisplayPerson): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
-        if (newRow) {
-          const data = this.state.data.slice();
-          data.push(newRow);
-          this.setState({ data }, () => resolve());
+        if (newData) {
+          console.log(newData);
+          this.addPersonOnServer(newData).then(() => {
+            resolve();
+          });
         }
-        resolve();
       }, 1000);
     });
   };
 
-  deleteRow = async (oldData: Row): Promise<void> => {
+  addPersonOnServer = async (newData: DisplayPerson) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .post(`/people`, { newData })
+        .then(response => {
+          if (response.status === 200) {
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    });
+  };
+
+  deleteRow = async (oldData: DisplayPerson): Promise<void> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        {
-          let data = this.state.data.slice();
-          const index = data.indexOf(oldData);
-          data.splice(index, 1);
-          this.setState({ data }, () => resolve());
-        }
-        resolve();
+        this.deletePersonOnServer(oldData)
+          .then(() => {
+            this.refreshTable();
+            resolve();
+          })
+          .catch(() => {
+            this.refreshTable();
+            resolve();
+          });
       }, 1000);
+    });
+  };
+
+  deletePersonOnServer = async (oldData: DisplayPerson) => {
+    return new Promise((resolve, reject) => {
+      const personID = oldData.id; //Temp until we make ids for people
+      axios
+        .delete(`/people/${personID}`)
+        .then(response => {
+          console.log("status: " + response.status);
+          resolve();
+        })
+        .catch(function(error) {
+          console.log(error);
+          reject();
+        });
     });
   };
 
@@ -131,22 +164,25 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
    * Once this loaded, this code will run.
    */
   componentDidMount() {
+    this.refreshTable();
+  }
+
+  refreshTable = () => {
     this.getPeople()
       .then(people => {
         this.setState({ people });
-        this.refreshTable();
       })
       .catch(() => {});
-  }
+  };
 
   render() {
     return (
       <Container>
         <MaterialTable
           columns={this.state.columns}
-          data={this.state.data}
+          data={this.state.people}
           editable={{
-            onRowAdd: this.showAddOptions,
+            onRowAdd: this.addRow,
             onRowUpdate: this.updateRow,
             onRowDelete: this.deleteRow
           }}

@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize');
+let result = require("dotenv").config();
 
-const sequelize = new Sequelize('localDatabaseSean','root','ConnectedNetwork1',{
-    host: 'localhost',
+const sequelize = new Sequelize(process.env.DATABASE,process.env.USER,process.env.PASSWORD,{
+    host: process.env.HOST,
     dialect: 'mysql',
     define: {
       freezeTableName: true
