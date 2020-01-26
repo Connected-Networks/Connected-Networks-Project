@@ -110,30 +110,37 @@ deleteIndividual = (IndividualID) => {
     // I can't get the delete for an individual to in turn
     //   delete rows from EmployeeHistory, so I'm doing 
     //   this the long way until I can ask about Sequelize
-    //   Cascade.
-    return models.EmployeeHistory.destroy({
-        where: {
-            IndividualID: IndividualID
-        }
-    }).then((deletedHistory) => {
-        models.Individuals.destroy({
+    //   Cascade. --Sean
+    //
+    // Modfying this to avoid a race condition -- Aaron
+    return new Promise((resolve,reject)=>{
+        models.EmployeeHistory.destroy({
             where: {
                 IndividualID: IndividualID
             }
-        }).then((deletedIndividual) =>{
-            return deletedIndividual;
+        }).then((deletedHistory) => {
+            models.Individuals.destroy({
+                where: {
+                    IndividualID: IndividualID
+                }
+            }).then((deletedIndividual) =>{
+                console.log("deletion resolved")
+                resolve(deletedIndividual);
+            })
+        }).catch(err => {console.error(err)
+                        reject(err)
         })
-    }).catch(err => console.error(err));
+    })
 }
-
-module.exports = {
-    getAllIndividuals,
-    getAllCompanies,
-    getAllFunds,
-    getAllEmployeeHistory,
-    getAllFundCompany,
-    insertPerson,
-    insertCompany,
+    
+    module.exports = {
+        getAllIndividuals,
+        getAllCompanies,
+        getAllFunds,
+        getAllEmployeeHistory,
+        getAllFundCompany,
+        insertPerson,
+        insertCompany,
     insertEmployeeHistory,
     insertFromCsvLine,
     getIndividualEmployeeHistory,

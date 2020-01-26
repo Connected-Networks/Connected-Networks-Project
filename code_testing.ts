@@ -2,7 +2,7 @@
 //this is for code meant to be executed to test the functionality of code being developed
 
 import BackendProcessing from './backend-processing'
-
+const db = require('./sequelizeDatabase/sequelFunctions')
 
 
 function test_connect_to_database(){
@@ -28,9 +28,10 @@ function test_retrieve_from_database(){
     })
 }
 
+//this test was created after experiencing drops from Heroku
 async function test_continuous_connection(){
     let be = new BackendProcessing()
-    let wait = 57
+    let wait = 50
     console.log("testing connection with increasing wait time")
     let b = true
     while (b){
@@ -39,12 +40,10 @@ async function test_continuous_connection(){
         console.log("wait: "+String(wait) + " seconds")
         await delay(wait*1000)
     }
-
-
 }
 async function check_connection_once(be:BackendProcessing):Promise<boolean>{
     return new Promise<boolean>((resolve,reject)=>{
-        let p = be.check_connection()
+        let p = test_connection()
         p.then(b=>{
             if (b){
                 console.log("successful connection")
@@ -67,6 +66,17 @@ function delay(ms: number)
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function test_connection():Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+        db.getAllIndividuals().then(result=>{
+            if (result!=null)
+                resolve(true)
+            else
+                resolve(false)
+        })
+    })
+}
+
 function call_retrieve_people(){
     let be = new BackendProcessing()
     be.retrievePeopleFromDatabase().then(result=>{
@@ -74,4 +84,13 @@ function call_retrieve_people(){
     })
 }
 
-call_retrieve_people()
+function test_sequelize_database_access(){
+    db.getAllIndividuals().then((rows)=>{
+        rows.forEach(element => {
+           console.log(JSON.stringify(element)) 
+        });
+    })
+}
+
+//test_sequelize_database_access()
+test_continuous_connection()
