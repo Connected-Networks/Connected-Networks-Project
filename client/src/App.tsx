@@ -8,6 +8,7 @@ import styled from "styled-components";
 
 export interface AppState {
   uploadDialogOpened: boolean;
+  openSideMenu: boolean;
 }
 
 const Container = styled.div`
@@ -24,7 +25,8 @@ const Content = styled.div`
 
 export default class App extends React.Component<any, AppState> {
   state = {
-    uploadDialogOpened: false
+    uploadDialogOpened: false,
+    openSideMenu: false
   };
   closeUploadDialog = () => {
     this.setState({ uploadDialogOpened: false });
@@ -33,7 +35,9 @@ export default class App extends React.Component<any, AppState> {
     this.setState({ uploadDialogOpened: true });
   };
 
-  toggleSideMenu = () => {};
+  toggleSideMenu = () => {
+    this.setState({ openSideMenu: !this.state.openSideMenu });
+  };
 
   render() {
     return (
@@ -41,6 +45,7 @@ export default class App extends React.Component<any, AppState> {
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
         <TitleBar toggleOpen={this.toggleSideMenu} />
         <Content>
+          <SideMenu open={this.state.openSideMenu} />
           <PeopleTable uploadHandler={this.openUploadDialog} />
         </Content>
         <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
