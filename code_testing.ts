@@ -92,5 +92,21 @@ function test_sequelize_database_access(){
     })
 }
 
+function test_timing(){
+    timing_help().then((result)=>{
+        console.log(result)
+    })
+}
+function timing_help():Promise<number[]>{
+    let start = [1,2,3,4,5]
+    return Promise.all(start.map((n)=>{return timing_help2(n)}))
+}
+function timing_help2(n):Promise<number>{
+    return new Promise<number>((resolve,reject)=>{
+        delay(1000).then(()=>{resolve(n+1)})
+    })
+}
+
 //test_sequelize_database_access()
-test_continuous_connection()
+//test_continuous_connection()
+test_timing()
