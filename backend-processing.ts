@@ -187,4 +187,17 @@ export default class BackendProcessing {
       })
     })
   }
+
+  insert_company(company):Promise<Boolean>{
+    //TODO: finish this function
+    return null
+  }
+  update_company(company):Promise<Boolean>{
+    //TODO: finish this function
+    return null
+  }
+  delete_company(company):Promise<Boolean>{
+    //TODO: finish this function
+    return null
+  }
 }
