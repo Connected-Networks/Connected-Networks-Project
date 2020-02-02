@@ -19,7 +19,6 @@ app.post("/csv", (req, res) => {
       res.sendStatus(200);
     })
   } catch (error) {
-    console.log(error);
     res.sendStatus(500);
   }
 });
@@ -27,9 +26,7 @@ app.post("/csv", (req, res) => {
 app.get("/people", (req, res) => {
   try {
     let be = new BackendProcessing();
-    console.log("starting retrieval")
     let data = be.retrievePeopleFromDatabase().then(results => {
-      console.log("results 2: "+results)
       if (!results) {
         res.sendStatus(500);
       } else {
@@ -38,7 +35,6 @@ app.get("/people", (req, res) => {
       }
     });
   } catch (error) {
-    console.log("error retrieving people: "+error);
     res.sendStatus(500);
   }
 });
@@ -86,6 +82,23 @@ app.delete("/people/:id", (req, res) => {
       res.sendStatus(500)
   })
   d.catch(res.sendStatus(500));
+});
+
+
+app.get("/company", (req, res) => {
+  try {
+    let be = new BackendProcessing();
+    let data = be.retrieveCompaniesFromDatabase().then((results) => {
+      if (!results) {
+        res.sendStatus(500);
+      } else {
+        res.json({ data: results });
+        res.sendStatus(200);
+      }
+    });
+  } catch (error) {
+    res.sendStatus(500);
+  }
 });
 
 app.put("/company", (req, res) => {

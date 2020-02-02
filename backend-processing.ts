@@ -13,6 +13,10 @@ interface DisplayPerson {
   comment: string;
   hyperlink: string;
 }
+interface DisplayCompany {
+  id: number;
+  name: string;
+}
 
 export default class BackendProcessing {
 
@@ -178,15 +182,40 @@ export default class BackendProcessing {
   }
 
   insert_company(company):Promise<Boolean>{
-    //TODO: finish this function
-    return null
+    return new Promise<Boolean>((resolve,reject)=>{
+      let i = database.insertCompany(company.name);
+      i.then(resolve(true));
+      i.catch(resolve(false));
+    });
   }
   update_company(company):Promise<Boolean>{
-    //TODO: finish this function
-    return null
+    return new Promise<Boolean>((resolve,reject)=>{
+      let u = database.modifyCompany(company.id,company.name);
+      u.then(resolve(true));
+      u.catch(resolve(false));
+
+    });
   }
   delete_company(company):Promise<Boolean>{
-    //TODO: finish this function
-    return null
+    return new Promise<Boolean>((resolve,reject)=>{
+      let d = database.deleteCompany(company.id);
+      d.then(resolve(true));
+      d.catch(resolve(false));
+    })
+  }
+
+  retrieveCompaniesFromDatabase():Promise<DisplayCompany[]>{
+    return new Promise<DisplayCompany[]>((resolve,reject)=>{
+      database.getAllCompanies().then((results)=>{
+        let list:DisplayCompany[] = results.map((element)=>{
+          let company:DisplayCompany={
+            id : element.CompanyID,
+            name : element.CompanyName
+          }
+          return company;
+        })
+        resolve(list);
+      })
+    })
   }
 }
