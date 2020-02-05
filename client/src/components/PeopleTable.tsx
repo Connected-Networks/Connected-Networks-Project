@@ -188,13 +188,14 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
             onRowUpdate: this.updateRow,
             onRowDelete: this.deleteRow
           }}
+          title="People"
           actions={[
             {
               icon: () => <ImportIcon fill={"grey"} />,
               tooltip: "Upload CSV",
               isFreeAction: true,
               onClick: (event, rowData) => {
-                this.props.uploadHandler()
+                this.props.uploadHandler();
                 this.refreshTable();
               }
             }

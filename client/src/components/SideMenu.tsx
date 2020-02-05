@@ -1,9 +1,11 @@
 import * as React from "react";
 import { Divider, List, ListItem, ListItemText } from "@material-ui/core";
 import styled from "styled-components";
+import { TableType } from "../App";
 
 export interface SideMenuProps {
   open: boolean;
+  handleSwitchTable: Function;
 }
 
 export interface SideMenuState {}
@@ -23,9 +25,9 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
     return (
       <Container open={this.props.open}>
         <List>
-          {["Recent", "Starred", "People", "Companies"].map(text => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
+          {[TableType.RECENT, TableType.STARRED, TableType.PEOPLE, TableType.COMPANIES].map(type => (
+            <ListItem button key={TableType[type]} onClick={() => this.props.handleSwitchTable(type)}>
+              <ListItemText primary={TableType[type]} />
             </ListItem>
           ))}
         </List>
