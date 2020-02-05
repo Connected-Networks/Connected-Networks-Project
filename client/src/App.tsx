@@ -5,10 +5,12 @@ import PeopleTable from "./components/PeopleTable";
 import SideMenu from "./components/SideMenu";
 import TitleBar from "./components/TitleBar";
 import styled from "styled-components";
+import CompaniesTable from "./components/CompaniesTable";
 
 export interface AppState {
   uploadDialogOpened: boolean;
   openSideMenu: boolean;
+  tableType: TableType;
 }
 
 const Container = styled.div`
@@ -23,10 +25,18 @@ const Content = styled.div`
   height: 0%;
 `;
 
+export enum TableType {
+  RECENT,
+  STARRED,
+  PEOPLE,
+  COMPANIES
+}
+
 export default class App extends React.Component<any, AppState> {
   state = {
     uploadDialogOpened: false,
-    openSideMenu: false
+    openSideMenu: false,
+    tableType: TableType.PEOPLE
   };
   closeUploadDialog = () => {
     this.setState({ uploadDialogOpened: false });
@@ -39,14 +49,31 @@ export default class App extends React.Component<any, AppState> {
     this.setState({ openSideMenu: !this.state.openSideMenu });
   };
 
+  switchTables = (tableType: TableType) => {
+    this.setState({ tableType });
+  };
+
+  getTable = (tableType: TableType) => {
+    switch (tableType) {
+      case TableType.PEOPLE:
+        return <PeopleTable uploadHandler={this.openUploadDialog} />;
+
+      case TableType.COMPANIES:
+        return <CompaniesTable uploadHandler={this.openUploadDialog} />;
+
+      default:
+        break;
+    }
+  };
+
   render() {
     return (
       <Container>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
         <TitleBar toggleOpen={this.toggleSideMenu} />
         <Content>
-          <SideMenu open={this.state.openSideMenu} />
-          <PeopleTable uploadHandler={this.openUploadDialog} />
+          <SideMenu open={this.state.openSideMenu} handleSwitchTable={this.switchTables} />
+          {this.getTable(this.state.tableType)}
         </Content>
         <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
       </Container>

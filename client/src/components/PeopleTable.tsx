@@ -117,8 +117,10 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
         .post(`/people`, { newData })
         .then(response => {
           if (response.status === 200) {
+            this.refreshTable();
             resolve();
           } else {
+            this.refreshTable();
             reject();
           }
         })
@@ -186,12 +188,16 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
             onRowUpdate: this.updateRow,
             onRowDelete: this.deleteRow
           }}
+          title="People"
           actions={[
             {
               icon: () => <ImportIcon fill={"grey"} />,
               tooltip: "Upload CSV",
               isFreeAction: true,
-              onClick: (event, rowData) => this.props.uploadHandler()
+              onClick: (event, rowData) => {
+                this.props.uploadHandler();
+                this.refreshTable();
+              }
             }
           ]}
         />
