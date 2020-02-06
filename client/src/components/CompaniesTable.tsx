@@ -3,15 +3,14 @@ import styled from "styled-components";
 import MaterialTable, { Column } from "material-table";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 import ATable, { TableState, TableProps } from "./ATable";
+import EditableObject from "./EditableObject";
+import DisplayTable from "./DisplayTable";
+import("./EditableObject");
+import("./IActionsObject");
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
 }
-
-// export interface CompaniesTableState {
-//   companies: DisplayCompany[];
-//   columns: Array<Column<DisplayCompany>>;
-// }
 
 interface DisplayCompany {
   id: number;
@@ -26,9 +25,27 @@ const getTableName = () => {
   return "Companies";
 }
 
-class CompaniesTable extends ATable<DisplayCompany> {
+class CompaniesEditableObject implements EditableObject<DisplayCompany> {
+    onRowUpdate = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
+      return new Promise<void>((resolve, reject) => {
+        resolve();
+      });
+    };;
+}
+
+
+export default class CompaniesTable extends DisplayTable<DisplayCompany> {
+
+  get actionsObject(): (import("material-table").Action<DisplayCompany> | ((rowData: DisplayCompany) => import("material-table").Action<DisplayCompany>))[] {
+    throw new Error("Method not implemented.");
+  }
+
+  get editableObject(): CompaniesEditableObject {
+    return new CompaniesEditableObject;
+  }
+
   
-  get name(): String {
+  get name(): string {
     return getTableName();
   }
 
@@ -69,9 +86,7 @@ class CompaniesTable extends ATable<DisplayCompany> {
         <MaterialTable
           columns={this.state.columns}
           data={this.state.data}
-          editable={{
-            onRowUpdate: this.updateRow
-          }}
+          editable={new CompaniesEditableObject}
           title="Companies"
           actions={[
             {
@@ -90,4 +105,3 @@ class CompaniesTable extends ATable<DisplayCompany> {
   }
 }
 
-export default CompaniesTable;

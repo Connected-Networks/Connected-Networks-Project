@@ -4,6 +4,9 @@ import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 import styled from "styled-components";
 import ATable, { TableState, TableProps } from "./ATable";
+import DisplayTable from "./DisplayTable";
+import EditableObject from "./EditableObject";
+
 
 const Container = styled.div`
   flex: 1;
@@ -33,9 +36,16 @@ const getTableName = () => {
   return tableName;
 }
 
-export default class PeopleTable extends ATable<DisplayPerson> {
+export default class PeopleTable extends DisplayTable<DisplayPerson> {
 
-  get name(): String {
+  get editableObject(): import("./EditableObject").default<DisplayPerson> {
+    throw new Error("Method not implemented.");
+  }
+  get actionsObject(): (import("material-table").Action<DisplayPerson> | ((rowData: DisplayPerson) => import("material-table").Action<DisplayPerson>))[] {
+    throw new Error("Method not implemented.");
+  }
+
+  get name(): string {
     return getTableName();
   }
   
