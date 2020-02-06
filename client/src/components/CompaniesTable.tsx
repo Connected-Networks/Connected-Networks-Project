@@ -29,8 +29,30 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
   };
 
   updateRow = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
-    return new Promise<void>((resolve, reject) => {
-      resolve();
+    return new Promise<void>(resolve => {
+      if (oldData) {
+        console.log(newData);
+        this.updateCompanyOnServer(newData).then(() => {
+          this.refreshTable().then(() => resolve());
+        });
+      }
+    });
+  };
+
+  updateCompanyOnServer = async (company: DisplayCompany) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .put("/company", company)
+        .then(response => {
+          if (response.status === 200) {
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     });
   };
 
@@ -38,12 +60,15 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
     this.refreshTable();
   }
 
-  refreshTable = () => {
-    this.getCompanies()
-      .then(companies => {
-        this.setState({ companies });
-      })
-      .catch(() => {});
+  refreshTable = async () => {
+    return new Promise((resolve, reject) => {
+      this.getCompanies()
+        .then(companies => {
+          this.setState({ companies });
+          resolve();
+        })
+        .catch(() => {});
+    });
   };
 
   getCompanies = async () => {
