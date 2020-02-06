@@ -103,6 +103,10 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
               }
             }
           ]}
+          detailPanel={rowData => {
+            return <p>Test test</p>;
+          }}
+          onRowClick={(event, rowData, togglePanel) => togglePanel!()}
         />
       </Container>
     );
