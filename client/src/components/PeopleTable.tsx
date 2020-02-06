@@ -4,11 +4,7 @@ import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 import styled from "styled-components";
 
-const Container = styled.div`
-  flex: 1;
-`;
-
-interface DisplayPerson {
+export interface DisplayPerson {
   id: number;
   name: string;
   company: string;
@@ -205,3 +201,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     );
   }
 }
+
+const Container = styled.div`
+  flex: 1;
+`;

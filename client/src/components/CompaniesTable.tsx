@@ -3,6 +3,8 @@ import styled from "styled-components";
 import MaterialTable, { Column } from "material-table";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 import axios from "axios";
+import PeopleTable from "./PeopleTable";
+import CompanyDetailsTable from "./CompanyDetailsTable";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
@@ -104,7 +106,11 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
             }
           ]}
           detailPanel={rowData => {
-            return <p>Test test</p>;
+            return (
+              <div style={{ marginLeft: "60px" }}>
+                <CompanyDetailsTable uploadHandler={this.props.uploadHandler} companyId={rowData.id} />
+              </div>
+            );
           }}
           onRowClick={(event, rowData, togglePanel) => togglePanel!()}
         />
