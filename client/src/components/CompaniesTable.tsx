@@ -2,15 +2,16 @@ import * as React from "react";
 import styled from "styled-components";
 import MaterialTable, { Column } from "material-table";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
+import ATable, { TableState, TableProps } from "./ATable";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
 }
 
-export interface CompaniesTableState {
-  companies: DisplayCompany[];
-  columns: Array<Column<DisplayCompany>>;
-}
+// export interface CompaniesTableState {
+//   companies: DisplayCompany[];
+//   columns: Array<Column<DisplayCompany>>;
+// }
 
 interface DisplayCompany {
   id: number;
@@ -21,9 +22,20 @@ const Container = styled.div`
   flex: 1;
 `;
 
-class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTableState> {
-  state: CompaniesTableState = {
-    companies: [],
+const getTableName = () => {
+  return "Companies";
+}
+
+class CompaniesTable extends ATable<DisplayCompany> {
+  
+  get name(): String {
+    return getTableName();
+  }
+
+  
+
+  state: TableState<DisplayCompany> = {
+    data: [],
     columns: [{ title: "Name", field: "name" }]
   };
 
@@ -40,7 +52,7 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
   refreshTable = () => {
     this.getCompanies()
       .then(companies => {
-        this.setState({ companies });
+        this.setState({ data:companies });
       })
       .catch(() => {});
   };
@@ -56,7 +68,7 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
       <Container>
         <MaterialTable
           columns={this.state.columns}
-          data={this.state.companies}
+          data={this.state.data}
           editable={{
             onRowUpdate: this.updateRow
           }}

@@ -3,6 +3,7 @@ import MaterialTable, { Column } from "material-table";
 import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 import styled from "styled-components";
+import ATable, { TableState, TableProps } from "./ATable";
 
 const Container = styled.div`
   flex: 1;
@@ -17,18 +18,29 @@ interface DisplayPerson {
   hyperlink: string;
 }
 
-interface TableProps {
-  uploadHandler: Function;
+// interface TableProps {
+//   uploadHandler: Function;
+// }
+
+// interface TableState {
+//   people: DisplayPerson[];
+//   columns: Array<Column<DisplayPerson>>;
+// }
+
+const tableName = "People";
+
+const getTableName = () => {
+  return tableName;
 }
 
-interface TableState {
-  people: DisplayPerson[];
-  columns: Array<Column<DisplayPerson>>;
-}
+export default class PeopleTable extends ATable<DisplayPerson> {
 
-export default class PeopleTable extends React.Component<TableProps, TableState> {
-  state: TableState = {
-    people: [],
+  get name(): String {
+    return getTableName();
+  }
+  
+  state: TableState<DisplayPerson> = {
+    data: [],
     columns: [
       { title: "Name", field: "name" },
       { title: "Company", field: "company" },
@@ -172,7 +184,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
   refreshTable = () => {
     this.getPeople()
       .then(people => {
-        this.setState({ people });
+        this.setState({ data:people });
       })
       .catch(() => {});
   };
@@ -182,7 +194,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
       <Container>
         <MaterialTable
           columns={this.state.columns}
-          data={this.state.people}
+          data={this.state.data}
           editable={{
             onRowAdd: this.addRow,
             onRowUpdate: this.updateRow,
