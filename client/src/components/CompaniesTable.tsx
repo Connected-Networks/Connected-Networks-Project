@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import MaterialTable, { Column } from "material-table";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
+import axios from "axios";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
@@ -47,7 +48,12 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
 
   getCompanies = async () => {
     return new Promise<DisplayCompany[]>(resolve => {
-      resolve([{ id: 0, name: "" }]);
+      axios
+        .get("/company")
+        .then(response => resolve(response.data.data))
+        .catch(function(error) {
+          console.log(error);
+        });
     });
   };
 
