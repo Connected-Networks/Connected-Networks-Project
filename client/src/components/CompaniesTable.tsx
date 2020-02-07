@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import MaterialTable, { Column } from "material-table";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-import ATable, { TableState, TableProps } from "./ATable";
+import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import DisplayTable from "./DisplayTable";
 import("./EditableObject");
@@ -23,29 +23,24 @@ const Container = styled.div`
 
 const getTableName = () => {
   return "Companies";
-}
+};
 
 class CompaniesEditableObject implements EditableObject<DisplayCompany> {
-    onRowUpdate = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
-      return new Promise<void>((resolve, reject) => {
-        resolve();
-      });
-    };;
+  onRowUpdate = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
+    return new Promise<void>((resolve, reject) => {
+      resolve();
+    });
+  };
 }
 
-
 export default class CompaniesTable extends DisplayTable<DisplayCompany> {
-
   get editableObject(): CompaniesEditableObject {
-    return new CompaniesEditableObject;
+    return new CompaniesEditableObject();
   }
 
-  
   get name(): string {
     return getTableName();
   }
-
-  
 
   state: TableState<DisplayCompany> = {
     data: [],
@@ -65,7 +60,7 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
   refreshTable = () => {
     this.getCompanies()
       .then(companies => {
-        this.setState({ data:companies });
+        this.setState({ data: companies });
       })
       .catch(() => {});
   };
@@ -82,7 +77,7 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
         <MaterialTable
           columns={this.state.columns}
           data={this.state.data}
-          editable={new CompaniesEditableObject}
+          editable={new CompaniesEditableObject()}
           title="Companies"
           actions={[
             {
@@ -100,4 +95,3 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
     );
   }
 }
-

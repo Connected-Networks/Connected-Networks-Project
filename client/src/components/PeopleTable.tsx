@@ -2,14 +2,10 @@ import React from "react";
 import MaterialTable, { Column } from "material-table";
 import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-import styled from "styled-components";
-import ATable, { TableState, TableProps } from "./ATable";
+
+import ATable, { TableState } from "./ATable";
 import DisplayTable from "./DisplayTable";
 import EditableObject from "./EditableObject";
-
-const Container = styled.div`
-  flex: 1;
-`;
 
 interface DisplayPerson {
   id: number;

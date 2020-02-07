@@ -1,8 +1,12 @@
 import React from "react";
 import MaterialTable, { Column, Action } from "material-table";
-import { Container } from "@material-ui/core";
+import styled from "styled-components";
 import EditableObject from "./EditableObject";
-import IActionsObject from "./IActionsObject";
+
+export interface TableState<T extends Object> {
+  data: T[];
+  columns: Array<Column<T>>;
+}
 
 // Make abstract class
 export default abstract class ATable<T extends Object, TableProps> extends React.Component<TableProps, TableState<T>> {
@@ -25,7 +29,6 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   }
 }
 
-export interface TableState<T extends Object> {
-  data: T[];
-  columns: Array<Column<T>>;
-}
+const Container = styled.div`
+  flex: 1;
+`;
