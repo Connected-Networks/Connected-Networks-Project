@@ -32,8 +32,12 @@ const getTableName = () => {
 };
 
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
-  get editableObject(): import("./EditableObject").default<DisplayPerson> {
-    throw new Error("Method not implemented.");
+  get editableObject(): EditableObject<DisplayPerson> {
+    return {
+      onRowAdd: this.addRow,
+      onRowUpdate: this.updateRow,
+      onRowDelete: this.deleteRow
+    };
   }
 
   get name(): string {
@@ -189,32 +193,4 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
       })
       .catch(() => {});
   };
-
-  render() {
-    return (
-      <Container>
-        <MaterialTable
-          columns={this.state.columns}
-          data={this.state.data}
-          editable={{
-            onRowAdd: this.addRow,
-            onRowUpdate: this.updateRow,
-            onRowDelete: this.deleteRow
-          }}
-          title="People"
-          actions={[
-            {
-              icon: () => <ImportIcon fill={"grey"} />,
-              tooltip: "Upload CSV",
-              isFreeAction: true,
-              onClick: (event, rowData) => {
-                this.props.uploadHandler();
-                this.refreshTable();
-              }
-            }
-          ]}
-        />
-      </Container>
-    );
-  }
 }

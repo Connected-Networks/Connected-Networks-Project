@@ -6,7 +6,6 @@ import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import DisplayTable from "./DisplayTable";
 import("./EditableObject");
-import("./IActionsObject");
 
 export interface CompaniesTableProps {
   uploadHandler: Function;

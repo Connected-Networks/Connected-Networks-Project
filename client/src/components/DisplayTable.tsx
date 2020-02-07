@@ -1,6 +1,5 @@
 import * as React from "react";
 import ATable from "./ATable";
-import IActionsObject from "./IActionsObject";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 
 export interface TableProps {
