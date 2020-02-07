@@ -150,6 +150,70 @@ app.delete("/company/:id", (req, res) => {
   d.catch(res.sendStatus(500));
 });
 
+app.get("/fund", (req, res) => {
+  try {
+    let be = new BackendProcessing();
+    let data = be.retrieveFundsFromDatabase().then((results) => {
+      if (!results) {
+        res.sendStatus(500);
+      } else {
+        res.json({ data: results });
+        res.sendStatus(200);
+      }
+    });
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+app.put("/fund", (req, res) => {
+  //update company
+  let be = new BackendProcessing();
+  //console.log("body: "+JSON.stringify(req.body))
+  let fund = req.body;
+  let update = be.update_fund(fund);
+  update.then((boolean) => {
+    if (boolean){
+      console.log("fund updated");
+      res.sendStatus(200);
+    }
+    else
+      res.sendStatus(500);
+  });
+  update.catch(() => {
+    res.sendStatus(500);
+  });
+});
+
+app.post("/fund", (req, res) => {
+  //add fund
+  let be = new BackendProcessing();
+  let fund = req.body.newData;
+  let i = be.insert_fund(fund);
+  i.then((boolean) => {
+    if (boolean){
+      console.log("fund added");
+      res.sendStatus(200);
+    }
+    else
+      res.sendStatus(500);
+  });
+  i.catch(res.sendStatus(500));
+});
+
+app.delete("/fund/:id", (req, res) => {
+  //delete fund
+  let be = new BackendProcessing();
+  let fund = req.params.id;
+  let d = be.delete_fund(fund)
+  d.then((boolean)=>{
+    if (boolean)
+      res.sendStatus(200)
+    else
+      res.sendStatus(500)
+  })
+  d.catch(res.sendStatus(500));
+});
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
