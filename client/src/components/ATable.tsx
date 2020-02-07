@@ -9,6 +9,7 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   abstract get editableObject(): EditableObject<T>;
   abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[];
   abstract get name(): string;
+  abstract refreshTable(): void;
   render() {
     return (
       <Container>

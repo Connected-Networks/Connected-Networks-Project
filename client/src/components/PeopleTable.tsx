@@ -7,7 +7,6 @@ import ATable, { TableState, TableProps } from "./ATable";
 import DisplayTable from "./DisplayTable";
 import EditableObject from "./EditableObject";
 
-
 const Container = styled.div`
   flex: 1;
 `;
@@ -34,21 +33,17 @@ const tableName = "People";
 
 const getTableName = () => {
   return tableName;
-}
+};
 
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
-
   get editableObject(): import("./EditableObject").default<DisplayPerson> {
-    throw new Error("Method not implemented.");
-  }
-  get actionsObject(): (import("material-table").Action<DisplayPerson> | ((rowData: DisplayPerson) => import("material-table").Action<DisplayPerson>))[] {
     throw new Error("Method not implemented.");
   }
 
   get name(): string {
     return getTableName();
   }
-  
+
   state: TableState<DisplayPerson> = {
     data: [],
     columns: [
@@ -194,7 +189,7 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
   refreshTable = () => {
     this.getPeople()
       .then(people => {
-        this.setState({ data:people });
+        this.setState({ data: people });
       })
       .catch(() => {});
   };

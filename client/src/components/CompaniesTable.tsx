@@ -36,10 +36,6 @@ class CompaniesEditableObject implements EditableObject<DisplayCompany> {
 
 export default class CompaniesTable extends DisplayTable<DisplayCompany> {
 
-  get actionsObject(): (import("material-table").Action<DisplayCompany> | ((rowData: DisplayCompany) => import("material-table").Action<DisplayCompany>))[] {
-    throw new Error("Method not implemented.");
-  }
-
   get editableObject(): CompaniesEditableObject {
     return new CompaniesEditableObject;
   }
