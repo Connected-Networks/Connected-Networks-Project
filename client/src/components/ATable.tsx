@@ -5,30 +5,26 @@ import EditableObject from "./EditableObject";
 import IActionsObject from "./IActionsObject";
 
 // Make abstract class
-export default abstract class ATable<T extends Object> extends React.Component<TableProps, TableState<T>> {
-    abstract get editableObject() : EditableObject<T>
-    abstract get actionsObject() :  (Action<T> | ((rowData: T) => Action<T>))[];
-    abstract get name() : string
-    render() {
-        return (
-            <Container>
-                <MaterialTable
-                columns={this.state.columns}
-                data={this.state.data}
-                editable={this.editableObject}
-                title={this.name}
-                actions={this.actionsObject}
-                />
-            </Container>
-        )
-    }
-}
-
-export interface TableProps {
-
+export default abstract class ATable<T extends Object, TableProps> extends React.Component<TableProps, TableState<T>> {
+  abstract get editableObject(): EditableObject<T>;
+  abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[];
+  abstract get name(): string;
+  render() {
+    return (
+      <Container>
+        <MaterialTable
+          columns={this.state.columns}
+          data={this.state.data}
+          editable={this.editableObject}
+          title={this.name}
+          actions={this.actionsObject}
+        />
+      </Container>
+    );
+  }
 }
 
 export interface TableState<T extends Object> {
-    data: T[];
-    columns: Array<Column<T>>;
-  }
+  data: T[];
+  columns: Array<Column<T>>;
+}
