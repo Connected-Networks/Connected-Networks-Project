@@ -25,13 +25,9 @@ interface DisplayPerson {
 //   columns: Array<Column<DisplayPerson>>;
 // }
 
-const tableName = "People";
-
-const getTableName = () => {
-  return tableName;
-};
-
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
+  readonly TABLE_NAME = "People";
+
   get editableObject(): EditableObject<DisplayPerson> {
     return {
       onRowAdd: this.addRow,
@@ -41,7 +37,7 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
   }
 
   get name(): string {
-    return getTableName();
+    return this.TABLE_NAME;
   }
 
   state: TableState<DisplayPerson> = {

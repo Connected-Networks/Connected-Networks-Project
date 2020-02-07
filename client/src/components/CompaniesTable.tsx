@@ -5,7 +5,6 @@ import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import DisplayTable from "./DisplayTable";
-import("./EditableObject");
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
@@ -16,35 +15,23 @@ interface DisplayCompany {
   name: string;
 }
 
-const Container = styled.div`
-  flex: 1;
-`;
-
-const getTableName = () => {
-  return "Companies";
-};
-
-class CompaniesEditableObject implements EditableObject<DisplayCompany> {
-  onRowUpdate = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
-    return new Promise<void>((resolve, reject) => {
-      resolve();
-    });
-  };
-}
-
 export default class CompaniesTable extends DisplayTable<DisplayCompany> {
-  get editableObject(): CompaniesEditableObject {
-    return new CompaniesEditableObject();
-  }
-
-  get name(): string {
-    return getTableName();
-  }
+  readonly TABLE_NAME = "Companies";
 
   state: TableState<DisplayCompany> = {
     data: [],
     columns: [{ title: "Name", field: "name" }]
   };
+
+  get editableObject(): EditableObject<DisplayCompany> {
+    return {
+      onRowUpdate: this.updateRow
+    };
+  }
+
+  get name(): string {
+    return this.TABLE_NAME;
+  }
 
   updateRow = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
     return new Promise<void>((resolve, reject) => {
@@ -69,28 +56,4 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
       resolve([{ id: 0, name: "" }]);
     });
   };
-
-  render() {
-    return (
-      <Container>
-        <MaterialTable
-          columns={this.state.columns}
-          data={this.state.data}
-          editable={new CompaniesEditableObject()}
-          title="Companies"
-          actions={[
-            {
-              icon: () => <ImportIcon fill={"grey"} />,
-              tooltip: "Upload CSV",
-              isFreeAction: true,
-              onClick: (event, rowData) => {
-                this.props.uploadHandler();
-                this.refreshTable();
-              }
-            }
-          ]}
-        />
-      </Container>
-    );
-  }
 }
