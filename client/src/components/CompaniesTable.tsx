@@ -2,6 +2,9 @@ import * as React from "react";
 import styled from "styled-components";
 import MaterialTable, { Column } from "material-table";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
+import axios from "axios";
+import PeopleTable from "./PeopleTable";
+import CompanyDetailsTable from "./CompanyDetailsTable";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
@@ -28,8 +31,30 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
   };
 
   updateRow = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
-    return new Promise<void>((resolve, reject) => {
-      resolve();
+    return new Promise<void>(resolve => {
+      if (oldData) {
+        console.log(newData);
+        this.updateCompanyOnServer(newData).then(() => {
+          this.refreshTable().then(() => resolve());
+        });
+      }
+    });
+  };
+
+  updateCompanyOnServer = async (company: DisplayCompany) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .put("/company", company)
+        .then(response => {
+          if (response.status === 200) {
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     });
   };
 
@@ -37,17 +62,25 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
     this.refreshTable();
   }
 
-  refreshTable = () => {
-    this.getCompanies()
-      .then(companies => {
-        this.setState({ companies });
-      })
-      .catch(() => {});
+  refreshTable = async () => {
+    return new Promise((resolve, reject) => {
+      this.getCompanies()
+        .then(companies => {
+          this.setState({ companies });
+          resolve();
+        })
+        .catch(() => {});
+    });
   };
 
   getCompanies = async () => {
     return new Promise<DisplayCompany[]>(resolve => {
-      resolve([{ id: 0, name: "" }]);
+      axios
+        .get("/company")
+        .then(response => resolve(response.data.data))
+        .catch(function(error) {
+          console.log(error);
+        });
     });
   };
 
@@ -72,6 +105,14 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
               }
             }
           ]}
+          detailPanel={rowData => {
+            return (
+              <div style={{ marginLeft: "60px" }}>
+                <CompanyDetailsTable uploadHandler={this.props.uploadHandler} companyId={rowData.id} />
+              </div>
+            );
+          }}
+          onRowClick={(event, rowData, togglePanel) => togglePanel!()}
         />
       </Container>
     );
