@@ -1,9 +1,5 @@
-import React from "react";
-import MaterialTable, { Column } from "material-table";
 import axios from "axios";
-import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-
-import ATable, { TableState } from "./ATable";
+import { TableState } from "./ATable";
 import DisplayTable from "./DisplayTable";
 import EditableObject from "./EditableObject";
 
@@ -154,13 +150,6 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
         });
     });
   };
-
-  /**
-   * Once this loaded, this code will run.
-   */
-  componentDidMount() {
-    this.refreshTable();
-  }
 
   refreshTable = () => {
     this.getPeople()

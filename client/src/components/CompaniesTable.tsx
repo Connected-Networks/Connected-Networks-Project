@@ -1,8 +1,4 @@
-import * as React from "react";
-import styled from "styled-components";
-import MaterialTable, { Column } from "material-table";
-import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-import ATable, { TableState } from "./ATable";
+import { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import DisplayTable from "./DisplayTable";
 
@@ -38,10 +34,6 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
       resolve();
     });
   };
-
-  componentDidMount() {
-    this.refreshTable();
-  }
 
   refreshTable = () => {
     this.getCompanies()

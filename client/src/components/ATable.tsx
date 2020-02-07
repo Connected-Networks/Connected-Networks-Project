@@ -14,6 +14,11 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[];
   abstract get name(): string;
   abstract refreshTable(): void;
+
+  componentDidMount() {
+    this.refreshTable();
+  }
+
   render() {
     return (
       <Container>
