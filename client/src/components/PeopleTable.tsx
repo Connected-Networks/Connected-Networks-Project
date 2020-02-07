@@ -16,17 +16,17 @@ interface DisplayPerson {
   hyperlink: string;
 }
 
-// interface TableProps {
-//   uploadHandler: Function;
-// }
-
-// interface TableState {
-//   people: DisplayPerson[];
-//   columns: Array<Column<DisplayPerson>>;
-// }
-
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
   readonly TABLE_NAME = "People";
+
+  state: TableState<DisplayPerson> = {
+    data: [],
+    columns: [
+      { title: "Name", field: "name" },
+      { title: "Company", field: "company" },
+      { title: "Position", field: "position" }
+    ]
+  };
 
   get editableObject(): EditableObject<DisplayPerson> {
     return {
@@ -39,15 +39,6 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
   get name(): string {
     return this.TABLE_NAME;
   }
-
-  state: TableState<DisplayPerson> = {
-    data: [],
-    columns: [
-      { title: "Name", field: "name" },
-      { title: "Company", field: "company" },
-      { title: "Position", field: "position" }
-    ]
-  };
 
   /**
    * This method sends an AJAX get request to get people
@@ -63,17 +54,6 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
     });
   };
 
-  // /**
-  //  * This takes in the local data state on people and refreshes the table based on that.
-  //  */
-  // refreshTable() {
-  //   this.state.people.forEach(person => {
-  //     let r: Row = {
-  //       name: person.name,
-  //       companyAndPosition: !person.company && !person.position ? "" : person.company.concat(" | " + person.position)
-  //     };
-  //   });
-  // }
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *
