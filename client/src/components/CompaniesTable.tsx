@@ -17,6 +17,10 @@ export interface DisplayCompany {
 export default class CompaniesTable extends DisplayTable<DisplayCompany> {
   readonly TABLE_NAME = "Companies";
 
+  static defaultProps = {
+    dataEndPoint: "/company"
+  };
+
   state: TableState<DisplayCompany> = {
     data: [],
     columns: [{ title: "Name", field: "name" }]

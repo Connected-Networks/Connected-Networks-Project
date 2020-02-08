@@ -15,6 +15,10 @@ export interface DisplayPerson {
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
   readonly TABLE_NAME = "People";
 
+  static defaultProps = {
+    dataEndPoint: "/people"
+  };
+
   state: TableState<DisplayPerson> = {
     data: [],
     columns: [
