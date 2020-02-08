@@ -1,5 +1,5 @@
-import React from "react";
-import MaterialTable, { Column, Action } from "material-table";
+import React, { ReactNode } from "react";
+import MaterialTable, { Column, Action, DetailPanel } from "material-table";
 import styled from "styled-components";
 import EditableObject from "./EditableObject";
 
@@ -14,6 +14,9 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[];
   abstract get name(): string;
   abstract refreshTable(): void;
+  getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
+    return undefined;
+  };
 
   componentDidMount() {
     this.refreshTable();
@@ -28,6 +31,8 @@ export default abstract class ATable<T extends Object, TableProps> extends React
           editable={this.editableObject}
           title={this.name}
           actions={this.actionsObject}
+          detailPanel={this.getDetailPanel}
+          onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
         />
       </Container>
     );
