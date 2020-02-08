@@ -13,7 +13,6 @@ export interface DisplayPerson {
 }
 
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
-
   readonly TABLE_NAME = "People";
 
   state: TableState<DisplayPerson> = {
@@ -36,20 +35,6 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
   get name(): string {
     return this.TABLE_NAME;
   }
-
-  /**
-   * This method sends an AJAX get request to get people
-   */
-  getPeople = async () => {
-    return new Promise<DisplayPerson[]>(resolve => {
-      axios
-        .get("/people")
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
-  };
 
   /**
    * This method takes two rows and updates the old row on the table with the new one
@@ -152,11 +137,14 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
     });
   };
 
-  refreshTable = () => {
-    this.getPeople()
-      .then(people => {
-        this.setState({ data: people });
-      })
-      .catch(() => {});
-  };
+  getData(): Promise<DisplayPerson[]> {
+    return new Promise<DisplayPerson[]>(resolve => {
+      axios
+        .get("/people")
+        .then(response => resolve(response.data.data))
+        .catch(function(error) {
+          console.log(error);
+        });
+    });
+  }
 }

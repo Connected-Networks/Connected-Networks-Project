@@ -13,7 +13,7 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   abstract get editableObject(): EditableObject<T>;
   abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[] | undefined;
   abstract get name(): string;
-  abstract refreshTable(): void;
+  abstract getData(): Promise<T[]>;
   getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
     return undefined;
   };
@@ -21,6 +21,14 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   componentDidMount() {
     this.refreshTable();
   }
+
+  refreshTable = () => {
+    this.getData()
+      .then(data => {
+        this.setState({ data });
+      })
+      .catch(() => {});
+  };
 
   render() {
     return (

@@ -9,7 +9,7 @@ export interface CompaniesTableProps {
   uploadHandler: Function;
 }
 
-interface DisplayCompany {
+export interface DisplayCompany {
   id: number;
   name: string;
 }
@@ -69,15 +69,7 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
     });
   };
 
-  refreshTable = () => {
-    this.getCompanies()
-      .then(companies => {
-        this.setState({ data: companies });
-      })
-      .catch(() => {});
-  };
-
-  getCompanies = async () => {
+  getData(): Promise<DisplayCompany[]> {
     return new Promise<DisplayCompany[]>(resolve => {
       axios
         .get("/company")
@@ -86,5 +78,5 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
           console.log(error);
         });
     });
-  };
+  }
 }
