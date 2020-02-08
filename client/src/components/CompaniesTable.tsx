@@ -1,15 +1,9 @@
-import * as React from "react";
-import styled from "styled-components";
-import MaterialTable, { Column } from "material-table";
-import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
+import { TableState } from "./ATable";
+import EditableObject from "./EditableObject";
+import DisplayTable from "./DisplayTable";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
-}
-
-export interface CompaniesTableState {
-  companies: DisplayCompany[];
-  columns: Array<Column<DisplayCompany>>;
 }
 
 interface DisplayCompany {
@@ -17,15 +11,23 @@ interface DisplayCompany {
   name: string;
 }
 
-const Container = styled.div`
-  flex: 1;
-`;
+export default class CompaniesTable extends DisplayTable<DisplayCompany> {
+  readonly TABLE_NAME = "Companies";
 
-class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTableState> {
-  state: CompaniesTableState = {
-    companies: [],
+  state: TableState<DisplayCompany> = {
+    data: [],
     columns: [{ title: "Name", field: "name" }]
   };
+
+  get editableObject(): EditableObject<DisplayCompany> {
+    return {
+      onRowUpdate: this.updateRow
+    };
+  }
+
+  get name(): string {
+    return this.TABLE_NAME;
+  }
 
   updateRow = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
     return new Promise<void>((resolve, reject) => {
@@ -33,14 +35,10 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
     });
   };
 
-  componentDidMount() {
-    this.refreshTable();
-  }
-
   refreshTable = () => {
     this.getCompanies()
       .then(companies => {
-        this.setState({ companies });
+        this.setState({ data: companies });
       })
       .catch(() => {});
   };
@@ -50,32 +48,4 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
       resolve([{ id: 0, name: "" }]);
     });
   };
-
-  render() {
-    return (
-      <Container>
-        <MaterialTable
-          columns={this.state.columns}
-          data={this.state.companies}
-          editable={{
-            onRowUpdate: this.updateRow
-          }}
-          title="Companies"
-          actions={[
-            {
-              icon: () => <ImportIcon fill={"grey"} />,
-              tooltip: "Upload CSV",
-              isFreeAction: true,
-              onClick: (event, rowData) => {
-                this.props.uploadHandler();
-                this.refreshTable();
-              }
-            }
-          ]}
-        />
-      </Container>
-    );
-  }
 }
-
-export default CompaniesTable;
