@@ -1,14 +1,9 @@
-import React from "react";
-import MaterialTable, { Column } from "material-table";
 import axios from "axios";
-import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-import styled from "styled-components";
+import { TableState } from "./ATable";
+import DisplayTable from "./DisplayTable";
+import EditableObject from "./EditableObject";
 
-const Container = styled.div`
-  flex: 1;
-`;
-
-interface DisplayPerson {
+export interface DisplayPerson {
   id: number;
   name: string;
   company: string;
@@ -17,24 +12,30 @@ interface DisplayPerson {
   hyperlink: string;
 }
 
-interface TableProps {
-  uploadHandler: Function;
-}
+export default class PeopleTable extends DisplayTable<DisplayPerson> {
 
-interface TableState {
-  people: DisplayPerson[];
-  columns: Array<Column<DisplayPerson>>;
-}
+  readonly TABLE_NAME = "People";
 
-export default class PeopleTable extends React.Component<TableProps, TableState> {
-  state: TableState = {
-    people: [],
+  state: TableState<DisplayPerson> = {
+    data: [],
     columns: [
       { title: "Name", field: "name" },
       { title: "Company", field: "company" },
       { title: "Position", field: "position" }
     ]
   };
+
+  get editableObject(): EditableObject<DisplayPerson> {
+    return {
+      onRowAdd: this.addRow,
+      onRowUpdate: this.updateRow,
+      onRowDelete: this.deleteRow
+    };
+  }
+
+  get name(): string {
+    return this.TABLE_NAME;
+  }
 
   /**
    * This method sends an AJAX get request to get people
@@ -50,17 +51,6 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  // /**
-  //  * This takes in the local data state on people and refreshes the table based on that.
-  //  */
-  // refreshTable() {
-  //   this.state.people.forEach(person => {
-  //     let r: Row = {
-  //       name: person.name,
-  //       companyAndPosition: !person.company && !person.position ? "" : person.company.concat(" | " + person.position)
-  //     };
-  //   });
-  // }
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *
@@ -117,8 +107,10 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
         .post(`/people`, { newData })
         .then(response => {
           if (response.status === 200) {
+            this.refreshTable();
             resolve();
           } else {
+            this.refreshTable();
             reject();
           }
         })
@@ -160,42 +152,11 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     });
   };
 
-  /**
-   * Once this loaded, this code will run.
-   */
-  componentDidMount() {
-    this.refreshTable();
-  }
-
   refreshTable = () => {
     this.getPeople()
       .then(people => {
-        this.setState({ people });
+        this.setState({ data: people });
       })
       .catch(() => {});
   };
-
-  render() {
-    return (
-      <Container>
-        <MaterialTable
-          columns={this.state.columns}
-          data={this.state.people}
-          editable={{
-            onRowAdd: this.addRow,
-            onRowUpdate: this.updateRow,
-            onRowDelete: this.deleteRow
-          }}
-          actions={[
-            {
-              icon: () => <ImportIcon fill={"grey"} />,
-              tooltip: "Upload CSV",
-              isFreeAction: true,
-              onClick: (event, rowData) => this.props.uploadHandler()
-            }
-          ]}
-        />
-      </Container>
-    );
-  }
 }

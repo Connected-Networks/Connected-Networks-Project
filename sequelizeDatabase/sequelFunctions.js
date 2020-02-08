@@ -132,6 +132,41 @@ deleteIndividual = (IndividualID) => {
         })
     })
 }
+
+//---------------Modify Company---------------//
+modifyCompany = (CompanyID, alteredCompanyName) => {
+    return models.Companies.findOne({
+        where: {
+            CompanyID: CompanyID
+        }
+    }).then(company => {
+        company.update({
+            CompanyName: alteredCompanyName
+        })
+        return company;
+    }).catch(err => console.error(err));
+}
+
+deleteCompany = (CompanyID) => {
+    return new Promise((resolve,reject)=>{
+        models.EmployeeHistory.destroy({
+            where: {
+                CompanyID: CompanyID
+            }
+        }).then((deletedHistory) => {
+            models.Companies.destroy({
+                where: {
+                    CompanyID: CompanyID
+                }
+            }).then((deletedCompany) =>{
+                console.log("deletion resolved")
+                resolve(deletedCompany);
+            })
+        }).catch(err => {console.error(err)
+                        reject(err)
+        })
+    })
+}
     
     module.exports = {
         getAllIndividuals,
@@ -146,5 +181,7 @@ deleteIndividual = (IndividualID) => {
     getIndividualEmployeeHistory,
     getIndividualCurrentEmployement,
     modifyIndividual,
-    deleteIndividual
+    deleteIndividual,
+    modifyCompany,
+    deleteCompany
 }

@@ -13,10 +13,14 @@ interface DisplayPerson {
   comment: string;
   hyperlink: string;
 }
+interface DisplayCompany {
+  id: number;
+  name: string;
+}
 
 export default class BackendProcessing {
 
-  async processRawCSV(data: string) {
+  processRawCSV(data: string) {
     //First line is commented and ignored
     //Second line is treated as header
     var results = papa.parse("#" + data, {//Adding a # causes the parser to skip the first row, treat the second row as header
@@ -32,14 +36,14 @@ export default class BackendProcessing {
         console.log("chunk: "+chunk);
         return chunk;
       }});
-      await results.data.forEach(element => {
-        if (element["name"] != null) this.call_from_csv_line(element);
-      });
+      console.log(JSON.stringify(results))
+      return Promise.all(results.data.map((element)=>{if (element["name"]!=null) this.call_from_csv_line(element)}))
     }
     
     //Papaparse creates JSON objects with fields: name,position, employment term, etc.
-    //Assume all fields will be entirely lowercase
-    async call_from_csv_line(entry) {
+    //This function assumes that the header is the second line of the csv file, with data starting on the third line
+    //This function converts all header strings to lowercase, so all retrievals use lowercase keys
+    call_from_csv_line(entry) {
       let name: String = entry["name"];
       if (name.length < 1) {
         return;
@@ -58,35 +62,19 @@ export default class BackendProcessing {
       let url = entry["hyperlink url"];
       let comments = entry["comments"];
       database.insertFromCsvLine(name,firstPosition,sterm,eterm,employer,position,url,comments)
-      //let call = `CALL ImportFromCvsLine("${name}","${firstPosition}","${sterm}","${eterm}","${employer}","${position}","${url}","${comments}")`;
   }
 
-  async retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {
+  retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {
     return new Promise<DisplayPerson[]>((resolve, reject) => {
-      database.getAllIndividuals().then(async (individuals)=>{
-        this.build_response_from_individuals(individuals).then((response)=>{
-          resolve(response)
-        })
+      database.getAllIndividuals().then((individuals)=>{
+        resolve(Promise.all(individuals.map((individual):Promise<DisplayPerson>=>{
+          return this.processIndividualForDisplay(individual)
+        })))
       })
     });
   }
-  async build_response_from_individuals(individuals):Promise<DisplayPerson[]>{
-    return new Promise<DisplayPerson[]>(async (resolve,reject)=>{
-      let response = new Array<DisplayPerson>();
-      let place = 0;
-      let remaining = individuals.length
-      individuals.forEach((individual) => {
-        this.processIndividualForDisplay(individual).then((dp)=>{
-          response[place] = dp;
-          place += 1;
-          remaining --;
-          if (remaining==0)
-            resolve(response)
-        })
-      })
-    })
-  }
-  async processIndividualForDisplay(individual):Promise<DisplayPerson>{
+
+  processIndividualForDisplay(individual):Promise<DisplayPerson>{
     return new Promise<DisplayPerson>((resolve,reject)=>{
       database.getIndividualCurrentEmployement(individual.IndividualID).then((employment)=>{
         let dp = {
@@ -101,7 +89,6 @@ export default class BackendProcessing {
           dp.company = employment.company.CompanyName;
           dp.position = employment.PositionName;
         }
-        console.log("created entry: "+JSON.stringify(dp))
         resolve(dp)
       })
     })
@@ -151,39 +138,83 @@ export default class BackendProcessing {
     if (mis.length == 1) mis = "0" + mi;
     return `${s[s.length - 1]}-${mis}-01`;
   }
-  async insert_person(person){
-    return new Promise<void>((resolve,reject)=>{
+
+  //returns a promise boolean representing if the operation was successful
+  insert_person(person){
+    return new Promise<boolean>((resolve,reject)=>{
       let insert = database.insertPerson(person.name,person.position,person.hyperlink,person.comment)
       insert.then((person)=>{
-        resolve()
+        resolve(true)
       })
       insert.catch((error)=>{
         console.error(error)
-        reject()
+        resolve(false)
       })
     })
   }
-  async update_person(person){
-    return new Promise<void>((resolve,reject)=>{
+
+  //returns a promise boolean representing if the operation was successful
+  update_person(person){
+    return new Promise<boolean>((resolve,reject)=>{
       let update = database.modifyIndividual(person.id,person.name,person.position,person.hyperlink,person.comment)
       update.then((person)=>{
-        resolve()
+        resolve(true)
       })
       update.catch((error)=>{
         console.error(error)
-        reject()
+        resolve(false)
       })
     })
   }
-  async delete_person(person){
-    return new Promise<void>((resolve,reject)=>{
+
+  //returns a promise boolean representing if the operation was successful
+  delete_person(person){
+    return new Promise<boolean>((resolve,reject)=>{
       console.log("starting deletion")
       let del = database.deleteIndividual(person)
       del.then((person)=>{
-        resolve();
+        resolve(true);
       })
       del.catch((error)=>{
-        reject();
+        reject(false);
+      })
+    })
+  }
+
+  insert_company(company):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let i = database.insertCompany(company.name);
+      i.then(resolve(true));
+      i.catch(resolve(false));
+    });
+  }
+  update_company(company):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let u = database.modifyCompany(company.id,company.name);
+      u.then(resolve(true));
+      u.catch(resolve(false));
+
+    });
+  }
+  delete_company(company):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let d = database.deleteCompany(company.id);
+      d.then(resolve(true));
+      d.catch(resolve(false));
+    })
+  }
+
+  retrieveCompaniesFromDatabase():Promise<DisplayCompany[]>{
+    return new Promise<DisplayCompany[]>((resolve,reject)=>{
+      database.getAllCompanies().then((results)=>{
+        let list:DisplayCompany[] = results.map((element)=>{
+          let company:DisplayCompany={
+            id : element.CompanyID,
+            name : element.CompanyName
+          }
+          return company;
+        })
+        resolve(list);
       })
     })
   }
