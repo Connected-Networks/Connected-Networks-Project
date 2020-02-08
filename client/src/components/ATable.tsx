@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 import MaterialTable, { Column, Action, DetailPanel } from "material-table";
 import styled from "styled-components";
 import EditableObject from "./EditableObject";
+import axios from "axios";
 
 export interface TableState<T extends Object> {
   data: T[];
@@ -13,7 +14,7 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   abstract get editableObject(): EditableObject<T>;
   abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[] | undefined;
   abstract get name(): string;
-  abstract getData(): Promise<T[]>;
+  abstract get dataEndPoint(): string;
   getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
     return undefined;
   };
@@ -28,6 +29,17 @@ export default abstract class ATable<T extends Object, TableProps> extends React
         this.setState({ data });
       })
       .catch(() => {});
+  };
+
+  getData = async () => {
+    return new Promise<T[]>(resolve => {
+      axios
+        .get(this.dataEndPoint)
+        .then(response => resolve(response.data.data))
+        .catch(function(error) {
+          console.log(error);
+        });
+    });
   };
 
   render() {

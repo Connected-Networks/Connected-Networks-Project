@@ -1,9 +1,9 @@
 import * as React from "react";
-import axios from "axios";
 import { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import DisplayTable from "./DisplayTable";
 import CompanyDetailsTable from "./CompanyDetailsTable";
+import axios from "axios";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
@@ -16,6 +16,7 @@ export interface DisplayCompany {
 
 export default class CompaniesTable extends DisplayTable<DisplayCompany> {
   readonly TABLE_NAME = "Companies";
+  readonly DATA_END_POINT = "/company";
 
   state: TableState<DisplayCompany> = {
     data: [],
@@ -30,6 +31,10 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
 
   get name(): string {
     return this.TABLE_NAME;
+  }
+
+  get dataEndPoint(): string {
+    return this.DATA_END_POINT;
   }
 
   getDetailPanel = (rowData: DisplayCompany) => {
@@ -68,15 +73,4 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
         });
     });
   };
-
-  getData(): Promise<DisplayCompany[]> {
-    return new Promise<DisplayCompany[]>(resolve => {
-      axios
-        .get("/company")
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
-  }
 }

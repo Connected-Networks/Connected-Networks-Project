@@ -14,6 +14,7 @@ export interface DisplayPerson {
 
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
   readonly TABLE_NAME = "People";
+  readonly DATA_END_POINT = "/people";
 
   state: TableState<DisplayPerson> = {
     data: [],
@@ -36,6 +37,9 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
     return this.TABLE_NAME;
   }
 
+  get dataEndPoint(): string {
+    throw new Error("Method not implemented.");
+  }
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *
@@ -136,15 +140,4 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
         });
     });
   };
-
-  getData(): Promise<DisplayPerson[]> {
-    return new Promise<DisplayPerson[]>(resolve => {
-      axios
-        .get("/people")
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
-  }
 }
