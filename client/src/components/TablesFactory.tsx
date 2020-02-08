@@ -9,8 +9,8 @@ class TablesFactory {
     this.tableTypes = new Map([
       ["Recent", undefined],
       ["Starred", undefined],
-      ["People", <PeopleTable uploadHandler={uploadHandler} />],
-      ["Companies", <CompaniesTable uploadHandler={uploadHandler} />]
+      ["People", <PeopleTable uploadHandler={uploadHandler} dataEndPoint="/people" />],
+      ["Companies", <CompaniesTable uploadHandler={uploadHandler} dataEndPoint="/company" />]
     ]);
   }
 

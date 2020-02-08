@@ -5,6 +5,7 @@ import { Action } from "material-table";
 
 export interface TableProps {
   uploadHandler: Function;
+  dataEndPoint: string;
 }
 
 export default abstract class DisplayTable<RowData extends Object> extends ATable<RowData, TableProps> {
@@ -29,4 +30,6 @@ export default abstract class DisplayTable<RowData extends Object> extends ATabl
   getExtraActions: () => (Action<RowData> | ((rowData: RowData) => Action<RowData>))[] = () => {
     return [];
   };
+
+  dataEndPoint = this.props.dataEndPoint;
 }

@@ -16,7 +16,6 @@ export interface DisplayCompany {
 
 export default class CompaniesTable extends DisplayTable<DisplayCompany> {
   readonly TABLE_NAME = "Companies";
-  readonly DATA_END_POINT = "/company";
 
   state: TableState<DisplayCompany> = {
     data: [],
@@ -31,10 +30,6 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
 
   get name(): string {
     return this.TABLE_NAME;
-  }
-
-  get dataEndPoint(): string {
-    return this.DATA_END_POINT;
   }
 
   getDetailPanel = (rowData: DisplayCompany) => {
