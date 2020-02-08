@@ -1,7 +1,9 @@
+import * as React from "react";
 import axios from "axios";
 import { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import DisplayTable from "./DisplayTable";
+import CompanyDetailsTable from "./CompanyDetailsTable";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
@@ -29,6 +31,14 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
   get name(): string {
     return this.TABLE_NAME;
   }
+
+  getDetailPanel = (rowData: DisplayCompany) => {
+    return (
+      <div style={{ marginLeft: "60px" }}>
+        <CompanyDetailsTable uploadHandler={this.props.uploadHandler} companyId={rowData.id} />
+      </div>
+    );
+  };
 
   updateRow = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
     return new Promise<void>(resolve => {

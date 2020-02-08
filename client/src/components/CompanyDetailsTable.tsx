@@ -24,17 +24,6 @@ export default class CompanyDetailsTable extends React.Component<CompanyDetailsT
     ]
   };
 
-  // /**
-  //  * This takes in the local data state on people and refreshes the table based on that.
-  //  */
-  // refreshTable() {
-  //   this.state.people.forEach(person => {
-  //     let r: Row = {
-  //       name: person.name,
-  //       companyAndPosition: !person.company && !person.position ? "" : person.company.concat(" | " + person.position)
-  //     };
-  //   });
-  // }
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *

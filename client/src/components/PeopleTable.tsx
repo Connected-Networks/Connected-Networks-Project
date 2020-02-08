@@ -3,7 +3,7 @@ import { TableState } from "./ATable";
 import DisplayTable from "./DisplayTable";
 import EditableObject from "./EditableObject";
 
-interface DisplayPerson {
+export interface DisplayPerson {
   id: number;
   name: string;
   company: string;
@@ -13,6 +13,7 @@ interface DisplayPerson {
 }
 
 export default class PeopleTable extends DisplayTable<DisplayPerson> {
+
   readonly TABLE_NAME = "People";
 
   state: TableState<DisplayPerson> = {
