@@ -11,7 +11,7 @@ export interface TableState<T extends Object> {
 // Make abstract class
 export default abstract class ATable<T extends Object, TableProps> extends React.Component<TableProps, TableState<T>> {
   abstract get editableObject(): EditableObject<T>;
-  abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[];
+  abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[] | undefined;
   abstract get name(): string;
   abstract refreshTable(): void;
   getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
