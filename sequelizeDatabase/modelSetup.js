@@ -17,6 +17,49 @@ sequelize.authenticate()
     console.error('Unable to connect to the database:', err);
   });
 
+  const User = sequelize.define('user', {
+    UserID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    Username: {
+      type: Sequelize.STRING
+    },
+    Password: {
+      type: Sequelize.STRING
+    },
+    Email: {
+      type: Sequelize.STRING
+    }
+  },{
+    timestamps: false
+  });
+
+  const Funds = sequelize.define('funds',{
+    FundID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true
+      },
+    FundName: {
+      type: Sequelize.STRING
+    },
+    UserID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'UserID'
+      }
+    }
+  }, {
+    //Options
+    timestamps: false
+  });
+
   const Individuals = sequelize.define('individuals',{
     IndividualID: {
       type: Sequelize.INTEGER,
@@ -24,10 +67,15 @@ sequelize.authenticate()
       primaryKey : true,
       autoIncrement: true
     },
-    IndividualName: {
-      type: Sequelize.STRING
+    FundID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: Funds,
+        key: 'FundID'
+      }
     },
-    OriginalPostion: {
+    Name: {
       type: Sequelize.STRING
     },
     LinkedInUrl : {
@@ -35,6 +83,34 @@ sequelize.authenticate()
     },
     Comments : {
       type: Sequelize.STRING(500)
+    }
+  }, {
+    //options:
+    timestamps: false
+  });
+
+  const SharedFunds = sequelize.define('sharefunds',{
+    SharingID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      primaryKey : true,
+      autoIncrement: true
+    },
+    FundID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: Funds,
+        key: 'FundID'
+      }
+    },
+    UserID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'UserID'
+      }
     }
   }, {
     //options:
@@ -48,6 +124,14 @@ sequelize.authenticate()
       primaryKey : true,
       autoIncrement: true
     },
+    FundID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: Funds,
+        key: 'FundID'
+      }
+    },
     CompanyName: {
       type: Sequelize.STRING
     }
@@ -56,20 +140,7 @@ sequelize.authenticate()
     timestamps: false
   });
   
-  const Funds = sequelize.define('funds',{
-    FundID: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
-      },
-    FundName: {
-      type: Sequelize.STRING
-    }
-  }, {
-    //Options
-    timestamps: false
-  });
+  
 
   const EmployeeHistory = sequelize.define('employeehistory',{
     HistoryID: {
@@ -77,6 +148,14 @@ sequelize.authenticate()
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
+    },
+    UserID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'UserID'
+      }
     },
     IndividualID: {
       type: Sequelize.INTEGER,
@@ -107,38 +186,45 @@ sequelize.authenticate()
     timestamps: false
   });
 
-  const FundCompany = sequelize.define('fundcompanies',{
-      FundCompanyID: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true
-      },
-      FundID: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-            model: Funds,
-            key: 'FundID'
-        }
-      },
-      CompanyID: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-            model: Companies,
-            key: 'CompanyID'
-        }
-      },
+  const OriginalFundPosition = sequelize.define('originalfundPosition',{
+    OriginalPosID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    FundID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+          model: Funds,
+          key: 'FundID'
+      }
+    },
+    CompanyID: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+          model: Companies,
+          key: 'CompanyID'
+      }
+    },
+    PositionName: {
+      type: Sequelize.STRING
+    }
+  }, {
+    timestamps: false
   });
  
   // (If I used hasMany, then an issue arose where it would use HistoryID instead of CompanyID)
   EmployeeHistory.belongsTo(Companies, {foreignKey: 'CompanyID'});
 
   module.exports = { //This determines what can be used from this custom module.
-    Individuals,
-    Companies,
+    User,
     Funds,
+    Individuals,
+    SharedFunds,
+    Companies,
     EmployeeHistory,
-    FundCompany
+    OriginalFundPosition
   }
