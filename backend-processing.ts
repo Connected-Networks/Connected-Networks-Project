@@ -218,4 +218,8 @@ export default class BackendProcessing {
       })
     })
   }
+
+  retrievePeopleViaCompany(companyID):Promise<Object>{
+    return database.retrieveCurrentEmployeesOfCompany(companyID)
+  }
 }
