@@ -3,6 +3,12 @@ const models = require('./modelSetup');
 //---------------FindAll: Get all data from the table --------------//
 //--------NOTE: These functions return Promises. Use ".then()" after calling them.
 
+getAllUsers = () => {
+    return models.User.findAll().then((users) => {
+        return users;
+    }).catch(err => console.err(err));
+};
+
 getAllIndividuals = () => {
     return models.Individuals.findAll().then((individuals) => {
         return individuals;
@@ -23,11 +29,11 @@ getAllEmployeeHistory = () => {
         return employeeHistory;
     }).catch(err => console.error(err));
 };
-getAllFundCompany = () => {
-    return models.FundCompany.findAll().then((fundCompany) => {
-        return fundCompany;
-    }).catch(err => console.error(err));
-};
+// getAllFundCompany = () => {
+//     return models.FundCompany.findAll().then((fundCompany) => {
+//         return fundCompany;
+//     }).catch(err => console.error(err));
+// };
 
 //--------------------Insert into Table Functions-----------//
 
@@ -169,11 +175,12 @@ deleteCompany = (CompanyID) => {
 }
     
     module.exports = {
+        getAllUsers,
         getAllIndividuals,
         getAllCompanies,
         getAllFunds,
         getAllEmployeeHistory,
-        getAllFundCompany,
+        // getAllFundCompany,
         insertPerson,
         insertCompany,
     insertEmployeeHistory,

@@ -60,6 +60,9 @@ sequelize.authenticate()
     timestamps: false
   });
 
+  Funds.belongsTo(User, {foreignKey:'UserID'});
+  User.hasMany(Funds, {foreignKey: 'UserID'});
+
   const Individuals = sequelize.define('individuals',{
     IndividualID: {
       type: Sequelize.INTEGER,
@@ -186,7 +189,15 @@ sequelize.authenticate()
     timestamps: false
   });
 
-  const OriginalFundPosition = sequelize.define('originalfundPosition',{
+  // (If I used hasMany, then an issue arose where it would use HistoryID instead of CompanyID)
+  EmployeeHistory.belongsTo(Companies, {foreignKey: 'CompanyID'});
+  EmployeeHistory.belongsTo(User, {foreignKey: 'UserID'});
+  EmployeeHistory.belongsTo(Individuals, {foreignKey: 'IndividualID'});
+
+  //THING_THAT_HAS_FOREIGN_KEY.belongsTo(FOREIGN_KEY_SOURCE)
+
+
+  const OriginalFundPosition = sequelize.define('originalfundposition',{
     OriginalPosID: {
       type: Sequelize.INTEGER,
       allowNull: false,
@@ -216,8 +227,10 @@ sequelize.authenticate()
     timestamps: false
   });
  
-  // (If I used hasMany, then an issue arose where it would use HistoryID instead of CompanyID)
-  EmployeeHistory.belongsTo(Companies, {foreignKey: 'CompanyID'});
+  OriginalFundPosition.belongsTo(Companies,{foreignKey:'CompanyID'});
+  OriginalFundPosition.belongsTo(Funds,{foreignKey:'FundID'});
+
+  
 
   module.exports = { //This determines what can be used from this custom module.
     User,
