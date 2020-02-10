@@ -37,31 +37,69 @@ export default class BackendProcessing {
         return chunk;
       }});
       console.log(JSON.stringify(results))
-      return Promise.all(results.data.map((element)=>{if (element["name"]!=null) this.call_from_csv_line(element)}))
+      let year = this.estimateYear(data)
+      return Promise.all(results.data.map((element)=>{if (element["name"]!=null) this.call_from_csv_line(element,year)}))
+    }
+
+    estimateYear(line:string):number{
+      line = line+"xxxx"
+      let i = line.indexOf("Q1 20")
+      let j = line.substring(i+3,i+8)
+      let k = Number.parseInt(j)
+      if (k>=2000)
+      return k
+      i = line.indexOf("20")
+      j = line.substring(i+3,i+8)
+      k = Number.parseInt(j)
+      if (k>=2000)
+      return k
+      i = line.indexOf("Q1 19")
+      j = line.substring(i+3,i+8)
+      k = Number.parseInt(j)
+      if (k>=1900 && k<2000)
+        return k
+      i = line.indexOf("19")
+      j = line.substring(i+3,i+8)
+      k = Number.parseInt(j)
+      if (k>=1900 && k<2000)
+        return k
+      return (new Date()).getFullYear()
     }
     
     //Papaparse creates JSON objects with fields: name,position, employment term, etc.
     //This function assumes that the header is the second line of the csv file, with data starting on the third line
     //This function converts all header strings to lowercase, so all retrievals use lowercase keys
-    call_from_csv_line(entry) {
-      let name: String = entry["name"];
-      if (name.length < 1) {
-        return;
-      }
-      let firstPosition = entry["portfolio company position"];
-      let position = entry["new position"];
-      let employer = entry["new employer"];
-      let term = entry["employment term"];
-      term = this.convertDates(term);
-      let sterm = "";
-      let eterm = "";
-      if (term != null) {
-        sterm = term[0];
-        eterm = term[1];
-      }
-      let url = entry["hyperlink url"];
-      let comments = entry["comments"];
-      database.insertFromCsvLine(name,firstPosition,sterm,eterm,employer,position,url,comments)
+    call_from_csv_line(entry,year) {
+      return new Promise<void>((resolve,reject)=>{
+        let name: String = entry["name"];
+        if (name.length < 1) {
+          return;
+        }
+        let firstPosition = entry["portfolio company position"];
+        let position = entry["new position"];
+        let employer = entry["new employer"];
+        let term = entry["employment term"];
+        term = this.convertDates(term);
+        let sterm = "";
+        let eterm = "";
+        if (term != null) {
+          sterm = term[0];
+          eterm = term[1];
+        }
+        let url = entry["hyperlink url"];
+        let comments = entry["comments"];
+        let promiseList = new Array<Promise<Object>>();
+        let p1 = database.insertFromCsvLine(name,firstPosition,sterm,eterm,employer,position,url,comments)
+        for(let q=1;q<=4;q++){
+          let descr:string = entry[`Q${q} ${year}`]
+          if (descr!=null){
+            
+
+
+
+          }
+        }
+    })
   }
 
   retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {

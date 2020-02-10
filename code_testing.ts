@@ -27,4 +27,5 @@ function test_company_functions(){
     f.catch(()=>{console.log("error")})
 }
 
-test_company_functions();
+//test_company_functions();
+//console.log((new Date()).getFullYear())
