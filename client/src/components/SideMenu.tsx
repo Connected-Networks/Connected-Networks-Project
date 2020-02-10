@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Divider, List, ListItem, ListItemText } from "@material-ui/core";
 import styled from "styled-components";
-import { SideMenuFund } from "../App";
 import axios from "axios";
 
 export interface SideMenuProps {
@@ -12,6 +11,11 @@ export interface SideMenuProps {
 
 export interface SideMenuState {
   funds: SideMenuFund[];
+}
+
+interface SideMenuFund {
+  id: number;
+  name: string;
 }
 
 export default class SideMenu extends React.Component<SideMenuProps, SideMenuState> {

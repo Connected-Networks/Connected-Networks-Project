@@ -6,12 +6,6 @@ import TitleBar from "./components/TitleBar";
 import styled from "styled-components";
 import TablesFactory from "./components/TablesFactory";
 
-
-export interface SideMenuFund {
-  id: number;
-  name: string;
-}
-
 export interface AppState {
   uploadDialogOpened: boolean;
   openSideMenu: boolean;
