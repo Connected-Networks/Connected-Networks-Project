@@ -50,7 +50,7 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
         <Divider />
         <List>
           {this.state.funds.map(fund => (
-            <ListItem button key={fund.id}>
+            <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString)}>
               <ListItemText primary={fund.name} />
             </ListItem>
           ))}

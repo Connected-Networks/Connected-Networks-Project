@@ -13,7 +13,7 @@ export default class FundTable extends DisplayTable<DisplayFundCompany> {
 
   state: TableState<DisplayFundCompany> = {
     data: [],
-    columns: [{ title: "Company", field: "company" }]
+    columns: [{ title: "Company", field: "name" }]
   };
 
   get name(): string {
