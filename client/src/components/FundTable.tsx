@@ -2,6 +2,7 @@ import * as React from "react";
 import DisplayTable from "./DisplayTable";
 import { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
+import FundDetailsTable from "./FundDetailsTable";
 
 interface DisplayFundCompany {
   id: number;
@@ -44,5 +45,13 @@ export default class FundTable extends DisplayTable<DisplayFundCompany> {
     return new Promise((resolve, reject) => {
       resolve();
     });
+  };
+
+  getDetailPanel = (rowData: DisplayFundCompany) => {
+    return (
+      <div style={{ marginLeft: "60px" }}>
+        <FundDetailsTable uploadHandler={this.props.uploadHandler} companyId={rowData.id} />
+      </div>
+    );
   };
 }
