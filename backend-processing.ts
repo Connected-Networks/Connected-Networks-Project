@@ -269,9 +269,24 @@ export default class BackendProcessing {
     return new Promise<DisplayFund[]>((resolve,reject)=>{
       database.getAllFunds().then((results)=>{
         let list:DisplayFund[] = results.map((element)=>{
-          let company:DisplayFund={
+          let fund:DisplayFund={
             id : element.FundID,
             name : element.FundName
+          }
+          return fund;
+        })
+        resolve(list);
+      })
+    })
+  }
+
+  retrieveCompaniesFromFund(fundID){
+    return new Promise<DisplayCompany[]>((resolve,reject)=>{
+      database.retrieveCompaniesByFunds(fundID).then((results)=>{
+        let list:DisplayCompany[] = results.map((element)=>{
+          let company:DisplayCompany={
+            id : element.company.CompanyID,
+            name : element.company.CompanyName
           }
           return company;
         })
@@ -279,5 +294,4 @@ export default class BackendProcessing {
       })
     })
   }
-
 }

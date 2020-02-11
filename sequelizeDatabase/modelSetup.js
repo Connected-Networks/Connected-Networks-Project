@@ -129,11 +129,15 @@ sequelize.authenticate()
             model: Companies,
             key: 'CompanyID'
         }
-      },
-  });
+      }
+    },{
+        timestamps: false
+      }
+  );
  
   // (If I used hasMany, then an issue arose where it would use HistoryID instead of CompanyID)
   EmployeeHistory.belongsTo(Companies, {foreignKey: 'CompanyID'});
+  FundCompany.belongsTo(Companies, {foreignKey: 'CompanyID'})
 
   module.exports = { //This determines what can be used from this custom module.
     Individuals,

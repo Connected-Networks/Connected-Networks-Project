@@ -18,13 +18,11 @@ function delay(ms: number)
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function test_company_functions(){
-    let be = new BackendProcessing();
-    let f = be.retrieveCompaniesFromDatabase();
-    f.then((results)=>{
-        console.log(results);
-        })
-    f.catch(()=>{console.log("error")})
+function test_company_via_fund(){
+    let be = new BackendProcessing()
+    be.retrieveCompaniesFromFund(2).then((results)=>{
+        console.log(JSON.stringify(results))
+    })
 }
 
-test_company_functions();
+test_company_via_fund();

@@ -4,11 +4,7 @@ import axios from "axios";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
 import styled from "styled-components";
 
-const Container = styled.div`
-  flex: 1;
-`;
-
-interface DisplayPerson {
+export interface DisplayPerson {
   id: number;
   name: string;
   company: string;
@@ -117,8 +113,10 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
         .post(`/people`, { newData })
         .then(response => {
           if (response.status === 200) {
+            this.refreshTable();
             resolve();
           } else {
+            this.refreshTable();
             reject();
           }
         })
@@ -186,12 +184,16 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
             onRowUpdate: this.updateRow,
             onRowDelete: this.deleteRow
           }}
+          title="People"
           actions={[
             {
               icon: () => <ImportIcon fill={"grey"} />,
               tooltip: "Upload CSV",
               isFreeAction: true,
-              onClick: (event, rowData) => this.props.uploadHandler()
+              onClick: (event, rowData) => {
+                this.props.uploadHandler();
+                this.refreshTable();
+              }
             }
           ]}
         />
@@ -199,3 +201,7 @@ export default class PeopleTable extends React.Component<TableProps, TableState>
     );
   }
 }
+
+const Container = styled.div`
+  flex: 1;
+`;

@@ -167,6 +167,30 @@ deleteCompany = (CompanyID) => {
         })
     })
 }
+
+//returns a list of objects
+//{
+// FundCompanyID
+// FundID
+// CompanyID
+// company:
+//   {
+//     CompanyID
+//     CompanyName
+//   }
+//}
+retrieveCompaniesByFunds = (fundID) => {
+    return models.FundCompany.findAll(
+        {
+            where: {
+                FundID: fundID
+            },
+            include: [{
+                model: models.Companies
+            }]
+        }
+    )
+}
     
     module.exports = {
         getAllIndividuals,
@@ -183,5 +207,6 @@ deleteCompany = (CompanyID) => {
     modifyIndividual,
     deleteIndividual,
     modifyCompany,
-    deleteCompany
+    deleteCompany,
+    retrieveCompaniesByFunds
 }
