@@ -44,7 +44,7 @@ app.get("/people/:companyId", (req, res) => {
   try {
     let be = new BackendProcessing();
     //Temp until function is implemented
-    let data = be.retrievePeopleFromDatabase().then(results => {
+    let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
       if (!results) {
         res.sendStatus(500);
       } else {
