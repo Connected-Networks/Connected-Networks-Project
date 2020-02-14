@@ -5,11 +5,9 @@ export interface TableProps {
 }
 
 export default abstract class DisplayTable<RowData extends Object> extends ATable<RowData, TableProps> {
-  getComponentsObject = () => {
-    return {
-      Toolbar: undefined,
-      Pagination: undefined
-    };
+  components = {
+    Toolbar: undefined,
+    Pagination: undefined
   };
 
   dataEndPoint = this.props.dataEndPoint;
