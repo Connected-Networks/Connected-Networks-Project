@@ -9,11 +9,7 @@ export interface TableProps {
 }
 
 export default abstract class DisplayTable<RowData extends Object> extends ATable<RowData, TableProps> {
-  get actionsObject() {
-    return this.getActions();
-  }
-
-  getActions: () => (Action<RowData> | ((rowData: RowData) => Action<RowData>))[] = () => {
+  getActionsObject = () => {
     return [this.uploadAction, ...this.getExtraActions()];
   };
 

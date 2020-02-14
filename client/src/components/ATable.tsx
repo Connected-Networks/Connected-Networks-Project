@@ -9,12 +9,13 @@ export interface TableState<T extends Object> {
   columns: Array<Column<T>>;
 }
 
-// Make abstract class
 export default abstract class ATable<T extends Object, TableProps> extends React.Component<TableProps, TableState<T>> {
   abstract get editableObject(): EditableObject<T>;
-  abstract get actionsObject(): (Action<T> | ((rowData: T) => Action<T>))[] | undefined;
   abstract get name(): string;
   abstract get dataEndPoint(): string;
+
+  getActionsObject: () => (Action<T> | ((rowData: T) => Action<T>))[] | undefined = () => undefined;
+
   getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
     return undefined;
   };
@@ -50,7 +51,7 @@ export default abstract class ATable<T extends Object, TableProps> extends React
           data={this.state.data}
           editable={this.editableObject}
           title={this.name}
-          actions={this.actionsObject}
+          actions={this.getActionsObject()}
           detailPanel={this.getDetailPanel}
           onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
         />
