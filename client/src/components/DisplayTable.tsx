@@ -9,10 +9,6 @@ export interface TableProps {
 }
 
 export default abstract class DisplayTable<RowData extends Object> extends ATable<RowData, TableProps> {
-  getActionsObject = () => {
-    return [this.uploadAction, ...this.getExtraActions()];
-  };
-
   uploadAction = {
     icon: () => <ImportIcon fill={"grey"} />,
     tooltip: "Upload CSV",
@@ -27,5 +23,6 @@ export default abstract class DisplayTable<RowData extends Object> extends ATabl
     return [];
   };
 
+  actions = [this.uploadAction, ...this.getExtraActions()];
   dataEndPoint = this.props.dataEndPoint;
 }

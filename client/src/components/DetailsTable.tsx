@@ -1,5 +1,6 @@
 import ATable from "./ATable";
 import { Components } from "material-table";
+
 export interface TableProps {
   dataEndPoint: string;
 }

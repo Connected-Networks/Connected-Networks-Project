@@ -13,9 +13,10 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   abstract get editableObject(): EditableObject<T>;
   abstract get name(): string;
   abstract get dataEndPoint(): string;
+
   components: Components | undefined = undefined;
 
-  getActionsObject: () => (Action<T> | ((rowData: T) => Action<T>))[] | undefined = () => undefined;
+  actions: (Action<T> | ((rowData: T) => Action<T>))[] | undefined = undefined;
 
   getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
     return undefined;
@@ -52,7 +53,7 @@ export default abstract class ATable<T extends Object, TableProps> extends React
           data={this.state.data}
           editable={this.editableObject}
           title={this.name}
-          actions={this.getActionsObject()}
+          actions={this.actions}
           detailPanel={this.getDetailPanel}
           components={this.components}
           onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
