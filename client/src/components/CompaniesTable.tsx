@@ -1,21 +1,25 @@
 import * as React from "react";
-import axios from "axios";
 import { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import DisplayTable from "./DisplayTable";
 import CompanyDetailsTable from "./CompanyDetailsTable";
+import axios from "axios";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
 }
 
-interface DisplayCompany {
+export interface DisplayCompany {
   id: number;
   name: string;
 }
 
 export default class CompaniesTable extends DisplayTable<DisplayCompany> {
   readonly TABLE_NAME = "Companies";
+
+  static defaultProps = {
+    dataEndPoint: "/company"
+  };
 
   state: TableState<DisplayCompany> = {
     data: [],
@@ -63,25 +67,6 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
             reject();
           }
         })
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
-  };
-
-  refreshTable = () => {
-    this.getCompanies()
-      .then(companies => {
-        this.setState({ data: companies });
-      })
-      .catch(() => {});
-  };
-
-  getCompanies = async () => {
-    return new Promise<DisplayCompany[]>(resolve => {
-      axios
-        .get("/company")
-        .then(response => resolve(response.data.data))
         .catch(function(error) {
           console.log(error);
         });

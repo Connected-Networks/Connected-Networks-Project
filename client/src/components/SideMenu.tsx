@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Divider, List, ListItem, ListItemText } from "@material-ui/core";
 import styled from "styled-components";
+import axios from "axios";
 
 export interface SideMenuProps {
   open: boolean;
@@ -8,9 +9,32 @@ export interface SideMenuProps {
   handleSwitchTable: Function;
 }
 
-export interface SideMenuState {}
+export interface SideMenuState {
+  funds: SideMenuFund[];
+}
+
+interface SideMenuFund {
+  id: number;
+  name: string;
+}
 
 export default class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
+  state: SideMenuState = { funds: [] };
+  componentDidMount() {
+    this.getFunds().then(funds => this.setState({ funds }));
+  }
+
+  getFunds = async () => {
+    return new Promise<SideMenuFund[]>(resolve => {
+      axios
+        .get("/funds")
+        .then(response => resolve(response.data.data))
+        .catch(function(error) {
+          console.log(error);
+        });
+    });
+  };
+
   render() {
     return (
       <Container open={this.props.open}>
@@ -28,6 +52,13 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
           </ListItem>
         </List>
         <Divider />
+        <List>
+          {this.state.funds.map(fund => (
+            <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString)}>
+              <ListItemText primary={fund.name} />
+            </ListItem>
+          ))}
+        </List>
       </Container>
     );
   }

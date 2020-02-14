@@ -155,6 +155,41 @@ app.delete("/company/:id", (req, res) => {
   d.catch(res.sendStatus(500));
 });
 
+app.get("/funds", (req, res) => {
+  //Todo for Aaron, make it so it sends a list of funds available to show them on the side menu,
+  //return type should be an Array of SideMenuFund objects as defined in App.tsx.
+  try {
+    //Temp until function is implemented
+    const results = [
+      { id: 0, name: "Fund1" },
+      { id: 1, name: "Fund2" }
+    ];
+
+    res.json({ data: results });
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+app.get("/funds/:id", (req, res) => {
+  //Todo for Aaron, implement this function so it returns all companies that are in this fund, we will need to talk about return type.
+  try {
+    //Temp until function is implemented
+    let be = new BackendProcessing();
+    let data = be.retrieveCompaniesFromDatabase().then(results => {
+      if (!results) {
+        res.sendStatus(500);
+      } else {
+        res.json({ data: results });
+        res.sendStatus(200);
+      }
+    });
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
