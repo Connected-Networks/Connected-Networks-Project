@@ -49,8 +49,8 @@ export default class FundTable extends DisplayTable<DisplayFundCompany> {
 
   getDetailPanel = (rowData: DisplayFundCompany) => {
     return (
-      <div style={{ marginLeft: "60px" }}>
-        <FundDetailsTable uploadHandler={this.props.uploadHandler} companyId={rowData.id} />
+      <div style={{ marginLeft: "60px", display: "flex" }}>
+        <FundDetailsTable dataEndPoint={"/people/original/" + rowData.id} />
       </div>
     );
   };

@@ -1,35 +1,31 @@
 import React from "react";
 import { DisplayPerson } from "./PeopleTable";
-import MaterialTable, { Column } from "material-table";
 import axios from "axios";
-import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-import styled from "styled-components";
+import DetailsTable from "./DetailsTable";
+import EditableObject from "./EditableObject";
 
-export interface FundDetailsTableProps {
-  uploadHandler: Function;
-  companyId: number;
-}
+export default class FundDetailsTable extends DetailsTable<DisplayPerson> {
+  readonly TABLE_NAME = "Companies";
 
-export interface FundDetailsTableState {
-  people: DisplayPerson[];
-  columns: Array<Column<DisplayPerson>>;
-}
-
-export default class FundDetailsTable extends React.Component<FundDetailsTableProps, FundDetailsTableState> {
-  state: FundDetailsTableState = {
-    people: [],
+  state = {
+    data: [],
     columns: [
       { title: "Name", field: "name" },
       { title: "Current Position", field: "position" }
     ]
   };
 
-  /**
-   * This method takes two rows and updates the old row on the table with the new one
-   *
-   * @param newData
-   * @param oldData
-   */
+  get name(): string {
+    return this.TABLE_NAME;
+  }
+
+  get editableObject(): EditableObject<DisplayPerson> {
+    return {
+      onRowUpdate: this.updateRow,
+      onRowDelete: this.deleteRow
+    };
+  }
+
   updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -124,69 +120,4 @@ export default class FundDetailsTable extends React.Component<FundDetailsTablePr
         });
     });
   };
-
-  /**
-   * Once this loaded, this code will run.
-   */
-  componentDidMount() {
-    this.refreshTable();
-  }
-
-  refreshTable = () => {
-    this.getPeople()
-      .then(people => {
-        this.setState({ people });
-      })
-      .catch(() => {});
-  };
-
-  /**
-   * This method sends an AJAX get request to get people
-   */
-  getPeople = async () => {
-    return new Promise<DisplayPerson[]>(resolve => {
-      axios
-        .get("/people/" + this.props.companyId)
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
-  };
-
-  render() {
-    return (
-      <Container>
-        <MaterialTable
-          columns={this.state.columns}
-          data={this.state.people}
-          editable={{
-            onRowAdd: this.addRow,
-            onRowUpdate: this.updateRow,
-            onRowDelete: this.deleteRow
-          }}
-          actions={[
-            {
-              icon: () => <ImportIcon fill={"grey"} />,
-              tooltip: "Upload CSV",
-              isFreeAction: true,
-              onClick: (event, rowData) => {
-                this.props.uploadHandler();
-                this.refreshTable();
-              }
-            }
-          ]}
-          components={{
-            Toolbar: props => null,
-            Pagination: props => null
-          }}
-          options={{ paging: false, maxBodyHeight: "50vh" }}
-        />
-      </Container>
-    );
-  }
 }
-
-const Container = styled.div`
-  flex: 1;
-`;
