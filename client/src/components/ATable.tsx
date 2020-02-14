@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import MaterialTable, { Column, Action, DetailPanel } from "material-table";
+import MaterialTable, { Column, Action, DetailPanel, Components } from "material-table";
 import styled from "styled-components";
 import EditableObject from "./EditableObject";
 import axios from "axios";
@@ -15,6 +15,8 @@ export default abstract class ATable<T extends Object, TableProps> extends React
   abstract get dataEndPoint(): string;
 
   getActionsObject: () => (Action<T> | ((rowData: T) => Action<T>))[] | undefined = () => undefined;
+
+  getComponentsObject: () => Components | undefined = () => undefined;
 
   getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
     return undefined;
@@ -53,6 +55,7 @@ export default abstract class ATable<T extends Object, TableProps> extends React
           title={this.name}
           actions={this.getActionsObject()}
           detailPanel={this.getDetailPanel}
+          components={this.getComponentsObject()}
           onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
         />
       </Container>
