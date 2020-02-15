@@ -2,7 +2,7 @@ import * as React from "react";
 import DisplayTable from "./DisplayTable";
 import { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
-import FundDetailsTable from "./FundDetailsTable";
+import CompanyDetailsTable from "./CompanyDetailsTable";
 
 interface DisplayFundCompany {
   id: number;
@@ -50,7 +50,7 @@ export default class FundTable extends DisplayTable<DisplayFundCompany> {
   getDetailPanel = (rowData: DisplayFundCompany) => {
     return (
       <div style={{ marginLeft: "60px", display: "flex" }}>
-        <FundDetailsTable dataEndPoint={"/people/original/" + rowData.id} />
+        <CompanyDetailsTable dataEndPoint={"/people/original/" + rowData.id} />
       </div>
     );
   };
