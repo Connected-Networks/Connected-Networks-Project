@@ -39,7 +39,7 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
   getDetailPanel = (rowData: DisplayCompany) => {
     return (
       <div style={{ marginLeft: "60px" }}>
-        <CompanyDetailsTable uploadHandler={this.props.uploadHandler} companyId={rowData.id} />
+        <CompanyDetailsTable dataEndPoint={"/people/" + rowData.id} />
       </div>
     );
   };
