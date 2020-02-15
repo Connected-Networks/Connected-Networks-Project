@@ -57,6 +57,24 @@ app.get("/people/:companyId", (req, res) => {
   }
 });
 
+app.get("/people/original/:companyId", (req, res) => {
+  //Todo for Aaron: implement this function to get all the people who **originally** worked in a certain company to show them in the fund details panel.
+  try {
+    let be = new BackendProcessing();
+    //Temp until function is implemented
+    let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
+      if (!results) {
+        res.sendStatus(500);
+      } else {
+        res.json({ data: results });
+        res.sendStatus(200);
+      }
+    });
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 app.put("/people", (req, res) => {
   //update person
   let be = new BackendProcessing();
