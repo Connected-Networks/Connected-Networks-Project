@@ -57,6 +57,9 @@ export default abstract class ATable<T extends Object, TableProps> extends React
           detailPanel={this.getDetailPanel}
           components={this.components}
           onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
+          options={{
+            actionsColumnIndex: -1
+          }}
         />
       </Container>
     );
