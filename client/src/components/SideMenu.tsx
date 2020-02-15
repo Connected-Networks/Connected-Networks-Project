@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Divider, List, ListItem, ListItemText } from "@material-ui/core";
+import { Divider, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton } from "@material-ui/core";
 import styled from "styled-components";
 import axios from "axios";
+import AddIcon from "@material-ui/icons/Add";
 
 export interface SideMenuProps {
   open: boolean;
@@ -49,6 +50,11 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
         <List>
           <ListItem key={"Funds"}>
             <ListItemText primary={"Funds"} />
+            <ListItemSecondaryAction>
+              <IconButton edge="end" aria-label="Add">
+                <AddIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
           </ListItem>
         </List>
         <Divider />
