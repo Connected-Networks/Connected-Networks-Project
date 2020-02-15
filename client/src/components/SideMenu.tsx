@@ -1,8 +1,10 @@
 import * as React from "react";
-import { Divider, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton } from "@material-ui/core";
+import { Divider, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, TextField } from "@material-ui/core";
 import styled from "styled-components";
 import axios from "axios";
 import AddIcon from "@material-ui/icons/Add";
+import CheckIcon from "@material-ui/icons/Check";
+import CloseIcon from "@material-ui/icons/Close";
 
 export interface SideMenuProps {
   open: boolean;
@@ -12,6 +14,7 @@ export interface SideMenuProps {
 
 export interface SideMenuState {
   funds: SideMenuFund[];
+  addMode: boolean;
 }
 
 interface SideMenuFund {
@@ -20,7 +23,7 @@ interface SideMenuFund {
 }
 
 export default class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
-  state: SideMenuState = { funds: [] };
+  state: SideMenuState = { funds: [], addMode: false };
   componentDidMount() {
     this.getFunds().then(funds => this.setState({ funds }));
   }
@@ -36,9 +39,36 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
     });
   };
 
+  getAddFundComponent = () => {
+    if (!this.state.addMode) {
+      return null;
+    }
+
+    return (
+      <ListItem>
+        <TextField
+          inputProps={{ onBlur: () => this.setState({ addMode: false }) }}
+          label="Fund Name"
+          placeholder="New Fund"
+          autoFocus
+        />
+        <IconButton edge="end" onMouseDown={event => event.preventDefault()} onClick={() => null}>
+          <CheckIcon />
+        </IconButton>
+        <IconButton edge="end" onClick={() => null}>
+          <CloseIcon />
+        </IconButton>
+      </ListItem>
+    );
+  };
+
+  getSideMenuWidth = () => {
+    return this.state.addMode ? "250px" : "150px";
+  };
+
   render() {
     return (
-      <Container open={this.props.open}>
+      <Container open={this.props.open} width={this.getSideMenuWidth()}>
         <List>
           {this.props.tableTypes.map(type => (
             <ListItem button key={type} onClick={() => this.props.handleSwitchTable(type)}>
@@ -51,7 +81,7 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
           <ListItem key={"Funds"}>
             <ListItemText primary={"Funds"} />
             <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="Add">
+              <IconButton edge="end" onClick={() => this.setState({ addMode: !this.state.addMode })}>
                 <AddIcon />
               </IconButton>
             </ListItemSecondaryAction>
@@ -64,18 +94,19 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
               <ListItemText primary={fund.name} />
             </ListItem>
           ))}
+          {this.getAddFundComponent()}
         </List>
       </Container>
     );
   }
 }
 
-const Container = styled.div<{ open: boolean }>`
+const Container = styled.div<{ open: boolean; width: string }>`
   /* max-height: 100%; */
-  min-width: 150px;
-  max-width: 150px;
-  transition: margin 0.5s;
-  margin-left: ${props => (props.open ? "0px" : "-150px")};
+  min-width: ${props => props.width};
+  max-width: ${props => props.width};
+  transition: margin 0.5s, min-width 0.5s, max-width 0.5s;
+  margin-left: ${props => (props.open ? "0px" : "-" + props.width)};
   display: flex;
   flex-direction: column;
 `;
