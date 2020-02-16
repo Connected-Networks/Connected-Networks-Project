@@ -45,7 +45,7 @@ export default class App extends React.Component<any, AppState> {
     return (
       <Container>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
-        <TitleBar toggleOpen={this.toggleSideMenu} />
+        <TitleBar toggleOpen={this.toggleSideMenu} handleUpload={this.openUploadDialog} />
         <Content>
           <SideMenu
             open={this.state.openSideMenu}
