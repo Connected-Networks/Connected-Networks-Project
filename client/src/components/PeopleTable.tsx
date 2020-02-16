@@ -11,7 +11,7 @@ export interface DisplayPerson {
   hyperlink: string;
 }
 
-export default class PeopleTable extends ATable<DisplayPerson, any> {
+export default class PeopleTable extends ATable<DisplayPerson> {
   readonly TABLE_NAME = "People";
   readonly DATA_END_POINT = "/people";
 

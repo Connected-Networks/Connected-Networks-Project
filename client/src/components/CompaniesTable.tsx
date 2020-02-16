@@ -9,7 +9,7 @@ export interface DisplayCompany {
   name: string;
 }
 
-export default class CompaniesTable extends ATable<DisplayCompany, any> {
+export default class CompaniesTable extends ATable<DisplayCompany> {
   readonly TABLE_NAME = "Companies";
   readonly DATA_END_POINT = "/company";
 
