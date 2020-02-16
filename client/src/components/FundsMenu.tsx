@@ -3,7 +3,20 @@ import axios from "axios";
 import AddIcon from "@material-ui/icons/Add";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
-import { ListItem, TextField, IconButton, List, ListItemText, ListItemSecondaryAction, Divider } from "@material-ui/core";
+import OptionIcon from "@material-ui/icons/MoreVert";
+import {
+  ListItem,
+  TextField,
+  IconButton,
+  List,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
+  Button,
+  Menu,
+  MenuItem
+} from "@material-ui/core";
+import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
 interface SideMenuFund {
   id: number;
@@ -77,6 +90,20 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
           {this.state.funds.map(fund => (
             <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString, fund.name)}>
               <ListItemText primary={fund.name} />
+              <ListItemSecondaryAction>
+                <PopupState variant="popover">
+                  {popupState => (
+                    <>
+                      <IconButton edge="end" {...bindTrigger(popupState)}>
+                        <OptionIcon />
+                      </IconButton>
+                      <Menu {...bindMenu(popupState)}>
+                        <MenuItem onClick={() => alert("Don't click me again")}>Edit</MenuItem>
+                      </Menu>
+                    </>
+                  )}
+                </PopupState>
+              </ListItemSecondaryAction>
             </ListItem>
           ))}
 
