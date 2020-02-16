@@ -29,18 +29,35 @@ getAllEmployeeHistory = () => {
         return employeeHistory;
     }).catch(err => console.error(err));
 };
-// getAllFundCompany = () => {
-//     return models.FundCompany.findAll().then((fundCompany) => {
-//         return fundCompany;
-//     }).catch(err => console.error(err));
-// };
+
+getAllOriginalFundPositions = () => {
+    return models.OriginalFundPosition.findAll().then((originalPositions) => {
+        return originalPositions;
+    }).catch(err => console.error(err));
+}
+
+getAllSharedFunds = () => {
+    return models.SharedFunds.findAll().then((sharedFunds) => {
+        return sharedFunds;
+    }).catch(err => console.error(err));
+}
 
 //--------------------Insert into Table Functions-----------//
 
-insertPerson = (IndividualName, OriginalPosition, LinkedInUrl, Comments) => {
-    return models.Individuals.findOrCreate({where:{IndividualName: IndividualName}, 
+//TODO: Make an Insert User.
+insertFund = (FundName, UserID) => {
+    return models.create({
+        FundName: FundName,
+        UserID: UserID
+    }).then((createdFund) => {
+        return createdFund;
+    }).catch(err => console.error('Error in "insertFund", ', err));
+};
+
+insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
+    return models.Individuals.findOrCreate({where:{Name: Name}, 
         defaults: {
-            OriginalPostion: OriginalPosition,
+            //TODO: Finish This.
             LinkedInUrl: LinkedInUrl,
             Comments: Comments}    
     }).spread((user,createdBoolean) => {
@@ -173,6 +190,21 @@ deleteCompany = (CompanyID) => {
         })
     })
 }
+
+deleteFund = (FundID) => {
+    return new Promise((resolve,reject)=>{
+        models.Funds.destroy({
+            where: {
+                FundID: FundID
+            }
+        }).then((deletedFund) => {
+            console.log("deleted ONLY a fund.");
+            resolve(deletedFund);
+        }).catch(err => {console.error(err)
+                        reject(err)
+        })
+    })
+};
     
     module.exports = {
         getAllUsers,
@@ -190,5 +222,6 @@ deleteCompany = (CompanyID) => {
     modifyIndividual,
     deleteIndividual,
     modifyCompany,
-    deleteCompany
+    deleteCompany,
+    deleteFund
 }
