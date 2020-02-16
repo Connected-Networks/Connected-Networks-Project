@@ -184,6 +184,9 @@ app.get("/funds", (req, res) => {
     res.sendStatus(500);
   }
 });
+app.post("/funds",(req,res)=>{
+  //TODO: finish this
+})
 
 app.get("/funds/:id", (req, res) => {
   try {
@@ -193,7 +196,8 @@ app.get("/funds/:id", (req, res) => {
       if (!results) {
         res.sendStatus(500);
       } else {
-        res.json({ data: results });
+        //let fundName = finish this function
+        //res.json({ data: results,fundName: fundName });
         res.sendStatus(200);
       }
     });
