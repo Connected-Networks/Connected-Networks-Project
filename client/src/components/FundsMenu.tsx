@@ -21,6 +21,7 @@ import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 interface SideMenuFund {
   id: number;
   name: string;
+  isEditable?: boolean;
 }
 
 export interface FundsMenuProps {
@@ -30,12 +31,13 @@ export interface FundsMenuProps {
 
 export interface FundsMenuState {
   funds: SideMenuFund[];
+  addMode: boolean;
   editMode: boolean;
   newFundName: string;
 }
 
 export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenuState> {
-  state: FundsMenuState = { funds: [], editMode: false, newFundName: "" };
+  state: FundsMenuState = { funds: [], addMode: false, editMode: false, newFundName: "" };
 
   componentDidMount() {
     this.refresh();
@@ -56,9 +58,84 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     });
   };
 
-  switchEditMode = (isEditMode: boolean) => {
-    this.props.handleEditMode(isEditMode);
-    this.setState({ editMode: isEditMode, newFundName: "" });
+  setModes = (isEditMode: boolean, isAddMode?: boolean) => {
+    if (this.state.editMode !== isEditMode) {
+      this.props.handleEditMode(isEditMode);
+      if (isAddMode === undefined) {
+        this.setState({ editMode: isEditMode, newFundName: "" });
+      } else {
+        this.setState({ editMode: isEditMode, addMode: isAddMode, newFundName: "" });
+      }
+    }
+  };
+
+  getFundListItem = (fund: SideMenuFund) => (
+    <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString, fund.name)}>
+      <ListItemText primary={fund.name} />
+      <ListItemSecondaryAction>
+        <PopupState variant="popover">
+          {popupState => (
+            <>
+              <IconButton edge="end" {...bindTrigger(popupState)}>
+                <OptionIcon />
+              </IconButton>
+              <Menu {...bindMenu(popupState)}>
+                <MenuItem
+                  onClick={() => {
+                    fund.isEditable = true;
+                    this.setModes(true);
+                  }}
+                >
+                  Edit
+                </MenuItem>
+              </Menu>
+            </>
+          )}
+        </PopupState>
+      </ListItemSecondaryAction>
+    </ListItem>
+  );
+
+  getFundEditableItem = (fund: SideMenuFund) => {
+    this.setModes(true);
+    return (
+      <ListItem>
+        <TextField
+          inputProps={{
+            onBlur: () => {
+              fund.isEditable = false;
+              this.setModes(false, false);
+            }
+          }}
+          label="Fund Name"
+          placeholder={fund.name}
+          autoFocus
+          onChange={event => this.setState({ newFundName: event.target.value })}
+        />
+        <IconButton
+          edge="end"
+          onMouseDown={event => event.preventDefault()}
+          onClick={() => {
+            this.applyNewName(this.state.newFundName, fund);
+            this.setModes(false, false);
+          }}
+        >
+          <CheckIcon />
+        </IconButton>
+        <IconButton edge="end">
+          <CloseIcon />
+        </IconButton>
+      </ListItem>
+    );
+  };
+
+  applyNewName = (newFundName: string, fund: SideMenuFund) => {
+    if (this.state.addMode) {
+      this.addFund(newFundName);
+    } else {
+      this.editFund(this.state.newFundName, fund);
+    }
+    this.refresh();
   };
 
   addFund = (fundName: string) => {
@@ -72,6 +149,14 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
       });
   };
 
+  editFund = (fundName: string, fund: SideMenuFund) => {
+    alert(`Fund with Id: ${fund.id} is now called: ${fundName}`);
+  };
+
+  getNewEditableFund = () => {
+    return { id: -1, name: "New Fund", isEditable: true };
+  };
+
   render() {
     return (
       <>
@@ -79,7 +164,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
           <ListItem key={"Funds"}>
             <ListItemText primary={"Funds"} />
             <ListItemSecondaryAction>
-              <IconButton edge="end" onClick={() => this.switchEditMode(true)}>
+              <IconButton edge="end" onClick={() => this.setModes(true, true)}>
                 <AddIcon />
               </IconButton>
             </ListItemSecondaryAction>
@@ -87,50 +172,8 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
         </List>
         <Divider />
         <List>
-          {this.state.funds.map(fund => (
-            <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString, fund.name)}>
-              <ListItemText primary={fund.name} />
-              <ListItemSecondaryAction>
-                <PopupState variant="popover">
-                  {popupState => (
-                    <>
-                      <IconButton edge="end" {...bindTrigger(popupState)}>
-                        <OptionIcon />
-                      </IconButton>
-                      <Menu {...bindMenu(popupState)}>
-                        <MenuItem onClick={() => alert("Don't click me again")}>Edit</MenuItem>
-                      </Menu>
-                    </>
-                  )}
-                </PopupState>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-
-          {!this.state.editMode ? null : (
-            <ListItem>
-              <TextField
-                inputProps={{ onBlur: () => this.switchEditMode(false) }}
-                label="Fund Name"
-                placeholder="New Fund"
-                autoFocus
-                onChange={event => this.setState({ newFundName: event.target.value })}
-              />
-              <IconButton
-                edge="end"
-                onMouseDown={event => event.preventDefault()}
-                onClick={() => {
-                  this.addFund(this.state.newFundName);
-                  this.switchEditMode(false);
-                }}
-              >
-                <CheckIcon />
-              </IconButton>
-              <IconButton edge="end">
-                <CloseIcon />
-              </IconButton>
-            </ListItem>
-          )}
+          {this.state.funds.map(fund => (fund.isEditable ? this.getFundEditableItem(fund) : this.getFundListItem(fund)))}
+          {this.state.addMode ? this.getFundEditableItem(this.getNewEditableFund()) : null}
         </List>
       </>
     );
