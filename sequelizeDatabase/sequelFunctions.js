@@ -221,15 +221,29 @@ retrieveCurrentEmployeesOfCompany = (CompanyID) => {
     })
 }
 
+retrieveFundName = (fundID) => {
+    return new Promise((resolve,reject)=>{
+        models.Funds.findAll({
+            where: {
+                FundID: fundID
+            }
+        }).then((result)=>{
+            if (result[0]!=undefined)
+               resolve(result[0].FundName)
+            else
+                resolve(undefined)
+        })
+    })
+}
     
-    module.exports = {
-        getAllIndividuals,
-        getAllCompanies,
-        getAllFunds,
-        getAllEmployeeHistory,
-        getAllFundCompany,
-        insertPerson,
-        insertCompany,
+module.exports = {
+    getAllIndividuals,
+    getAllCompanies,
+    getAllFunds,
+    getAllEmployeeHistory,
+    getAllFundCompany,
+    insertPerson,
+    insertCompany,
     insertEmployeeHistory,
     insertFromCsvLine,
     getIndividualEmployeeHistory,
@@ -239,5 +253,6 @@ retrieveCurrentEmployeesOfCompany = (CompanyID) => {
     modifyCompany,
     deleteCompany,
     retrieveCompaniesByFunds,
-    retrieveCurrentEmployeesOfCompany
+    retrieveCurrentEmployeesOfCompany,
+    retrieveFundName
 }

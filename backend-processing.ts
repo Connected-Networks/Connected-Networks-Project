@@ -297,6 +297,17 @@ export default class BackendProcessing {
   retrievePeopleViaCompany(companyID):Promise<Object>{
     return database.retrieveCurrentEmployeesOfCompany(companyID)
   }
+
+
+  //returns undefined if fundID is not found
+  retrieveFundName(fundID):Promise<String>{
+    return new Promise<String>((resolve,reject)=>{
+      database.retrieveFundName(fundID).then((result)=>{
+        resolve(result)
+      })
+    })
+  }
+
   retrievePeopleFromOriginalCompany(companyID):Promise<Object>{
     //TODO: complete this function
     //This function will be simpler after the schema changes

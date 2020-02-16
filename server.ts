@@ -185,7 +185,14 @@ app.get("/funds", (req, res) => {
   }
 });
 app.post("/funds",(req,res)=>{
-  //TODO: finish this
+  let be = new BackendProcessing();
+  let fund = req.body.newData;
+  be.insert_fund(fund).then((result)=>{
+    if (result)
+      res.sendStatus(200)
+    else
+      res.sendStatus(500)
+  })
 })
 
 app.get("/funds/:id", (req, res) => {
@@ -196,9 +203,14 @@ app.get("/funds/:id", (req, res) => {
       if (!results) {
         res.sendStatus(500);
       } else {
-        //let fundName = finish this function
-        //res.json({ data: results,fundName: fundName });
-        res.sendStatus(200);
+        let fundName = be.retrieveFundName(fundID)
+        fundName.then((name)=>{
+          res.json({ data: results,fundName: name});
+          res.sendStatus(200);
+        })
+        fundName.catch((error)=>{
+          res.sendStatus(500);
+        })
       }
     });
   } catch (error) {
