@@ -10,6 +10,7 @@ export interface AppState {
   uploadDialogOpened: boolean;
   openSideMenu: boolean;
   tableType: string;
+  fundName: string | undefined;
 }
 
 export default class App extends React.Component<any, AppState> {
@@ -22,7 +23,8 @@ export default class App extends React.Component<any, AppState> {
     this.state = {
       uploadDialogOpened: false,
       openSideMenu: false,
-      tableType: this.tablesFactory.getDefaultTableType()
+      tableType: this.tablesFactory.getDefaultTableType(),
+      fundName: undefined
     };
   }
 
@@ -37,8 +39,8 @@ export default class App extends React.Component<any, AppState> {
     this.setState({ openSideMenu: !this.state.openSideMenu });
   };
 
-  switchTables = (tableType: string) => {
-    this.setState({ tableType });
+  switchTables = (tableType: string, fundName?: string) => {
+    this.setState({ tableType, fundName });
   };
 
   render() {
@@ -52,7 +54,7 @@ export default class App extends React.Component<any, AppState> {
             tableTypes={this.tablesFactory.getAvailableTables()}
             handleSwitchTable={this.switchTables}
           />
-          {this.tablesFactory.getTableComponent(this.state.tableType)}
+          {this.tablesFactory.getTableComponent(this.state.tableType, this.state.fundName)}
         </Content>
         <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
       </Container>

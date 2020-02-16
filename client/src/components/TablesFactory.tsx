@@ -15,15 +15,15 @@ class TablesFactory {
     return Array.from(this.tableTypes.keys());
   };
 
-  getTableComponent = (tableType: string) => {
+  getTableComponent = (tableType: string, fundName?: string) => {
     if (this.tableTypes.has(tableType)) {
       return this.tableTypes.get(tableType);
     }
-    return this.getFundTableWithId(tableType);
+    return this.getFundTableWithId(tableType, fundName);
   };
 
-  getFundTableWithId = (fundId: string) => {
-    return <FundTable dataEndPoint={"/funds/" + fundId} />;
+  getFundTableWithId = (fundId: string, fundName: string = "Name not found") => {
+    return <FundTable fundId={fundId} fundName={fundName} />;
   };
 
   getDefaultTableType() {

@@ -4,7 +4,8 @@ import EditableObject from "./EditableObject";
 import CompanyDetailsTable from "./CompanyDetailsTable";
 
 interface FundTableProps {
-  dataEndPoint: string;
+  fundId: string;
+  fundName: string;
 }
 
 interface DisplayFundCompany {
@@ -13,7 +14,7 @@ interface DisplayFundCompany {
 }
 
 export default class FundTable extends ATable<DisplayFundCompany, FundTableProps> {
-  readonly TABLE_NAME = "Funds";
+  readonly DATA_END_POINT = "/funds/" + this.props.fundId;
 
   state: TableState<DisplayFundCompany> = {
     data: [],
@@ -21,11 +22,11 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
   };
 
   get name(): string {
-    return this.TABLE_NAME;
+    return this.props.fundName;
   }
 
   get dataEndPoint(): string {
-    return this.props.dataEndPoint;
+    return this.DATA_END_POINT;
   }
 
   get editableObject(): EditableObject<DisplayFundCompany> {

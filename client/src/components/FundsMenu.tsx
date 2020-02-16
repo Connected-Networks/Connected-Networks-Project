@@ -75,7 +75,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
         <Divider />
         <List>
           {this.state.funds.map(fund => (
-            <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString)}>
+            <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString, fund.name)}>
               <ListItemText primary={fund.name} />
             </ListItem>
           ))}
