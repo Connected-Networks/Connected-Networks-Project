@@ -197,6 +197,14 @@ app.post("/funds", (req, res) => {
   res.sendStatus(200);
 });
 
+app.put("/funds", (req, res) => {
+  //Todo for Aaron, implement this function so it updates an existing fund, the fund can be accessed by req.body.fund,
+  //req.body.fund.name is probably gonna be the thing that always change
+  //Temp until function is implemented
+  console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
+  res.sendStatus(200);
+});
+
 app.get("/funds/:id", (req, res) => {
   //Todo for Aaron, implement this function so it returns all companies that are in this fund, we will need to talk about return type.
   try {

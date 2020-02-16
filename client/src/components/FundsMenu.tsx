@@ -44,7 +44,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
   }
 
   refresh = () => {
-    this.getFunds().then(funds => this.setState({ funds }));
+    this.getFunds().then(funds => this.setState({ funds, addMode: false, editMode: false, newFundName: "" }));
   };
 
   getFunds = async () => {
@@ -99,7 +99,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
   getFundEditableItem = (fund: SideMenuFund) => {
     this.setModes(true);
     return (
-      <ListItem>
+      <ListItem key={fund.id}>
         <TextField
           inputProps={{
             onBlur: () => {
@@ -117,7 +117,6 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
           onMouseDown={event => event.preventDefault()}
           onClick={() => {
             this.applyNewName(this.state.newFundName, fund);
-            this.setModes(false, false);
           }}
         >
           <CheckIcon />
@@ -135,12 +134,11 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     } else {
       this.editFund(this.state.newFundName, fund);
     }
-    this.refresh();
   };
 
-  addFund = (fundName: string) => {
+  addFund = (newFundName: string) => {
     axios
-      .post("/funds", { fundName })
+      .post("/funds", { newFundName })
       .then(response => {
         this.refresh();
       })
@@ -149,8 +147,16 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
       });
   };
 
-  editFund = (fundName: string, fund: SideMenuFund) => {
-    alert(`Fund with Id: ${fund.id} is now called: ${fundName}`);
+  editFund = (newFundName: string, fund: SideMenuFund) => {
+    const newFund = { ...fund, name: newFundName };
+    axios
+      .put("/funds", { fund: newFund })
+      .then(response => {
+        this.refresh();
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   };
 
   getNewEditableFund = () => {
