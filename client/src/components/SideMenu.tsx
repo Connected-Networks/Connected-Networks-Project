@@ -15,6 +15,7 @@ export interface SideMenuProps {
 export interface SideMenuState {
   funds: SideMenuFund[];
   addMode: boolean;
+  newFundName: string;
 }
 
 interface SideMenuFund {
@@ -23,10 +24,15 @@ interface SideMenuFund {
 }
 
 export default class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
-  state: SideMenuState = { funds: [], addMode: false };
+  state: SideMenuState = { funds: [], addMode: false, newFundName: "" };
+
   componentDidMount() {
-    this.getFunds().then(funds => this.setState({ funds }));
+    this.refresh();
   }
+
+  refresh = () => {
+    this.getFunds().then(funds => this.setState({ funds }));
+  };
 
   getFunds = async () => {
     return new Promise<SideMenuFund[]>(resolve => {
@@ -47,19 +53,42 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
     return (
       <ListItem>
         <TextField
-          inputProps={{ onBlur: () => this.setState({ addMode: false }) }}
+          inputProps={{ onBlur: () => this.stopAddMode() }}
           label="Fund Name"
           placeholder="New Fund"
           autoFocus
+          onChange={event => this.setState({ newFundName: event.target.value })}
         />
-        <IconButton edge="end" onMouseDown={event => event.preventDefault()} onClick={() => null}>
+        <IconButton
+          edge="end"
+          onMouseDown={event => event.preventDefault()}
+          onClick={() => {
+            this.addFund(this.state.newFundName);
+            this.stopAddMode();
+          }}
+        >
           <CheckIcon />
         </IconButton>
-        <IconButton edge="end" onClick={() => null}>
+        <IconButton edge="end">
           <CloseIcon />
         </IconButton>
       </ListItem>
     );
+  };
+
+  stopAddMode = () => {
+    this.setState({ addMode: false, newFundName: "" });
+  };
+
+  addFund = (fundName: string) => {
+    axios
+      .post("/funds", { fundName })
+      .then(response => {
+        this.refresh();
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   };
 
   getSideMenuWidth = () => {

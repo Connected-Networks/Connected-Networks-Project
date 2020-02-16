@@ -190,6 +190,13 @@ app.get("/funds", (req, res) => {
   }
 });
 
+app.post("/funds", (req, res) => {
+  //Todo for Aaron, implement this function so it add a new fund to the database with req.body.fundName as the name of the new fund
+  //Temp until function is implemented
+  console.log("Added fund: " + req.body.fundName + " to the database");
+  res.sendStatus(200);
+});
+
 app.get("/funds/:id", (req, res) => {
   //Todo for Aaron, implement this function so it returns all companies that are in this fund, we will need to talk about return type.
   try {
