@@ -4,18 +4,12 @@ import CompaniesTable from "./CompaniesTable";
 import FundTable from "./FundTable";
 
 class TablesFactory {
-  tableTypes: Map<string, JSX.Element | undefined>;
-  uploadHandler: Function;
-
-  constructor(uploadHandler: Function) {
-    this.tableTypes = new Map([
-      ["Recent", undefined],
-      ["Starred", undefined],
-      ["People", <PeopleTable uploadHandler={uploadHandler} />],
-      ["Companies", <CompaniesTable uploadHandler={uploadHandler} />]
-    ]);
-    this.uploadHandler = uploadHandler;
-  }
+  tableTypes = new Map([
+    ["Recent", undefined],
+    ["Starred", undefined],
+    ["People", <PeopleTable />],
+    ["Companies", <CompaniesTable />]
+  ]);
 
   getAvailableTables = () => {
     return Array.from(this.tableTypes.keys());
@@ -29,7 +23,7 @@ class TablesFactory {
   };
 
   getFundTableWithId = (fundId: string) => {
-    return <FundTable uploadHandler={this.uploadHandler} dataEndPoint={"/funds/" + fundId} />;
+    return <FundTable dataEndPoint={"/funds/" + fundId} />;
   };
 
   getDefaultTableType() {

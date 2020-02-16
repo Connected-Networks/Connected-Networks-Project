@@ -17,7 +17,7 @@ export default class App extends React.Component<any, AppState> {
 
   constructor(props: any) {
     super(props);
-    this.tablesFactory = new TablesFactory(this.openUploadDialog);
+    this.tablesFactory = new TablesFactory();
 
     this.state = {
       uploadDialogOpened: false,
