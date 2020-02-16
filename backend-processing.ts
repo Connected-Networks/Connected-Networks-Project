@@ -297,4 +297,9 @@ export default class BackendProcessing {
   retrievePeopleViaCompany(companyID):Promise<Object>{
     return database.retrieveCurrentEmployeesOfCompany(companyID)
   }
+  retrievePeopleFromOriginalCompany(companyID):Promise<Object>{
+    //TODO: complete this function
+    //This function will be simpler after the schema changes
+    return null;
+  }
 }
