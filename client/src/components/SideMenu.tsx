@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Divider, List, ListItem, ListItemText } from "@material-ui/core";
 import styled from "styled-components";
-import { SideMenuFund } from "../App";
 import axios from "axios";
 
 export interface SideMenuProps {
@@ -12,6 +11,11 @@ export interface SideMenuProps {
 
 export interface SideMenuState {
   funds: SideMenuFund[];
+}
+
+interface SideMenuFund {
+  id: number;
+  name: string;
 }
 
 export default class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
@@ -50,7 +54,7 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
         <Divider />
         <List>
           {this.state.funds.map(fund => (
-            <ListItem button key={fund.id}>
+            <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString)}>
               <ListItemText primary={fund.name} />
             </ListItem>
           ))}

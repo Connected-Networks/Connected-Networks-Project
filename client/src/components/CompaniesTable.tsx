@@ -1,33 +1,47 @@
 import * as React from "react";
-import styled from "styled-components";
-import MaterialTable, { Column } from "material-table";
-import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
-import axios from "axios";
-import PeopleTable from "./PeopleTable";
+import { TableState } from "./ATable";
+import EditableObject from "./EditableObject";
+import DisplayTable from "./DisplayTable";
 import CompanyDetailsTable from "./CompanyDetailsTable";
+import axios from "axios";
 
 export interface CompaniesTableProps {
   uploadHandler: Function;
 }
 
-export interface CompaniesTableState {
-  companies: DisplayCompany[];
-  columns: Array<Column<DisplayCompany>>;
-}
-
-interface DisplayCompany {
+export interface DisplayCompany {
   id: number;
   name: string;
 }
 
-const Container = styled.div`
-  flex: 1;
-`;
+export default class CompaniesTable extends DisplayTable<DisplayCompany> {
+  readonly TABLE_NAME = "Companies";
 
-class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTableState> {
-  state: CompaniesTableState = {
-    companies: [],
+  static defaultProps = {
+    dataEndPoint: "/company"
+  };
+
+  state: TableState<DisplayCompany> = {
+    data: [],
     columns: [{ title: "Name", field: "name" }]
+  };
+
+  get editableObject(): EditableObject<DisplayCompany> {
+    return {
+      onRowUpdate: this.updateRow
+    };
+  }
+
+  get name(): string {
+    return this.TABLE_NAME;
+  }
+
+  getDetailPanel = (rowData: DisplayCompany) => {
+    return (
+      <div style={{ marginLeft: "60px" }}>
+        <CompanyDetailsTable dataEndPoint={"/people/" + rowData.id} />
+      </div>
+    );
   };
 
   updateRow = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
@@ -35,7 +49,8 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
       if (oldData) {
         console.log(newData);
         this.updateCompanyOnServer(newData).then(() => {
-          this.refreshTable().then(() => resolve());
+          this.refreshTable();
+          resolve();
         });
       }
     });
@@ -57,66 +72,4 @@ class CompaniesTable extends React.Component<CompaniesTableProps, CompaniesTable
         });
     });
   };
-
-  componentDidMount() {
-    this.refreshTable();
-  }
-
-  refreshTable = async () => {
-    return new Promise((resolve, reject) => {
-      this.getCompanies()
-        .then(companies => {
-          this.setState({ companies });
-          resolve();
-        })
-        .catch(() => {});
-    });
-  };
-
-  getCompanies = async () => {
-    return new Promise<DisplayCompany[]>(resolve => {
-      axios
-        .get("/company")
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
-  };
-
-  render() {
-    return (
-      <Container>
-        <MaterialTable
-          columns={this.state.columns}
-          data={this.state.companies}
-          editable={{
-            onRowUpdate: this.updateRow
-          }}
-          title="Companies"
-          actions={[
-            {
-              icon: () => <ImportIcon fill={"grey"} />,
-              tooltip: "Upload CSV",
-              isFreeAction: true,
-              onClick: (event, rowData) => {
-                this.props.uploadHandler();
-                this.refreshTable();
-              }
-            }
-          ]}
-          detailPanel={rowData => {
-            return (
-              <div style={{ marginLeft: "60px" }}>
-                <CompanyDetailsTable uploadHandler={this.props.uploadHandler} companyId={rowData.id} />
-              </div>
-            );
-          }}
-          onRowClick={(event, rowData, togglePanel) => togglePanel!()}
-        />
-      </Container>
-    );
-  }
 }
-
-export default CompaniesTable;

@@ -18,6 +18,7 @@ function delay(ms: number)
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+<<<<<<< HEAD
 function test_company_via_fund(){
     let be = new BackendProcessing()
     be.retrieveCompaniesFromFund(2).then((results)=>{
@@ -26,3 +27,14 @@ function test_company_via_fund(){
 }
 
 test_company_via_fund();
+=======
+function test_ibc_retrieval(){
+    for (let i=1;i<=5;i++){
+        db.retrieveCurrentEmployeesOfCompany(i).then((result)=>{
+            console.log("results from company: "+i);
+            console.log(JSON.stringify(result))
+        })
+    }
+}
+test_ibc_retrieval()
+>>>>>>> milestone-8

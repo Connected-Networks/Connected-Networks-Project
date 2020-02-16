@@ -191,6 +191,36 @@ retrieveCompaniesByFunds = (fundID) => {
         }
     )
 }
+retrieveCurrentEmployeesOfCompany = (CompanyID) => {
+    return new Promise((resolve,reject)=>{
+        getAllIndividuals().then((people)=>{
+            Promise.all(people.map((person)=>{
+                return new Promise((resolve,reject)=>{
+                    getIndividualCurrentEmployement(person.IndividualID).then((result)=>{
+                        if (result==null || result==undefined || result.company==null || result.company.CompanyID!=CompanyID)
+                            resolve(null)
+                        else{
+                            let info = {
+                                //Final JSON format
+                                IndividualID : person.IndividualID,
+                                name : person.IndividualName,
+                                CompanyID : result.company.CompanyID,
+                                company : result.company.CompanyName,
+                                StartDate : result.StartDate,
+                                EndDate : result.EndDate,
+                                position : result.PositionName
+                            }
+                            resolve(info);
+                        }
+                    })
+                })
+            })).then((results)=>{
+                resolve(results.filter(x=>x!=null))
+            })
+        })
+    })
+}
+
     
     module.exports = {
         getAllIndividuals,
@@ -208,5 +238,6 @@ retrieveCompaniesByFunds = (fundID) => {
     deleteIndividual,
     modifyCompany,
     deleteCompany,
-    retrieveCompaniesByFunds
+    retrieveCompaniesByFunds,
+    retrieveCurrentEmployeesOfCompany
 }
