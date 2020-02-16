@@ -9,7 +9,7 @@ export interface TableState<T extends Object> {
   columns: Array<Column<T>>;
 }
 
-export default abstract class ATable<T extends Object, TableProps> extends React.Component<TableProps, TableState<T>> {
+export default abstract class ATable<T extends Object, TableProps = {}> extends React.Component<TableProps, TableState<T>> {
   abstract get editableObject(): EditableObject<T>;
   abstract get name(): string;
   abstract get dataEndPoint(): string;

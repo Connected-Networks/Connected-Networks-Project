@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Divider, List, ListItem, ListItemText } from "@material-ui/core";
+import { Divider, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, TextField } from "@material-ui/core";
 import styled from "styled-components";
-import axios from "axios";
+import FundsMenu from "./FundsMenu";
 
 export interface SideMenuProps {
   open: boolean;
@@ -10,34 +10,21 @@ export interface SideMenuProps {
 }
 
 export interface SideMenuState {
-  funds: SideMenuFund[];
-}
-
-interface SideMenuFund {
-  id: number;
-  name: string;
+  editMode: boolean;
 }
 
 export default class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
-  state: SideMenuState = { funds: [] };
-  componentDidMount() {
-    this.getFunds().then(funds => this.setState({ funds }));
-  }
+  state = { editMode: false };
 
-  getFunds = async () => {
-    return new Promise<SideMenuFund[]>(resolve => {
-      axios
-        .get("/funds")
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
+  handleEditMode = (editMode: boolean) => this.setState({ editMode });
+
+  getSideMenuWidth = () => {
+    return this.state.editMode ? "250px" : "150px";
   };
 
   render() {
     return (
-      <Container open={this.props.open}>
+      <Container open={this.props.open} width={this.getSideMenuWidth()}>
         <List>
           {this.props.tableTypes.map(type => (
             <ListItem button key={type} onClick={() => this.props.handleSwitchTable(type)}>
@@ -46,30 +33,17 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
           ))}
         </List>
         <Divider />
-        <List>
-          <ListItem key={"Funds"}>
-            <ListItemText primary={"Funds"} />
-          </ListItem>
-        </List>
-        <Divider />
-        <List>
-          {this.state.funds.map(fund => (
-            <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString)}>
-              <ListItemText primary={fund.name} />
-            </ListItem>
-          ))}
-        </List>
+        <FundsMenu handleSwitchTable={this.props.handleSwitchTable} handleEditMode={this.handleEditMode} />
       </Container>
     );
   }
 }
 
-const Container = styled.div<{ open: boolean }>`
-  /* max-height: 100%; */
-  min-width: 150px;
-  max-width: 150px;
-  transition: margin 0.5s;
-  margin-left: ${props => (props.open ? "0px" : "-150px")};
+const Container = styled.div<{ open: boolean; width: string }>`
+  min-width: ${props => props.width};
+  max-width: ${props => props.width};
+  transition: margin 0.5s, min-width 0.5s, max-width 0.5s;
+  margin-left: ${props => (props.open ? "0px" : "-" + props.width)};
   display: flex;
   flex-direction: column;
 `;

@@ -1,6 +1,5 @@
 import axios from "axios";
-import { TableState } from "./ATable";
-import DisplayTable from "./DisplayTable";
+import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 
 export interface DisplayPerson {
@@ -12,12 +11,9 @@ export interface DisplayPerson {
   hyperlink: string;
 }
 
-export default class PeopleTable extends DisplayTable<DisplayPerson> {
+export default class PeopleTable extends ATable<DisplayPerson> {
   readonly TABLE_NAME = "People";
-
-  static defaultProps = {
-    dataEndPoint: "/people"
-  };
+  readonly DATA_END_POINT = "/people";
 
   state: TableState<DisplayPerson> = {
     data: [],
@@ -38,6 +34,10 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
 
   get name(): string {
     return this.TABLE_NAME;
+  }
+
+  get dataEndPoint(): string {
+    return this.DATA_END_POINT;
   }
 
   /**

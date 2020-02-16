@@ -1,25 +1,17 @@
 import * as React from "react";
-import { TableState } from "./ATable";
+import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
-import DisplayTable from "./DisplayTable";
 import CompanyDetailsTable from "./CompanyDetailsTable";
 import axios from "axios";
-
-export interface CompaniesTableProps {
-  uploadHandler: Function;
-}
 
 export interface DisplayCompany {
   id: number;
   name: string;
 }
 
-export default class CompaniesTable extends DisplayTable<DisplayCompany> {
+export default class CompaniesTable extends ATable<DisplayCompany> {
   readonly TABLE_NAME = "Companies";
-
-  static defaultProps = {
-    dataEndPoint: "/company"
-  };
+  readonly DATA_END_POINT = "/company";
 
   state: TableState<DisplayCompany> = {
     data: [],
@@ -34,6 +26,10 @@ export default class CompaniesTable extends DisplayTable<DisplayCompany> {
 
   get name(): string {
     return this.TABLE_NAME;
+  }
+
+  get dataEndPoint(): string {
+    return this.DATA_END_POINT;
   }
 
   getDetailPanel = (rowData: DisplayCompany) => {
