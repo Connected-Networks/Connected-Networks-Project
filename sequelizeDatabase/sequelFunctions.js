@@ -119,12 +119,19 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
     }).catch(err => console.error('Error in insertEmployeeHistory',err));
 }
 
-insertFromCsvLine = (EmployeeName, OriginalPostion, OriginalStartDate, OriginalEndDate, CurrentEmployer, CurrentPostion, LinkedInUrl, Comments) =>{
-    insertPerson(EmployeeName, OriginalPostion, LinkedInUrl, Comments).then((newPerson) => {
-        insertCompany(CurrentEmployer).then((newCompany) => {
-            insertEmployeeHistory(newPerson.IndividualID, newCompany.CompanyID, CurrentPostion, OriginalStartDate, OriginalEndDate)
-        })
-    });
+insertFromCsvLine = (UserID, FundID, PortfolioCompanyName, EmployeeName, OriginalPostion, OriginalStartDate, OriginalEndDate, CurrentEmployer, CurrentPostion, LinkedInUrl, Comments) =>{
+    insertPerson(FundID, EmployeeName, LinkedInUrl, Comments).then((newPerson) => {
+        insertCompany(PortfolioCompanyName, FundID).then((originalCompany) => {
+            insertOriginalFundPosition(newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion).then(() => {
+                //NOTE: I'm hoping it doesn't freak out that I included no arguements here.
+                insertEmployeeHistory(UserID, newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion, OriginalStartDate, OriginalEndDate).then(() => {
+                     insertCompany(CurrentEmployer).then((newCompany) => {
+                        insertEmployeeHistory(newPerson.IndividualID, newCompany.CompanyID, CurrentPostion, OriginalStartDate, OriginalEndDate)
+                     });
+                });
+            });
+        });
+    }).catch(err => console.error('Error in "insertFromCsvLine", ', err));
 }
 
 getIndividualEmployeeHistory = (IndividualID) => {
