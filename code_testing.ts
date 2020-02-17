@@ -20,8 +20,12 @@ function delay(ms: number)
 
 function test_new_function(){
     let be = new BackendProcessing()
-    be.retrieveFundName(3).then((result)=>{
+    let fund = {
+        name : "First Fund",
+        id : 1
+    }
+    be.update_fund(fund).then((result)=>{
         console.log(result)
-    })
+    }).catch(()=>{console.log("xxx")})
 }
 test_new_function()

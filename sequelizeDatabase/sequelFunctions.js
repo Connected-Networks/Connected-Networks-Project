@@ -147,7 +147,24 @@ modifyCompany = (CompanyID, alteredCompanyName) => {
     }).catch(err => console.error(err));
 }
 
-deleteCompany = (CompanyID) => {
+//---------------Modify Fund---------------//
+modifyFund = (FundID, alteredFundName) => {
+    return new Promise((resolve,reject)=>{
+        models.Funds.findOne({
+            where: {
+                FundID: FundID
+            }
+        }).then(fund => {
+            fund.update({
+                FundName: alteredFundName
+            }).then(resolve(true)).catch(reject())
+        }).catch(reject());
+    })
+}
+    
+    
+    
+    deleteCompany = (CompanyID) => {
     return new Promise((resolve,reject)=>{
         models.EmployeeHistory.destroy({
             where: {
@@ -251,6 +268,7 @@ module.exports = {
     modifyIndividual,
     deleteIndividual,
     modifyCompany,
+    modifyFund,
     deleteCompany,
     retrieveCompaniesByFunds,
     retrieveCurrentEmployeesOfCompany,

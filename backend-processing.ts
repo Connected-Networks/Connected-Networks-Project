@@ -249,7 +249,6 @@ export default class BackendProcessing {
       let u = database.modifyFund(fund.id,fund.name);
       u.then(resolve(true));
       u.catch(resolve(false));
-
     });
   }
 

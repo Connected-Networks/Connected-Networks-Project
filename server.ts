@@ -186,7 +186,8 @@ app.get("/funds", (req, res) => {
 });
 app.post("/funds",(req,res)=>{
   let be = new BackendProcessing();
-  let fund = req.body.newData;
+  console.log("Added fund: " + req.body.fundName + " to the database");
+  let fund = req.body.fundName;
   be.insert_fund(fund).then((result)=>{
     if (result)
       res.sendStatus(200)
@@ -195,19 +196,20 @@ app.post("/funds",(req,res)=>{
   })
 })
 
-app.post("/funds", (req, res) => {
-  //Todo for Aaron, implement this function so it add a new fund to the database with req.body.fundName as the name of the new fund
-  //Temp until function is implemented
-  console.log("Added fund: " + req.body.fundName + " to the database");
-  res.sendStatus(200);
-});
 
 app.put("/funds", (req, res) => {
   //Todo for Aaron, implement this function so it updates an existing fund, the fund can be accessed by req.body.fund,
   //req.body.fund.name is probably gonna be the thing that always change
   //Temp until function is implemented
+  let be = new BackendProcessing();
   console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
-  res.sendStatus(200);
+  let fund = req.body.fund;
+  be.update_fund(fund).then((result)=>{
+    if (result)
+      res.sendStatus(200)
+    else
+      res.sendStatus(500)
+  })
 });
 
 app.get("/funds/:id", (req, res) => {
@@ -215,19 +217,13 @@ app.get("/funds/:id", (req, res) => {
     let be = new BackendProcessing();
     let fundID = req.params.id;
     let data = be.retrieveCompaniesFromFund(fundID).then(results => {
-      if (!results) {
-        res.sendStatus(500);
-      } else {
-        let fundName = be.retrieveFundName(fundID)
-        fundName.then((name)=>{
-          res.json({ data: results,fundName: name});
+        if (results!=null){
+          res.json({data: results});
           res.sendStatus(200);
-        })
-        fundName.catch((error)=>{
-          res.sendStatus(500);
-        })
-      }
-    });
+        }
+        else
+          res.sendStatus(500)
+      })
   } catch (error) {
     res.sendStatus(500);
   }
