@@ -174,43 +174,66 @@ app.delete("/company/:id", (req, res) => {
 });
 
 app.get("/funds", (req, res) => {
-  //Todo for Aaron, make it so it sends a list of funds available to show them on the side menu,
   //return type should be an Array of SideMenuFund objects as defined in App.tsx.
   try {
-    //Temp until function is implemented
-    const results = [
-      { id: 0, name: "Fund1" },
-      { id: 1, name: "Fund2" }
-    ];
-
+    let be = new BackendProcessing();
+    let results = be.retrieveFundsFromDatabase();
     res.json({ data: results });
     res.sendStatus(200);
   } catch (error) {
     res.sendStatus(500);
   }
 });
-
-app.post("/funds", (req, res) => {
-  //Todo for Aaron, implement this function so it add a new fund to the database with req.body.fundName as the name of the new fund
-  //Temp until function is implemented
+app.post("/funds",(req,res)=>{
+  let be = new BackendProcessing();
   console.log("Added fund: " + req.body.fundName + " to the database");
-  res.sendStatus(200);
-});
+  let fund = req.body.fundName;
+  be.insert_fund(fund).then((result)=>{
+    if (result)
+      res.sendStatus(200)
+    else
+      res.sendStatus(500)
+  })
+})
+
 
 app.put("/funds", (req, res) => {
   //Todo for Aaron, implement this function so it updates an existing fund, the fund can be accessed by req.body.fund,
   //req.body.fund.name is probably gonna be the thing that always change
   //Temp until function is implemented
+  let be = new BackendProcessing();
   console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
-  res.sendStatus(200);
+  let fund = req.body.fund;
+  be.update_fund(fund).then((result)=>{
+    if (result)
+      res.sendStatus(200)
+    else
+      res.sendStatus(500)
+  })
 });
 
 app.get("/funds/:id", (req, res) => {
-  //Todo for Aaron, implement this function so it returns all companies that are in this fund, we will need to talk about return type.
   try {
-    //Temp until function is implemented
     let be = new BackendProcessing();
-    let data = be.retrieveCompaniesFromDatabase().then(results => {
+    let fundID = req.params.id;
+    let data = be.retrieveCompaniesFromFund(fundID).then(results => {
+        if (results!=null){
+          res.json({data: results});
+          res.sendStatus(200);
+        }
+        else
+          res.sendStatus(500)
+      })
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+app.get("/people/original/:companyId",(req,res)=>{
+  try {
+    let be = new BackendProcessing();
+    let companyID = req.params.id;
+    let data = be.retrievePeopleFromOriginalCompany(companyID).then(results => {
       if (!results) {
         res.sendStatus(500);
       } else {
@@ -221,7 +244,7 @@ app.get("/funds/:id", (req, res) => {
   } catch (error) {
     res.sendStatus(500);
   }
-});
+})
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));

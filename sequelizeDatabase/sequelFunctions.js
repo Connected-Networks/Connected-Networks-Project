@@ -147,7 +147,24 @@ modifyCompany = (CompanyID, alteredCompanyName) => {
     }).catch(err => console.error(err));
 }
 
-deleteCompany = (CompanyID) => {
+//---------------Modify Fund---------------//
+modifyFund = (FundID, alteredFundName) => {
+    return new Promise((resolve,reject)=>{
+        models.Funds.findOne({
+            where: {
+                FundID: FundID
+            }
+        }).then(fund => {
+            fund.update({
+                FundName: alteredFundName
+            }).then(resolve(true)).catch(reject())
+        }).catch(reject());
+    })
+}
+    
+    
+    
+    deleteCompany = (CompanyID) => {
     return new Promise((resolve,reject)=>{
         models.EmployeeHistory.destroy({
             where: {
@@ -168,6 +185,29 @@ deleteCompany = (CompanyID) => {
     })
 }
 
+//returns a list of objects
+//{
+// FundCompanyID
+// FundID
+// CompanyID
+// company:
+//   {
+//     CompanyID
+//     CompanyName
+//   }
+//}
+retrieveCompaniesByFunds = (fundID) => {
+    return models.FundCompany.findAll(
+        {
+            where: {
+                FundID: fundID
+            },
+            include: [{
+                model: models.Companies
+            }]
+        }
+    )
+}
 retrieveCurrentEmployeesOfCompany = (CompanyID) => {
     return new Promise((resolve,reject)=>{
         getAllIndividuals().then((people)=>{
@@ -198,15 +238,29 @@ retrieveCurrentEmployeesOfCompany = (CompanyID) => {
     })
 }
 
+retrieveFundName = (fundID) => {
+    return new Promise((resolve,reject)=>{
+        models.Funds.findAll({
+            where: {
+                FundID: fundID
+            }
+        }).then((result)=>{
+            if (result[0]!=undefined)
+               resolve(result[0].FundName)
+            else
+                resolve(undefined)
+        })
+    })
+}
     
-    module.exports = {
-        getAllIndividuals,
-        getAllCompanies,
-        getAllFunds,
-        getAllEmployeeHistory,
-        getAllFundCompany,
-        insertPerson,
-        insertCompany,
+module.exports = {
+    getAllIndividuals,
+    getAllCompanies,
+    getAllFunds,
+    getAllEmployeeHistory,
+    getAllFundCompany,
+    insertPerson,
+    insertCompany,
     insertEmployeeHistory,
     insertFromCsvLine,
     getIndividualEmployeeHistory,
@@ -214,6 +268,9 @@ retrieveCurrentEmployeesOfCompany = (CompanyID) => {
     modifyIndividual,
     deleteIndividual,
     modifyCompany,
+    modifyFund,
     deleteCompany,
-    retrieveCurrentEmployeesOfCompany
+    retrieveCompaniesByFunds,
+    retrieveCurrentEmployeesOfCompany,
+    retrieveFundName
 }

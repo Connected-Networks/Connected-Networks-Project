@@ -17,6 +17,10 @@ interface DisplayCompany {
   id: number;
   name: string;
 }
+interface DisplayFund {
+  id: number;
+  name: string;
+}
 
 export default class BackendProcessing {
 
@@ -181,6 +185,8 @@ export default class BackendProcessing {
     })
   }
 
+  
+  //returns a promise boolean representing if the operation was successful
   insert_company(company):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
       let i = database.insertCompany(company.name);
@@ -188,6 +194,9 @@ export default class BackendProcessing {
       i.catch(resolve(false));
     });
   }
+
+  
+  //returns a promise boolean representing if the operation was successful
   update_company(company):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
       let u = database.modifyCompany(company.id,company.name);
@@ -196,6 +205,9 @@ export default class BackendProcessing {
 
     });
   }
+
+  
+  //returns a promise boolean representing if the operation was successful
   delete_company(company):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
       let d = database.deleteCompany(company.id);
@@ -204,6 +216,8 @@ export default class BackendProcessing {
     })
   }
 
+  
+  //returns a promise boolean representing if the operation was successful
   retrieveCompaniesFromDatabase():Promise<DisplayCompany[]>{
     return new Promise<DisplayCompany[]>((resolve,reject)=>{
       database.getAllCompanies().then((results)=>{
@@ -219,7 +233,83 @@ export default class BackendProcessing {
     })
   }
 
+  //returns a promise boolean representing if the operation was successful
+  insert_fund(fund):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let i = database.insertFund(fund.name);
+      i.then(resolve(true));
+      i.catch(resolve(false));
+    });
+  }
+
+  
+  //returns a promise boolean representing if the operation was successful
+  update_fund(fund):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let u = database.modifyFund(fund.id,fund.name);
+      u.then(resolve(true));
+      u.catch(resolve(false));
+    });
+  }
+
+  
+  //returns a promise boolean representing if the operation was successful
+  delete_fund(fund):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let d = database.deleteFund(fund.id);
+      d.then(resolve(true));
+      d.catch(resolve(false));
+    })
+  }
+
+  
+  //returns a promise boolean representing if the operation was successful
+  retrieveFundsFromDatabase():Promise<DisplayFund[]>{
+    return new Promise<DisplayFund[]>((resolve,reject)=>{
+      database.getAllFunds().then((results)=>{
+        let list:DisplayFund[] = results.map((element)=>{
+          let fund:DisplayFund={
+            id : element.FundID,
+            name : element.FundName
+          }
+          return fund;
+        })
+        resolve(list);
+      })
+    })
+  }
+
+  retrieveCompaniesFromFund(fundID){
+    return new Promise<DisplayCompany[]>((resolve,reject)=>{
+      database.retrieveCompaniesByFunds(fundID).then((results)=>{
+        let list:DisplayCompany[] = results.map((element)=>{
+          let company:DisplayCompany={
+            id : element.company.CompanyID,
+            name : element.company.CompanyName
+          }
+          return company;
+        })
+        resolve(list);
+      })
+    })
+  }
   retrievePeopleViaCompany(companyID):Promise<Object>{
     return database.retrieveCurrentEmployeesOfCompany(companyID)
+  }
+
+
+  //returns undefined if fundID is not found
+  retrieveFundName(fundID):Promise<String>{
+    return new Promise<String>((resolve,reject)=>{
+      database.retrieveFundName(fundID).then((result)=>{
+        resolve(result)
+      })
+    })
+  }
+
+  retrievePeopleFromOriginalCompany(companyID):Promise<Object>{
+    //TODO: complete this function
+    //This function will be simpler after the schema changes
+    return null;
   }
 }
