@@ -1,16 +1,20 @@
 import * as React from "react";
-import DisplayTable from "./DisplayTable";
-import { TableState } from "./ATable";
+import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import CompanyDetailsTable from "./CompanyDetailsTable";
+
+interface FundTableProps {
+  fundId: string;
+  fundName: string;
+}
 
 interface DisplayFundCompany {
   id: number;
   name: string;
 }
 
-export default class FundTable extends DisplayTable<DisplayFundCompany> {
-  readonly TABLE_NAME = "Funds";
+export default class FundTable extends ATable<DisplayFundCompany, FundTableProps> {
+  readonly DATA_END_POINT = "/funds/" + this.props.fundId;
 
   state: TableState<DisplayFundCompany> = {
     data: [],
@@ -18,7 +22,11 @@ export default class FundTable extends DisplayTable<DisplayFundCompany> {
   };
 
   get name(): string {
-    return this.TABLE_NAME;
+    return this.props.fundName;
+  }
+
+  get dataEndPoint(): string {
+    return this.DATA_END_POINT;
   }
 
   get editableObject(): EditableObject<DisplayFundCompany> {
