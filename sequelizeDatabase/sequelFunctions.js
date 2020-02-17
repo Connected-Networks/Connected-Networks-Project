@@ -106,6 +106,7 @@ insertOriginalFundPosition = (IndividualID, CompanyID, PositionName) => {
 
 insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDate, EndDate) => {
     return models.EmployeeHistory.create({
+        //TODO: Add a restriction so you can't have Individuals and companies with Mismatched FundID's.
         UserID: UserID,
         IndividualID: IndividualID,
         CompanyID: CompanyID,
