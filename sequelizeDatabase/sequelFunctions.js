@@ -44,9 +44,19 @@ getAllSharedFunds = () => {
 
 //--------------------Insert into Table Functions-----------//
 
-//TODO: Make an Insert User.
+insertUser = (Username, Password, Email) =>{
+    return models.User.findOrCreate({where:{Email: Email},
+        defaults: {
+            Username: Username,
+            Password: Password
+        }
+    }).spread((user, createdBoolean) =>{
+        return user;
+    }).catch(err => console.error('Error in "insertUser", ', err));
+};
+
 insertFund = (FundName, UserID) => {
-    return models.create({
+    return models.Funds.create({ //TODO: Make this a findOrCreate to prevent duplicate names.
         FundName: FundName,
         UserID: UserID
     }).then((createdFund) => {
@@ -54,11 +64,20 @@ insertFund = (FundName, UserID) => {
     }).catch(err => console.error('Error in "insertFund", ', err));
 };
 
+insertSharedFunds = (FundID, UserID) => {
+    //NOTE: UserID here is the user the fund is being shared with, not the fund owner.
+    return models.SharedFunds.create({//TODO: May need a "findOrCreate" with both fields in 'where'.
+        FundID: FundID,
+        UserID: UserID
+    }).then((createdSharedFund) => {
+        return createdSharedFund;
+    }).catch(err => console.error('Error in "insertSharedFunds", ', err));
+}
+
 insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
-    return models.Individuals.findOrCreate({where:{Name: Name}, 
+    return models.Individuals.findOrCreate({where:{LinkedInUrl: LinkedInUrl, FundID: FundID}, 
         defaults: {
-            //TODO: Finish This.
-            LinkedInUrl: LinkedInUrl,
+            Name: Name,
             Comments: Comments}    
     }).spread((user,createdBoolean) => {
         return user;
