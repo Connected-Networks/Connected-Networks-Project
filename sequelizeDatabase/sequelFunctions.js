@@ -72,7 +72,7 @@ insertSharedFunds = (FundID, UserID) => {
     }).then((createdSharedFund) => {
         return createdSharedFund;
     }).catch(err => console.error('Error in "insertSharedFunds", ', err));
-}
+};
 
 insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
     return models.Individuals.findOrCreate({where:{LinkedInUrl: LinkedInUrl, FundID: FundID}, 
@@ -82,18 +82,31 @@ insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
     }).spread((user,createdBoolean) => {
         return user;
     }).catch(err => console.error('Error in insertPerson', err));
-}
+};
 
-insertCompany = (CompanyName) => {
-    return models.Companies.findOrCreate({where: {CompanyName: CompanyName}
+insertCompany = (CompanyName, FundID) => {
+    return models.Companies.findOrCreate({where: {CompanyName: CompanyName, FundID: FundID}
     }).spread((company, createdBoolean) => {
         //console.log('Company Created: ', company);
         return company;
     }).catch(err => console.error('Error in insertCompany',err));
-}
+};
 
-insertEmployeeHistory = (IndividualID, CompanyID, PositionName, StartDate, EndDate) => {
+insertOriginalFundPosition = (IndividualID, CompanyID, PositionName) => {
+    //TODO: Verify that the fundIDs in both of these match each other.
+    //      Otherwise, just use with Caution.
+    return models.OriginalFundPostion.create({//TODO: Maybe make this findOrCreate, check if Funds match.
+        IndividualID: IndividualID,
+        CompanyID: CompanyID,
+        PositionName: PositionName
+    }).then((originalFundPosition) =>{
+        return originalFundPosition;
+    }).catch(err => console.error('Error in "insertOriginalFundPosition", ', err));
+};
+
+insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDate, EndDate) => {
     return models.EmployeeHistory.create({
+        UserID: UserID,
         IndividualID: IndividualID,
         CompanyID: CompanyID,
         PositionName: PositionName,
@@ -140,7 +153,7 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
     }).then(individual => {
         individual.update({
             IndividualName: newName,
-            OriginalPostion: newPosition,
+            OriginalPostion: newPosition,//TODO: Update this.
             LinkedInUrl: newUrl,
             Comments: newComments
         })
