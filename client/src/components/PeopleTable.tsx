@@ -1,7 +1,9 @@
 import axios from "axios";
 import { TableState } from "./ATable";
 import DisplayTable from "./DisplayTable";
+import PeopleDetailPanel from "./PeopleDetailPanel";
 import EditableObject from "./EditableObject";
+import React from "react";
 
 export interface DisplayPerson {
   id: number;
@@ -39,6 +41,15 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
   get name(): string {
     return this.TABLE_NAME;
   }
+
+
+  getDetailPanel = (rowData: DisplayPerson) => {
+
+    return (
+      <PeopleDetailPanel personId={rowData.id} personComment={rowData.comment}/>
+    );
+  };
+
 
   /**
    * This method takes two rows and updates the old row on the table with the new one
