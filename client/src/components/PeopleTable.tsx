@@ -1,6 +1,8 @@
 import axios from "axios";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
+import React from "react";
+import PeopleDetailPanel from "./PeopleDetailPanel";
 
 export interface DisplayPerson {
   id: number;
@@ -39,6 +41,10 @@ export default class PeopleTable extends ATable<DisplayPerson> {
   get dataEndPoint(): string {
     return this.DATA_END_POINT;
   }
+
+  getDetailPanel = (rowData: DisplayPerson) => {
+    return <PeopleDetailPanel personId={rowData.id} personComment={rowData.comment} />;
+  };
 
   /**
    * This method takes two rows and updates the old row on the table with the new one

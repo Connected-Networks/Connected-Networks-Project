@@ -54,8 +54,8 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
           editable={this.editableObject}
           title={this.name}
           actions={this.actions}
-          detailPanel={this.getDetailPanel}
           components={this.components}
+          detailPanel={this.getDetailPanel}
           onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
           options={{
             actionsColumnIndex: -1
