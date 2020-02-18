@@ -89,6 +89,11 @@ getIndividualCurrentEmployement = (IndividualID) => {
     })
 }
 
+insertFund = (FundName) => {
+    return models.Funds.create({
+        FundName: FundName
+    }).catch((err) => console.error('Error in insertFund: ', err));
+}
 //---------------Modify Existing Data Functions----------//
 modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
     return models.Individuals.findOne({
@@ -272,5 +277,6 @@ module.exports = {
     deleteCompany,
     retrieveCompaniesByFunds,
     retrieveCurrentEmployeesOfCompany,
-    retrieveFundName
+    retrieveFundName,
+    insertFund
 }

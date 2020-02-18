@@ -234,9 +234,9 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
-  insert_fund(fund):Promise<Boolean>{
+  insert_fund(fundName):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
-      let i = database.insertFund(fund.name);
+      let i = database.insertFund(fundName);
       i.then(resolve(true));
       i.catch(resolve(false));
     });

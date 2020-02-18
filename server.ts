@@ -192,7 +192,7 @@ app.get("/funds", (req, res) => {
 });
 app.post("/funds",(req,res)=>{
   let be = new BackendProcessing();
-  console.log("Added fund: " + req.body.newFundName + " to the database");
+  console.log("Adding fund: " + req.body.newFundName + " to the database");
   let fund = req.body.newFundName;
   be.insert_fund(fund).then((result)=>{
     if (result)
