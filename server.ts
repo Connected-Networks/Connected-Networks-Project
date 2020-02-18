@@ -4,6 +4,7 @@ const papa = require("papaparse");
 const app = express();
 import BackendProcessing from "./backend-processing";
 import { rejects } from "assert";
+import { type } from "os";
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
@@ -178,16 +179,21 @@ app.get("/funds", (req, res) => {
   try {
     let be = new BackendProcessing();
     let results = be.retrieveFundsFromDatabase();
-    res.json({ data: results });
-    res.sendStatus(200);
+    results.then((funds)=>{
+      res.json({ data: funds});
+      res.sendStatus(200);
+    })
+    results.catch(()=>{
+      res.sendStatus(500)
+    })
   } catch (error) {
     res.sendStatus(500);
   }
 });
 app.post("/funds",(req,res)=>{
   let be = new BackendProcessing();
-  console.log("Added fund: " + req.body.fundName + " to the database");
-  let fund = req.body.fundName;
+  console.log("Added fund: " + req.body.newFundName + " to the database");
+  let fund = req.body.newFundName;
   be.insert_fund(fund).then((result)=>{
     if (result)
       res.sendStatus(200)
@@ -216,6 +222,9 @@ app.get("/funds/:id", (req, res) => {
   try {
     let be = new BackendProcessing();
     let fundID = req.params.id;
+    console.log("params: "+JSON.stringify(req.params))
+    console.log("type: "+typeof(fundID))
+    console.log("string: "+fundID)
     let data = be.retrieveCompaniesFromFund(fundID).then(results => {
         if (results!=null){
           res.json({data: results});
