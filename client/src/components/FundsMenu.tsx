@@ -44,7 +44,13 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
   }
 
   refresh = () => {
-    this.getFunds().then(funds => this.setState({ funds, addMode: false, editMode: false, newFundName: "" }));
+    this.getFunds().then(funds => {
+      if (!Object.keys(funds).length) {
+        funds = [];
+      }
+      console.log(funds);
+      this.setState({ funds, addMode: false, editMode: false, newFundName: "" });
+    });
   };
 
   getFunds = async () => {
@@ -70,7 +76,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
   };
 
   getFundListItem = (fund: SideMenuFund) => (
-    <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString, fund.name)}>
+    <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString(), fund.name)}>
       <ListItemText primary={fund.name} />
       <ListItemSecondaryAction>
         <PopupState variant="popover">

@@ -1,6 +1,7 @@
 import axios from "axios";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
+import React from "react";
 
 export interface DisplayPerson {
   id: number;
