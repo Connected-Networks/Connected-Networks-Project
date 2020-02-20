@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node server.ts",
-    "heroku-postbuild": "cd client && npm install && npm run build"
+    "heroku-postbuild": "cd client && npm install && npm run build",
+    "dev": "ts-node-dev server.ts"
   },
   "repository": {
     "type": "git",
@@ -34,5 +35,8 @@
     "tsc": "^1.20150623.0",
     "typeface-roboto": "0.0.75",
     "typescript": "^3.7.5"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.0.0-pre.44"
   }
 }
