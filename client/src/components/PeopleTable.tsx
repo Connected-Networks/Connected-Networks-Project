@@ -42,10 +42,6 @@ export default class PeopleTable extends ATable<DisplayPerson> {
     return this.DATA_END_POINT;
   }
 
-  getDetailPanel = (rowData: DisplayPerson) => {
-    return <PeopleDetailPanel personId={rowData.id} personComment={rowData.comment} />;
-  };
-
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *
