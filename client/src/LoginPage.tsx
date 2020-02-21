@@ -16,6 +16,13 @@ export default function LoginPage(props: LoginPageProps) {
   const [alertMessage, setAlertMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
 
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    credentialsValid(email, password).then(() => {
+      goToMainPage();
+    });
+  };
+
   const credentialsValid = async (email: string, password: string) => {
     return new Promise((resolve, reject) => {
       Axios.post(`/login`, { email, password })
@@ -44,27 +51,27 @@ export default function LoginPage(props: LoginPageProps) {
 
   return (
     <Container>
-      <FormContainer>
-        <TextField type="text" label="Email" variant="outlined" value={email} onChange={event => setEmail(event.target.value)} />
-        <TextField
-          type="password"
-          label="Password"
-          variant="outlined"
-          value={password}
-          onChange={event => setPassword(event.target.value)}
-        />
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => {
-            credentialsValid(email, password).then(() => {
-              goToMainPage();
-            });
-          }}
-        >
-          Connect
-        </Button>
-      </FormContainer>
+      <form onSubmit={onSubmit}>
+        <FormContainer>
+          <TextField
+            type="text"
+            label="Email"
+            variant="outlined"
+            value={email}
+            onChange={event => setEmail(event.target.value)}
+          />
+          <TextField
+            type="password"
+            label="Password"
+            variant="outlined"
+            value={password}
+            onChange={event => setPassword(event.target.value)}
+          />
+          <Button type="submit" variant="outlined" color="primary">
+            Connect
+          </Button>
+        </FormContainer>
+      </form>
       <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
         <Alert variant="filled" onClose={() => setOpen(false)} severity="error">
           {alertMessage}
