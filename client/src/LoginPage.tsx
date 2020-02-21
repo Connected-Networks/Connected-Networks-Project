@@ -1,7 +1,8 @@
 import * as React from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { TextField, Button } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
+import { TextField, Button, Snackbar } from "@material-ui/core";
 import Axios from "axios";
 
 interface LoginPageProps {
@@ -12,6 +13,8 @@ export default function LoginPage(props: LoginPageProps) {
   const history = useHistory();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [alertMessage, setAlertMessage] = React.useState("");
+  const [open, setOpen] = React.useState(false);
 
   const credentialsValid = (email: string, password: string) => {
     if (email === "user" && password === "pass") {
@@ -23,6 +26,11 @@ export default function LoginPage(props: LoginPageProps) {
   const goToMainPage = () => {
     props.confirmAuth();
     history.push("/");
+  };
+
+  const notifyUser = (message: string) => {
+    setAlertMessage(message);
+    setOpen(true);
   };
 
   return (
@@ -42,12 +50,19 @@ export default function LoginPage(props: LoginPageProps) {
           onClick={() => {
             if (credentialsValid(email, password)) {
               goToMainPage();
+            } else {
+              notifyUser("Invalid email and/or password. Please try again");
             }
           }}
         >
           Connect
         </Button>
       </FormContainer>
+      <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
+        <Alert onClose={() => setOpen(false)} severity="error">
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
