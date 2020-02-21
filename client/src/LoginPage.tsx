@@ -16,11 +16,20 @@ export default function LoginPage(props: LoginPageProps) {
   const [alertMessage, setAlertMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
 
-  const credentialsValid = (email: string, password: string) => {
-    if (email === "user" && password === "pass") {
-      return true;
-    }
-    return false;
+  const credentialsValid = async (email: string, password: string) => {
+    return new Promise((resolve, reject) => {
+      Axios.post(`/login`, { email, password })
+        .then(() => resolve())
+        .catch(error => {
+          console.log(error);
+          if (error.response.status === 401) {
+            notifyUser("Invalid email and/or password. Please try again");
+          } else {
+            notifyUser("Something went wrong with the server. Please try again later");
+          }
+          reject();
+        });
+    });
   };
 
   const goToMainPage = () => {
@@ -48,11 +57,9 @@ export default function LoginPage(props: LoginPageProps) {
           variant="outlined"
           color="primary"
           onClick={() => {
-            if (credentialsValid(email, password)) {
+            credentialsValid(email, password).then(() => {
               goToMainPage();
-            } else {
-              notifyUser("Invalid email and/or password. Please try again");
-            }
+            });
           }}
         >
           Connect
