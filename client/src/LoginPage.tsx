@@ -18,12 +18,12 @@ export default function LoginPage(props: LoginPageProps) {
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    credentialsValid(email, password).then(() => {
+    checkCredentials(email, password).then(() => {
       goToMainPage();
     });
   };
 
-  const credentialsValid = async (email: string, password: string) => {
+  const checkCredentials = async (email: string, password: string) => {
     return new Promise((resolve, reject) => {
       Axios.post(`/login`, { email, password })
         .then(() => resolve())
