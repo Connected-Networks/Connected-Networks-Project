@@ -59,7 +59,7 @@ export default function LoginPage(props: LoginPageProps) {
         </Button>
       </FormContainer>
       <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
-        <Alert onClose={() => setOpen(false)} severity="error">
+        <Alert variant="filled" onClose={() => setOpen(false)} severity="error">
           {alertMessage}
         </Alert>
       </Snackbar>
