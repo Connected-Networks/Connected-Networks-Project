@@ -17,8 +17,6 @@ export default class App extends React.Component<any, AppState> {
 
   componentDidMount() {
     this.checkIfLoggedIn().then((user: User) => {
-      console.log("login");
-
       this.handleLogin(user);
     });
   }
@@ -28,18 +26,8 @@ export default class App extends React.Component<any, AppState> {
       console.log("sent");
 
       Axios.get(`/user`)
-        .then(response => {
-          console.log("res");
-          console.log(response.data);
-          resolve(response.data);
-        })
-        .catch(error => {
-          console.log("catch");
-
-          console.log(error);
-
-          reject();
-        });
+        .then(response => resolve(response.data))
+        .catch(() => reject());
     });
   };
 

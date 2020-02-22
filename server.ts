@@ -5,8 +5,6 @@ const session = require("express-session");
 const passport = require("./config/passport");
 const app = express();
 import BackendProcessing from "./backend-processing";
-import { rejects } from "assert";
-import { type } from "os";
 
 const port = process.env.PORT || 5000;
 
@@ -56,7 +54,6 @@ app.get("/people", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -74,7 +71,6 @@ app.get("/people/:companyId", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -92,7 +88,6 @@ app.get("/people/original/:companyId", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -147,7 +142,6 @@ app.get("/company", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -205,7 +199,6 @@ app.get("/funds", (req, res) => {
     let results = be.retrieveFundsFromDatabase();
     results.then(funds => {
       res.json({ data: funds });
-      res.sendStatus(200);
     });
     results.catch(() => {
       res.sendStatus(500);
@@ -247,7 +240,6 @@ app.get("/funds/:id", (req, res) => {
     let data = be.retrieveCompaniesFromFund(fundID).then(results => {
       if (results != null) {
         res.json({ data: results });
-        res.sendStatus(200);
       } else res.sendStatus(500);
     });
   } catch (error) {
@@ -264,7 +256,6 @@ app.get("/people/original/:companyId", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -291,7 +282,6 @@ app.get("/history/:id", (req, res) => {
     ];
 
     res.json({ data: results });
-    res.sendStatus(200);
   } catch (error) {
     res.sendStatus(500);
   }
