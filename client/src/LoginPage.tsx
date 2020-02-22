@@ -5,8 +5,12 @@ import Alert from "@material-ui/lab/Alert";
 import { TextField, Button, Snackbar } from "@material-ui/core";
 import Axios from "axios";
 
+export interface User {
+  username: string;
+}
+
 interface LoginPageProps {
-  confirmAuth: Function;
+  handleLogin: Function;
 }
 
 export default function LoginPage(props: LoginPageProps) {
@@ -18,15 +22,15 @@ export default function LoginPage(props: LoginPageProps) {
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    checkCredentials(email, password).then(() => {
-      goToMainPage();
+    checkCredentials(email, password).then((user: User) => {
+      goToMainPage(user);
     });
   };
 
   const checkCredentials = async (email: string, password: string) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<User>((resolve, reject) => {
       Axios.post(`/login`, { email, password })
-        .then(() => resolve())
+        .then(response => resolve(response.data))
         .catch(error => {
           console.log(error);
           if (error.response.status === 401) {
@@ -39,8 +43,8 @@ export default function LoginPage(props: LoginPageProps) {
     });
   };
 
-  const goToMainPage = () => {
-    props.confirmAuth();
+  const goToMainPage = (user: User) => {
+    props.handleLogin(user);
     history.push("/");
   };
 

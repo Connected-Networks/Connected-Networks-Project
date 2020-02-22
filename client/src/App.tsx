@@ -2,17 +2,18 @@ import * as React from "react";
 import "typeface-roboto";
 import { BrowserRouter as Router, Switch, Route, Redirect, useHistory } from "react-router-dom";
 import MainPage from "./MainPage";
-import LoginPage from "./LoginPage";
+import LoginPage, { User } from "./LoginPage";
 
 interface AppState {
   isAuthenticated: boolean;
+  user?: User;
 }
 
 export default class App extends React.Component<any, AppState> {
-  state = { isAuthenticated: false };
+  state: AppState = { isAuthenticated: false };
 
-  confirmAuth = () => {
-    this.setState({ isAuthenticated: true });
+  handleLogin = (user: User) => {
+    this.setState({ isAuthenticated: true, user });
   };
 
   render() {
@@ -20,9 +21,9 @@ export default class App extends React.Component<any, AppState> {
       <Router>
         <Switch>
           <Route path="/login">
-            <LoginPage confirmAuth={this.confirmAuth} />
+            <LoginPage handleLogin={this.handleLogin} />
           </Route>
-          <Route path="/">{this.state.isAuthenticated ? <MainPage /> : <Redirect to="/login" />}</Route>
+          <Route path="/">{this.state.isAuthenticated ? <MainPage user={this.state.user!} /> : <Redirect to="/login" />}</Route>
         </Switch>
       </Router>
     );

@@ -5,15 +5,23 @@ import SideMenu from "./components/SideMenu";
 import TitleBar from "./components/TitleBar";
 import styled from "styled-components";
 import TablesFactory from "./components/TablesFactory";
+import { User } from "./LoginPage";
+import { Snackbar } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
 
 export interface MainPageState {
   uploadDialogOpened: boolean;
   openSideMenu: boolean;
   tableType: string;
   fundName: string | undefined;
+  openGreeting: boolean;
 }
 
-export default class MainPage extends React.Component<any, MainPageState> {
+interface MainPageProps {
+  user: User;
+}
+
+export default class MainPage extends React.Component<MainPageProps, MainPageState> {
   tablesFactory: TablesFactory;
 
   constructor(props: any) {
@@ -24,7 +32,8 @@ export default class MainPage extends React.Component<any, MainPageState> {
       uploadDialogOpened: false,
       openSideMenu: false,
       tableType: this.tablesFactory.getDefaultTableType(),
-      fundName: undefined
+      fundName: undefined,
+      openGreeting: true
     };
   }
 
@@ -57,6 +66,16 @@ export default class MainPage extends React.Component<any, MainPageState> {
           {this.tablesFactory.getTableComponent(this.state.tableType, this.state.fundName)}
         </Content>
         <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
+        <Snackbar
+          open={this.state.openGreeting}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          autoHideDuration={6000}
+          onClose={() => this.setState({ openGreeting: false })}
+        >
+          <Alert variant="filled" severity="success">
+            {`Hey ${this.props.user.username}, looking good today`}
+          </Alert>
+        </Snackbar>
       </Container>
     );
   }
