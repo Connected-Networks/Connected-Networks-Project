@@ -1,28 +1,31 @@
 const express = require("express");
 const path = require("path");
 const papa = require("papaparse");
+const session = require("express-session");
+const passport = require("./config/passport");
 const app = express();
 import BackendProcessing from "./backend-processing";
 import { rejects } from "assert";
 import { type } from "os";
+
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(
+  session({
+    secret: "http://bitly.com/98K8eH",
+    resave: false,
+    saveUninitialized: false
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-app.post("/login", (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (email === "user" && password === "password") {
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(401);
-    }
-  } catch (error) {
-    res.sendStatus(500);
-  }
+app.post("/login", passport.authenticate("local"), (req, res) => {
+  res.json({ username: req.user.username });
 });
 
 app.post("/csv", (req, res) => {
