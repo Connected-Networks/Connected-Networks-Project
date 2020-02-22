@@ -11,8 +11,6 @@ import { type } from "os";
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(
   session({
     secret: "http://bitly.com/98K8eH",
@@ -20,12 +18,22 @@ app.use(
     saveUninitialized: false
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
   res.json({ username: req.user.username });
+});
+
+app.get("/user", (req, res) => {
+  if (req.user) {
+    res.json({ username: req.user.username });
+  } else {
+    res.sendStatus(401);
+  }
 });
 
 app.post("/csv", (req, res) => {
