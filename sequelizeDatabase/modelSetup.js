@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 let result = require("dotenv").config();
 
 const sequelize = new Sequelize(process.env.DATABASE,process.env.USER,process.env.PASSWORD,{
-    logging: false,
+    //logging: false,
     host: process.env.HOST,
     dialect: 'mysql',
     define: {
@@ -64,7 +64,7 @@ sequelize.authenticate()
     timestamps: false
   });
 
-  //
+  // NOTE: "ClassThatTakesForeignKey.BELONGSTO(ClassWithForeignKey)"
   Funds.belongsTo(User, {foreignKey:'UserID'});
   User.hasMany(Funds, {foreignKey: 'UserID'});
 
@@ -96,6 +96,9 @@ sequelize.authenticate()
     //options:
     timestamps: false
   });
+
+  Individuals.belongsTo(Funds, {foreignKey:'FundID'});
+  Funds.hasMany(Individuals, {foreignKey: 'IndividualID'});
 
   const SharedFunds = sequelize.define('sharefunds',{
     SharingID: {

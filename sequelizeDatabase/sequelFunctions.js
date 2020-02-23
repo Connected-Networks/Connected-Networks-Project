@@ -95,7 +95,7 @@ insertCompany = (CompanyName, FundID) => {
 insertOriginalFundPosition = (IndividualID, CompanyID, PositionName) => {
     //TODO: Verify that the fundIDs in both of these match each other.
     //      Otherwise, just use with Caution.
-    return models.OriginalFundPostion.create({//TODO: Maybe make this findOrCreate, check if Funds match.
+    return models.OriginalFundPosition.create({//TODO: Maybe make this findOrCreate, check if Funds match.
         IndividualID: IndividualID,
         CompanyID: CompanyID,
         PositionName: PositionName
@@ -120,18 +120,20 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
 }
 
 insertFromCsvLine = (UserID, FundID, PortfolioCompanyName, EmployeeName, OriginalPostion, OriginalStartDate, OriginalEndDate, CurrentEmployer, CurrentPostion, LinkedInUrl, Comments) =>{
+    console.log("\n\n Fields are:, ", UserID, FundID, PortfolioCompanyName, EmployeeName, OriginalPostion, OriginalStartDate, OriginalEndDate, CurrentEmployer, CurrentPostion, LinkedInUrl, Comments, "\n");
     insertPerson(FundID, EmployeeName, LinkedInUrl, Comments).then((newPerson) => {
         insertCompany(PortfolioCompanyName, FundID).then((originalCompany) => {
             insertOriginalFundPosition(newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion).then(() => {
                 //NOTE: I'm hoping it doesn't freak out that I included no arguements here.
                 insertEmployeeHistory(UserID, newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion, OriginalStartDate, OriginalEndDate).then(() => {
-                     insertCompany(CurrentEmployer).then((newCompany) => {
+                     insertCompany(CurrentEmployer,FundID).then((newCompany) => {
                         insertEmployeeHistory(newPerson.IndividualID, newCompany.CompanyID, CurrentPostion, OriginalStartDate, OriginalEndDate)
                      });
                 });
             });
         });
     }).catch(err => console.error('Error in "insertFromCsvLine", ', err));
+    
 }
 
 getIndividualEmployeeHistory = (IndividualID) => {
@@ -326,11 +328,11 @@ retrieveFundName = (fundID) => {
 }
     
 module.exports = {
+    getAllUsers,
     getAllIndividuals,
     getAllCompanies,
     getAllFunds,
     getAllEmployeeHistory,
-    getAllFundCompany,
     insertPerson,
     insertCompany,
     insertEmployeeHistory,
