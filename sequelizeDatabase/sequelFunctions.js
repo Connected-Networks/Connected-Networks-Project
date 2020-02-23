@@ -210,7 +210,24 @@ modifyCompany = (CompanyID, alteredCompanyName) => {
     }).catch(err => console.error(err));
 }
 
-deleteCompany = (CompanyID) => {
+//---------------Modify Fund---------------//
+modifyFund = (FundID, alteredFundName) => {
+    return new Promise((resolve,reject)=>{
+        models.Funds.findOne({
+            where: {
+                FundID: FundID
+            }
+        }).then(fund => {
+            fund.update({
+                FundName: alteredFundName
+            }).then(resolve(true)).catch(reject())
+        }).catch(reject());
+    })
+}
+    
+    
+    
+    deleteCompany = (CompanyID) => {
     return new Promise((resolve,reject)=>{
         models.EmployeeHistory.destroy({
             where: {
@@ -246,15 +263,76 @@ deleteFund = (FundID) => {
     })
 };
     
-    module.exports = {
-        getAllUsers,
-        getAllIndividuals,
-        getAllCompanies,
-        getAllFunds,
-        getAllEmployeeHistory,
-        // getAllFundCompany,
-        insertPerson,
-        insertCompany,
+//returns a list of objects
+//TODO: Update
+retrieveCompaniesByFunds = (fundID) => {
+    return models.FundCompany.findAll(
+        {
+            where: {
+                FundID: fundID
+            },
+            include: [{
+                model: models.Companies
+            }]
+        }
+    )
+}
+retrieveCurrentEmployeesOfCompany = (CompanyID) => {
+    return new Promise((resolve,reject)=>{
+        getAllIndividuals().then((people)=>{
+            Promise.all(people.map((person)=>{
+                return new Promise((resolve,reject)=>{
+                    getIndividualCurrentEmployement(person.IndividualID).then((result)=>{
+                        if (result==null || result==undefined || result.company==null || result.company.CompanyID!=CompanyID)
+                            resolve(null)
+                        else{
+                            let info = {
+                                //Final JSON format
+                                IndividualID : person.IndividualID,
+                                name : person.IndividualName,
+                                CompanyID : result.company.CompanyID,
+                                company : result.company.CompanyName,
+                                StartDate : result.StartDate,
+                                EndDate : result.EndDate,
+                                position : result.PositionName
+                            }
+                            resolve(info);
+                        }
+                    })
+                })
+            })).then((results)=>{
+                resolve(results.filter(x=>x!=null));
+            })
+        })
+    }).catch((error)=>{
+        console.err("Error in retrieveCurrentEmployeesOfCompany",error);
+        reject();
+    })
+}
+
+retrieveFundName = (fundID) => {
+    return new Promise((resolve,reject)=>{
+        models.Funds.findAll({
+            where: {
+                FundID: fundID
+            }
+        }).then((result)=>{
+            if (result[0]!=undefined)
+               resolve(result[0].FundName)
+            else
+                resolve(undefined)
+        })
+    })
+}
+    
+module.exports = {
+    getAllIndividuals,
+    getAllCompanies,
+    getAllFunds,
+    getAllEmployeeHistory,
+    getAllFundCompany,
+    insertPerson,
+    insertCompany,
     insertEmployeeHistory,
     insertFromCsvLine,
     getIndividualEmployeeHistory,
@@ -263,5 +341,10 @@ deleteFund = (FundID) => {
     deleteIndividual,
     modifyCompany,
     deleteCompany,
-    deleteFund
+    deleteFund,
+    modifyFund,
+    retrieveCompaniesByFunds,
+    retrieveCurrentEmployeesOfCompany,
+    retrieveFundName,
+    insertFund
 }
