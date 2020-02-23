@@ -25,13 +25,16 @@ sequelize.authenticate()
       autoIncrement: true
     },
     Username: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: false
     },
     Password: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: false
     },
     Email: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
+      allowNull: false
     }
   },{
     timestamps: false
@@ -60,6 +63,7 @@ sequelize.authenticate()
     timestamps: false
   });
 
+  //
   Funds.belongsTo(User, {foreignKey:'UserID'});
   User.hasMany(Funds, {foreignKey: 'UserID'});
 
