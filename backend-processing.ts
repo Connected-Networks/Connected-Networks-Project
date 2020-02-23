@@ -102,7 +102,7 @@ export default class BackendProcessing {
       database.getIndividualCurrentEmployement(individual.IndividualID).then((employment)=>{
         let dp = {
           id: individual.IndividualID,
-          name: individual.IndividualName,
+          name: individual.Name,
           company: "",
           position: "",
           hyperlink: individual.LinkedInUrl,
