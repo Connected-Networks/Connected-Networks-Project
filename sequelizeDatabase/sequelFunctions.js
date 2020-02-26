@@ -291,7 +291,7 @@ retrieveCurrentEmployeesOfCompany = (CompanyID) => {
                             let info = {
                                 //Final JSON format
                                 IndividualID : person.IndividualID,
-                                name : person.IndividualName,
+                                name : person.Name,
                                 CompanyID : result.company.CompanyID,
                                 company : result.company.CompanyName,
                                 StartDate : result.StartDate,
