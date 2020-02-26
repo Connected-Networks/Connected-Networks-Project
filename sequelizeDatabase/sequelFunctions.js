@@ -268,17 +268,15 @@ deleteFund = (FundID) => {
 //returns a list of objects
 //TODO: Update
 retrieveCompaniesByFunds = (fundID) => {
-    return models.FundCompany.findAll(
+    return models.Companies.findAll(
         {
             where: {
                 FundID: fundID
-            },
-            include: [{
-                model: models.Companies
-            }]
+            }
+            
         }
-    )
-}
+    ).catch(err => console.error(">>>ERROR in retrieveCompaniesByFunds, ",err));
+};
 retrieveCurrentEmployeesOfCompany = (CompanyID) => {
     return new Promise((resolve,reject)=>{
         getAllIndividuals().then((people)=>{
