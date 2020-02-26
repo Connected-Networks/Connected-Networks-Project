@@ -212,12 +212,12 @@ sequelize.authenticate()
       primaryKey: true,
       autoIncrement: true
     },
-    FundID: {
+    IndividualID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-          model: Funds,
-          key: 'FundID'
+          model: Individuals,
+          key: 'IndividualID'
       }
     },
     CompanyID: {
@@ -236,7 +236,7 @@ sequelize.authenticate()
   });
  
   OriginalFundPosition.belongsTo(Companies,{foreignKey:'CompanyID'});
-  OriginalFundPosition.belongsTo(Funds,{foreignKey:'FundID'});
+  OriginalFundPosition.belongsTo(Individuals,{foreignKey:'IndividualID'});
 
   
 
