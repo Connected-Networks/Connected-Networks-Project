@@ -127,10 +127,10 @@ insertFromCsvLine = (UserID, FundID, PortfolioCompanyName, EmployeeName, Origina
                 //NOTE: I'm hoping it doesn't freak out that I included no arguements here.
                 insertEmployeeHistory(UserID, newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion, OriginalStartDate, OriginalEndDate).then(() => {
                      insertCompany(CurrentEmployer,FundID).then((newCompany) => {
-                        insertEmployeeHistory(newPerson.IndividualID, newCompany.CompanyID, CurrentPostion, OriginalStartDate, OriginalEndDate)
+                        insertEmployeeHistory(UserID, newPerson.IndividualID, newCompany.CompanyID, CurrentPostion, OriginalStartDate, OriginalEndDate)
                      });
                 });
-            });
+            }).catch(err => console.error(">>ERROR ini insertFromCSVLine, in insertOriginal Position."));
         });
     }).catch(err => console.error('Error in "insertFromCsvLine", ', err));
     
