@@ -66,3 +66,9 @@ CREATE TABLE OriginalFundPosition (
     FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID)
 );
 
+INSERT INTO User(
+	Username,
+    Password,
+    Email)
+VALUES ('test username', 'test password', 'test email'); #TODO: Delete this insert once we have user functionality.
+
