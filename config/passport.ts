@@ -1,7 +1,7 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
-const strategy = new LocalStrategy({ usernameField: "email" }, (username, password, done) => {
+const strategy = new LocalStrategy((username, password, done) => {
   //Temp until we integrate with the database
   if (username === "user1" && password === "123") {
     const user = {

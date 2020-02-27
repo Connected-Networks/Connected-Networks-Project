@@ -15,21 +15,21 @@ interface LoginPageProps {
 
 export default function LoginPage(props: LoginPageProps) {
   const history = useHistory();
-  const [email, setEmail] = React.useState("");
+  const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [alertMessage, setAlertMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    checkCredentials(email, password).then((user: User) => {
+    checkCredentials(username, password).then((user: User) => {
       goToMainPage(user);
     });
   };
 
-  const checkCredentials = async (email: string, password: string) => {
+  const checkCredentials = async (username: string, password: string) => {
     return new Promise<User>((resolve, reject) => {
-      Axios.post(`/login`, { email, password })
+      Axios.post(`/login`, { username, password })
         .then(response => resolve(response.data))
         .catch(error => {
           console.log(error);
@@ -59,10 +59,10 @@ export default function LoginPage(props: LoginPageProps) {
         <FormContainer>
           <TextField
             type="text"
-            label="Email"
+            label="Username"
             variant="outlined"
-            value={email}
-            onChange={event => setEmail(event.target.value)}
+            value={username}
+            onChange={event => setUsername(event.target.value)}
           />
           <TextField
             type="password"
