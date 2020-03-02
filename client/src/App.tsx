@@ -37,7 +37,7 @@ export default class App extends React.Component<any, AppState> {
   };
 
   handleLogout = () => {
-    Axios.get(`/logout`)
+    Axios.post(`/logout`)
       .then(() => this.setState({ isAuthenticated: false, user: undefined }))
       .catch(error => console.log(error));
   };

@@ -35,7 +35,13 @@ app.get("/user", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.sendStatus(200);
+  if (req.user) {
+    req.session.destroy();
+    res.clearCookie("connect.sid");
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(500);
+  }
 });
 
 app.post("/csv", (req, res) => {
