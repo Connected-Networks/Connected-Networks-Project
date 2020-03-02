@@ -10,11 +10,10 @@ export interface User {
 }
 
 interface LoginPageProps {
-  handleLogin: Function;
+  goToMainPage: Function;
 }
 
 export default function LoginPage(props: LoginPageProps) {
-  const history = useHistory();
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [alertMessage, setAlertMessage] = React.useState("");
@@ -22,12 +21,12 @@ export default function LoginPage(props: LoginPageProps) {
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    checkCredentials(username, password).then((user: User) => {
-      goToMainPage(user);
+    login(username, password).then((user: User) => {
+      props.goToMainPage(user);
     });
   };
 
-  const checkCredentials = async (username: string, password: string) => {
+  const login = async (username: string, password: string) => {
     return new Promise<User>((resolve, reject) => {
       Axios.post(`/login`, { username, password })
         .then(response => resolve(response.data))
@@ -41,11 +40,6 @@ export default function LoginPage(props: LoginPageProps) {
           reject();
         });
     });
-  };
-
-  const goToMainPage = (user: User) => {
-    props.handleLogin(user);
-    history.push("/");
   };
 
   const notifyUser = (message: string) => {

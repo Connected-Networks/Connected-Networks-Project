@@ -10,7 +10,7 @@ export interface User {
 }
 
 interface SignupPageProps {
-  handleLogin: Function;
+  goToMainPage: Function;
 }
 
 export default function SignupPage(props: SignupPageProps) {
@@ -25,7 +25,7 @@ export default function SignupPage(props: SignupPageProps) {
     event.preventDefault();
     signup(email, username, password).then(() => {
       login(username, password).then((user: User) => {
-        goToMainPage(user);
+        props.goToMainPage(user);
       });
     });
   };
@@ -54,11 +54,6 @@ export default function SignupPage(props: SignupPageProps) {
         .then(response => resolve(response.data))
         .catch(() => reject());
     });
-  };
-
-  const goToMainPage = (user: User) => {
-    props.handleLogin(user);
-    history.push("/");
   };
 
   const notifyUser = (message: string) => {
