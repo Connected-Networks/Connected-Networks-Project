@@ -34,6 +34,10 @@ app.get("/user", (req, res) => {
   }
 });
 
+app.post("/logout", (req, res) => {
+  res.sendStatus(200);
+});
+
 app.post("/csv", (req, res) => {
   try {
     let data = req.body.data;

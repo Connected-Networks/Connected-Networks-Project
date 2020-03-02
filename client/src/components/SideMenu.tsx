@@ -7,6 +7,7 @@ export interface SideMenuProps {
   open: boolean;
   tableTypes: string[];
   handleSwitchTable: Function;
+  handleLogout: Function;
 }
 
 export interface SideMenuState {
@@ -34,6 +35,10 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
         </List>
         <Divider />
         <FundsMenu handleSwitchTable={this.props.handleSwitchTable} handleEditMode={this.handleEditMode} />
+        <Divider />
+        <ListItem button key="logout" onClick={() => this.props.handleLogout()}>
+          <ListItemText primary="Logout" />
+        </ListItem>
       </Container>
     );
   }

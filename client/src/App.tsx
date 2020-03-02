@@ -36,6 +36,12 @@ export default class App extends React.Component<any, AppState> {
     this.history.push("/");
   };
 
+  handleLogout = () => {
+    Axios.get(`/logout`)
+      .then(() => this.setState({ isAuthenticated: false, user: undefined }))
+      .catch(error => console.log(error));
+  };
+
   render() {
     return (
       <Router history={this.history}>
@@ -43,7 +49,13 @@ export default class App extends React.Component<any, AppState> {
           <Route path="/login">
             <LoginPage handleLogin={this.handleLogin} />
           </Route>
-          <Route path="/">{this.state.isAuthenticated ? <MainPage user={this.state.user!} /> : <Redirect to="/login" />}</Route>
+          <Route path="/">
+            {this.state.isAuthenticated ? (
+              <MainPage user={this.state.user!} handleLogout={this.handleLogout} />
+            ) : (
+              <Redirect to="/login" />
+            )}
+          </Route>
         </Switch>
       </Router>
     );
