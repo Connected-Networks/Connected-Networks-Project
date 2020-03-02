@@ -1,73 +1,51 @@
 import * as React from "react";
 import "typeface-roboto";
-import UploadDialog from "./components/UploadDialog";
-import SideMenu from "./components/SideMenu";
-import TitleBar from "./components/TitleBar";
-import styled from "styled-components";
-import TablesFactory from "./components/TablesFactory";
+import { Router, Switch, Route, Redirect } from "react-router-dom";
+import MainPage from "./MainPage";
+import LoginPage, { User } from "./LoginPage";
+import Axios from "axios";
+import { createBrowserHistory } from "history";
 
-export interface AppState {
-  uploadDialogOpened: boolean;
-  openSideMenu: boolean;
-  tableType: string;
+interface AppState {
+  isAuthenticated: boolean;
+  user?: User;
 }
 
 export default class App extends React.Component<any, AppState> {
-  tablesFactory: TablesFactory;
+  state: AppState = { isAuthenticated: false };
+  history = createBrowserHistory();
 
-  constructor(props: any) {
-    super(props);
-    this.tablesFactory = new TablesFactory(this.openUploadDialog);
-
-    this.state = {
-      uploadDialogOpened: false,
-      openSideMenu: false,
-      tableType: this.tablesFactory.getDefaultTableType()
-    };
+  componentDidMount() {
+    this.checkIfLoggedIn().then((user: User) => {
+      this.handleLogin(user);
+    });
   }
 
-  closeUploadDialog = () => {
-    this.setState({ uploadDialogOpened: false });
-  };
-  openUploadDialog = () => {
-    this.setState({ uploadDialogOpened: true });
+  checkIfLoggedIn = () => {
+    return new Promise<User>((resolve, reject) => {
+      console.log("sent");
+
+      Axios.get(`/user`)
+        .then(response => resolve(response.data))
+        .catch(() => reject());
+    });
   };
 
-  toggleSideMenu = () => {
-    this.setState({ openSideMenu: !this.state.openSideMenu });
-  };
-
-  switchTables = (tableType: string) => {
-    this.setState({ tableType });
+  handleLogin = (user: User) => {
+    this.setState({ isAuthenticated: true, user });
+    this.history.push("/");
   };
 
   render() {
     return (
-      <Container>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
-        <TitleBar toggleOpen={this.toggleSideMenu} />
-        <Content>
-          <SideMenu
-            open={this.state.openSideMenu}
-            tableTypes={this.tablesFactory.getAvailableTables()}
-            handleSwitchTable={this.switchTables}
-          />
-          {this.tablesFactory.getTableComponent(this.state.tableType)}
-        </Content>
-        <UploadDialog open={this.state.uploadDialogOpened} handleClose={this.closeUploadDialog} />
-      </Container>
+      <Router history={this.history}>
+        <Switch>
+          <Route path="/login">
+            <LoginPage handleLogin={this.handleLogin} />
+          </Route>
+          <Route path="/">{this.state.isAuthenticated ? <MainPage user={this.state.user!} /> : <Redirect to="/login" />}</Route>
+        </Switch>
+      </Router>
     );
   }
 }
-
-const Container = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Content = styled.div`
-  display: flex;
-  flex: 1;
-  height: 0%;
-`;

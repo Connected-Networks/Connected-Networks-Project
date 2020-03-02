@@ -17,12 +17,26 @@ interface DisplayCompany {
   id: number;
   name: string;
 }
+interface DisplayFund {
+  id: number;
+  name: string;
+}
 
 export default class BackendProcessing {
 
   processRawCSV(data: string) {
     //First line is commented and ignored
     //Second line is treated as header
+
+
+
+
+    //TODO: add logic
+    //currently this is hardcoded
+    let fundName = "First Fund";
+    let userID = 1;
+
+
     var results = papa.parse("#" + data, {//Adding a # causes the parser to skip the first row, treat the second row as header
       header: true,
       comments: "#",
@@ -37,17 +51,26 @@ export default class BackendProcessing {
         return chunk;
       }});
       console.log(JSON.stringify(results))
-      return Promise.all(results.data.map((element)=>{if (element["name"]!=null) this.call_from_csv_line(element)}))
+      return new Promise((resolve,reject)=>{
+        database.insertFund(fundName,userID).then((fund)=>{
+          return Promise.all(results.data.map((element)=>{if (element["name"]!=null) this.call_from_csv_line(element,fund.FundID,userID)})).then(()=>{
+            resolve(true)
+          })
+        })
+      }).catch((error)=>{
+        console.error("error in processRawCSV",error);
+      })
     }
     
     //Papaparse creates JSON objects with fields: name,position, employment term, etc.
     //This function assumes that the header is the second line of the csv file, with data starting on the third line
     //This function converts all header strings to lowercase, so all retrievals use lowercase keys
-    call_from_csv_line(entry) {
+    call_from_csv_line(entry,fundID,userID) {
       let name: String = entry["name"];
       if (name.length < 1) {
         return;
       }
+      let firstCompany = entry["portfolio company"];
       let firstPosition = entry["portfolio company position"];
       let position = entry["new position"];
       let employer = entry["new employer"];
@@ -61,7 +84,7 @@ export default class BackendProcessing {
       }
       let url = entry["hyperlink url"];
       let comments = entry["comments"];
-      database.insertFromCsvLine(name,firstPosition,sterm,eterm,employer,position,url,comments)
+      database.insertFromCsvLine(userID,fundID,firstCompany,name,firstPosition,sterm,eterm,employer,position,url,comments)
   }
 
   retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {
@@ -79,7 +102,7 @@ export default class BackendProcessing {
       database.getIndividualCurrentEmployement(individual.IndividualID).then((employment)=>{
         let dp = {
           id: individual.IndividualID,
-          name: individual.IndividualName,
+          name: individual.Name,
           company: "",
           position: "",
           hyperlink: individual.LinkedInUrl,
@@ -181,6 +204,8 @@ export default class BackendProcessing {
     })
   }
 
+  
+  //returns a promise boolean representing if the operation was successful
   insert_company(company):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
       let i = database.insertCompany(company.name);
@@ -188,6 +213,9 @@ export default class BackendProcessing {
       i.catch(resolve(false));
     });
   }
+
+  
+  //returns a promise boolean representing if the operation was successful
   update_company(company):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
       let u = database.modifyCompany(company.id,company.name);
@@ -196,6 +224,9 @@ export default class BackendProcessing {
 
     });
   }
+
+  
+  //returns a promise boolean representing if the operation was successful
   delete_company(company):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
       let d = database.deleteCompany(company.id);
@@ -204,6 +235,8 @@ export default class BackendProcessing {
     })
   }
 
+  
+  //returns a promise boolean representing if the operation was successful
   retrieveCompaniesFromDatabase():Promise<DisplayCompany[]>{
     return new Promise<DisplayCompany[]>((resolve,reject)=>{
       database.getAllCompanies().then((results)=>{
@@ -217,5 +250,85 @@ export default class BackendProcessing {
         resolve(list);
       })
     })
+  }
+
+  //returns a promise boolean representing if the operation was successful
+  insert_fund(fundName):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let i = database.insertFund(fundName);
+      i.then(resolve(true));
+      i.catch(resolve(false));
+    });
+  }
+
+  
+  //returns a promise boolean representing if the operation was successful
+  update_fund(fund):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let u = database.modifyFund(fund.id,fund.name);
+      u.then(resolve(true));
+      u.catch(resolve(false));
+    });
+  }
+
+  
+  //returns a promise boolean representing if the operation was successful
+  delete_fund(fund):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      let d = database.deleteFund(fund.id);
+      d.then(resolve(true));
+      d.catch(resolve(false));
+    })
+  }
+
+  
+  //returns a promise boolean representing if the operation was successful
+  retrieveFundsFromDatabase():Promise<DisplayFund[]>{
+    return new Promise<DisplayFund[]>((resolve,reject)=>{
+      database.getAllFunds().then((results)=>{
+        let list:DisplayFund[] = results.map((element)=>{
+          let fund:DisplayFund={
+            id : element.FundID,
+            name : element.FundName
+          }
+          return fund;
+        })
+        resolve(list);
+      })
+    })
+  }
+
+  retrieveCompaniesFromFund(fundID){
+    return new Promise<DisplayCompany[]>((resolve,reject)=>{
+      database.retrieveCompaniesByFunds(fundID).then((results)=>{
+        let list:DisplayCompany[] = results.map((element)=>{
+          let company:DisplayCompany={
+            id : element.CompanyID,
+            name : element.CompanyName
+          }
+          return company;
+        })
+        resolve(list);
+      })
+    })
+  }
+  retrievePeopleViaCompany(companyID):Promise<Object>{
+    return database.retrieveCurrentEmployeesOfCompany(companyID)
+  }
+
+
+  //returns undefined if fundID is not found
+  retrieveFundName(fundID):Promise<String>{
+    return new Promise<String>((resolve,reject)=>{
+      database.retrieveFundName(fundID).then((result)=>{
+        resolve(result)
+      })
+    })
+  }
+
+  retrievePeopleFromOriginalCompany(companyID):Promise<Object>{
+    //TODO: complete this function
+    //This function will be simpler after the schema changes
+    return null;
   }
 }

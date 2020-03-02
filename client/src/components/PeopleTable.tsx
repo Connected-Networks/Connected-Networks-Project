@@ -1,7 +1,7 @@
 import axios from "axios";
-import { TableState } from "./ATable";
-import DisplayTable from "./DisplayTable";
+import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
+import React from "react";
 
 export interface DisplayPerson {
   id: number;
@@ -12,9 +12,9 @@ export interface DisplayPerson {
   hyperlink: string;
 }
 
-export default class PeopleTable extends DisplayTable<DisplayPerson> {
-
+export default class PeopleTable extends ATable<DisplayPerson> {
   readonly TABLE_NAME = "People";
+  readonly DATA_END_POINT = "/people";
 
   state: TableState<DisplayPerson> = {
     data: [],
@@ -37,19 +37,9 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
     return this.TABLE_NAME;
   }
 
-  /**
-   * This method sends an AJAX get request to get people
-   */
-  getPeople = async () => {
-    return new Promise<DisplayPerson[]>(resolve => {
-      axios
-        .get("/people")
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
-          console.log(error);
-        });
-    });
-  };
+  get dataEndPoint(): string {
+    return this.DATA_END_POINT;
+  }
 
   /**
    * This method takes two rows and updates the old row on the table with the new one
@@ -150,13 +140,5 @@ export default class PeopleTable extends DisplayTable<DisplayPerson> {
           reject();
         });
     });
-  };
-
-  refreshTable = () => {
-    this.getPeople()
-      .then(people => {
-        this.setState({ data: people });
-      })
-      .catch(() => {});
   };
 }
