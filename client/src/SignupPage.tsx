@@ -23,11 +23,33 @@ export default function SignupPage(props: SignupPageProps) {
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!emailIsValid(email)) {
+      notifyUser("Email is invalid");
+      return;
+    }
+    if (!passwordIsValid(password)) {
+      notifyUser("Password is invalid. Passwords should be at least 6 characters");
+      return;
+    }
+
     signup(email, username, password).then(() => {
       login(username, password).then((user: User) => {
         props.goToMainPage(user);
       });
     });
+  };
+
+  const emailIsValid = (email: string) => {
+    const emailRegex = new RegExp(
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+
+    return emailRegex.test(String(email).toLowerCase());
+  };
+
+  const passwordIsValid = (password: string) => {
+    return password.length >= 6;
   };
 
   const signup = async (email: string, username: string, password: string) => {
@@ -84,6 +106,7 @@ export default function SignupPage(props: SignupPageProps) {
             label="Password"
             variant="outlined"
             value={password}
+            helperText="Has to be at least 6 characters"
             onChange={event => setPassword(event.target.value)}
           />
           <Button type="submit" variant="outlined" color="primary">
