@@ -5,6 +5,7 @@ import MainPage from "./MainPage";
 import LoginPage, { User } from "./LoginPage";
 import Axios from "axios";
 import { createBrowserHistory } from "history";
+import SignupPage from "./SignupPage";
 
 interface AppState {
   isAuthenticated: boolean;
@@ -42,6 +43,9 @@ export default class App extends React.Component<any, AppState> {
         <Switch>
           <Route path="/login">
             <LoginPage handleLogin={this.handleLogin} />
+          </Route>
+          <Route path="/signup">
+            <SignupPage handleLogin={this.handleLogin} />
           </Route>
           <Route path="/">{this.state.isAuthenticated ? <MainPage user={this.state.user!} /> : <Redirect to="/login" />}</Route>
         </Switch>

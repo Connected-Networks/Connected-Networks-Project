@@ -9,12 +9,13 @@ export interface User {
   username: string;
 }
 
-interface LoginPageProps {
+interface SignupPageProps {
   handleLogin: Function;
 }
 
-export default function LoginPage(props: LoginPageProps) {
+export default function SignupPage(props: SignupPageProps) {
   const history = useHistory();
+  const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [alertMessage, setAlertMessage] = React.useState("");
@@ -22,24 +23,36 @@ export default function LoginPage(props: LoginPageProps) {
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    checkCredentials(username, password).then((user: User) => {
-      goToMainPage(user);
+    signup(email, username, password).then(() => {
+      login(username, password).then((user: User) => {
+        goToMainPage(user);
+      });
     });
   };
 
-  const checkCredentials = async (username: string, password: string) => {
-    return new Promise<User>((resolve, reject) => {
-      Axios.post(`/login`, { username, password })
-        .then(response => resolve(response.data))
+  const signup = async (email: string, username: string, password: string) => {
+    return new Promise((resolve, reject) => {
+      Axios.post(`/signup`, { email, username, password })
+        .then(() => resolve())
         .catch(error => {
           console.log(error);
-          if (error.response.status === 401) {
-            notifyUser("Invalid email and/or password. Please try again");
+          if (error.response.status === 409) {
+            notifyUser(
+              "Email and/or username is already used for another account. Please login or use a different email and/or username"
+            );
           } else {
             notifyUser("Something went wrong with the server. Please try again later");
           }
           reject();
         });
+    });
+  };
+
+  const login = async (username: string, password: string) => {
+    return new Promise<User>((resolve, reject) => {
+      Axios.post(`/login`, { username, password })
+        .then(response => resolve(response.data))
+        .catch(() => reject());
     });
   };
 
@@ -59,6 +72,13 @@ export default function LoginPage(props: LoginPageProps) {
         <FormContainer>
           <TextField
             type="text"
+            label="Email"
+            variant="outlined"
+            value={email}
+            onChange={event => setEmail(event.target.value)}
+          />
+          <TextField
+            type="text"
             label="Username"
             variant="outlined"
             value={username}
@@ -71,13 +91,8 @@ export default function LoginPage(props: LoginPageProps) {
             value={password}
             onChange={event => setPassword(event.target.value)}
           />
-          <div style={{ width: "100%" }}>
-            <P>
-              Don't have an account? <Link to="/signup">Sign up</Link>
-            </P>
-          </div>
           <Button type="submit" variant="outlined" color="primary">
-            Connect
+            Sign Up
           </Button>
         </FormContainer>
       </form>
@@ -99,7 +114,7 @@ const Container = styled.div`
 `;
 
 const FormContainer = styled.div`
-  height: 30vh;
+  height: 50vh;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
