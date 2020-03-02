@@ -226,6 +226,8 @@ modifyFund = (FundID, alteredFundName) => {
         }).catch(reject());
     })
 }
+
+modifyHistory = ()
     
     
     
@@ -310,6 +312,15 @@ retrieveCurrentEmployeesOfCompany = (CompanyID) => {
     })
 }
 
+retrieveIndividualsByOriginalCompany = (companyID) => {
+    return models.OriginalFundPosition.findAll({
+        where: {CompanyID: companyID},
+        include: [{
+            model: models.Individuals
+        }]
+    })
+}
+
 retrieveFundName = (fundID) => {
     return new Promise((resolve,reject)=>{
         models.Funds.findAll({
@@ -324,6 +335,7 @@ retrieveFundName = (fundID) => {
         })
     })
 }
+
     
 module.exports = {
     getAllUsers,
@@ -337,6 +349,7 @@ module.exports = {
     insertFromCsvLine,
     getIndividualEmployeeHistory,
     getIndividualCurrentEmployement,
+    retrieveIndividualsByOriginalCompany,
     modifyIndividual,
     deleteIndividual,
     modifyCompany,

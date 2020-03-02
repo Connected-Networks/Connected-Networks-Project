@@ -21,6 +21,13 @@ interface DisplayFund {
   id: number;
   name: string;
 }
+interface DisplayHistory {
+  id: number;
+  company: string;
+  position: string;
+  start: string;
+  end: string;
+}
 
 export default class BackendProcessing {
 
@@ -252,6 +259,8 @@ export default class BackendProcessing {
     })
   }
 
+  
+
   //returns a promise boolean representing if the operation was successful
   insert_fund(fundName):Promise<Boolean>{
     return new Promise<Boolean>((resolve,reject)=>{
@@ -316,6 +325,29 @@ export default class BackendProcessing {
     return database.retrieveCurrentEmployeesOfCompany(companyID)
   }
 
+  //Assumes that OriginalFundPosition table will not have duplicate combinations of IndividualID and CompanyID
+  //If this assumption is wrong, this function may return duplicate entries
+  retrievePeopleFromOriginalCompany(companyID):Promise<Object>{
+    return new Promise<DisplayPerson[]>((resolve,reject)=>{
+      database.retrieveIndividualsByOriginalCompany(companyID).then((results)=>{
+        resolve(results.map((entry)=>{
+          let dp:DisplayPerson = {
+            id: entry.Individual.IndividualID,
+            name: entry.Individual.Name,
+            //should not be needed. If it ever is, the db function could easily be edited to include companies table, at the cost of running time.
+            company: null,
+            position: entry.PositionName,
+            comment: entry.Individual.Comments,
+            hyperlink: entry.Individual.LinkedInUrl
+          }
+          return dp;
+        }))
+      }).catch((error)=>{
+        console.error("Error in retrievePeopleViaOriginalCompany")
+        console.error(error)
+      }) 
+    })
+  }
 
   //returns undefined if fundID is not found
   retrieveFundName(fundID):Promise<String>{
@@ -326,9 +358,47 @@ export default class BackendProcessing {
     })
   }
 
-  retrievePeopleFromOriginalCompany(companyID):Promise<Object>{
-    //TODO: complete this function
-    //This function will be simpler after the schema changes
-    return null;
+  getHistoryOfIndividual(individualID):Promise<DisplayHistory[]>{
+    return new Promise<DisplayHistory[]>((resolve,reject)=>{
+      database.getIndividualEmployeeHistory(individualID).then((results)=>{
+        resolve(results.map((entry)=>{
+          let history:DisplayHistory = {
+            id: entry.id,
+            company: entry.Company.CompanyName,
+            position: entry.PositionName,
+            start: entry.StartDate,
+            end: entry.EndDate
+          }
+          return history
+        }))
+    })})
+  }
+
+  insertHistory(history):Promise<Boolean>{
+    //TODO: change this logic
+    let userID = 1;
+
+    return new Promise<Boolean>((resolve,reject)=>{
+      return new Promise<Boolean>((resolve,reject)=>{
+        //TODO: retrieve CompanyID
+        let companyID = -1;
+        database.insertEmployeeHistory(userID,history.id,companyID,history.position,history.start,history.end).then((result)=>{
+          if (result!=null)
+            resolve(true)
+          else
+            resolve(false)
+        }).catch(resolve(false))
+      })
+    })
+  }
+
+  updateHistory(history):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      database.updateHistory()
+
+
+    })
+
+
   }
 }

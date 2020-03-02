@@ -32,7 +32,6 @@ app.get("/people", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -40,35 +39,15 @@ app.get("/people", (req, res) => {
   }
 });
 
+//retrieve all individuals whose most recent employment was in the specified company
 app.get("/people/:companyId", (req, res) => {
-  //Todo for Aaron: implement this function to get all the people who work in a certain company to show them in the company details panel.
   try {
     let be = new BackendProcessing();
-    //Temp until function is implemented
     let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
       if (!results) {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
-      }
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
-
-app.get("/people/original/:companyId", (req, res) => {
-  //Todo for Aaron: implement this function to get all the people who **originally** worked in a certain company to show them in the fund details panel.
-  try {
-    let be = new BackendProcessing();
-    //Temp until function is implemented
-    let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
-      if (!results) {
-        res.sendStatus(500);
-      } else {
-        res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -123,7 +102,6 @@ app.get("/company", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -181,7 +159,6 @@ app.get("/funds", (req, res) => {
     let results = be.retrieveFundsFromDatabase();
     results.then((funds)=>{
       res.json({ data: funds});
-      res.sendStatus(200);
     })
     results.catch(()=>{
       res.sendStatus(500)
@@ -228,7 +205,6 @@ app.get("/funds/:id", (req, res) => {
     let data = be.retrieveCompaniesFromFund(fundID).then(results => {
         if (results!=null){
           res.json({data: results});
-          res.sendStatus(200);
         }
         else
           res.sendStatus(500)
@@ -247,7 +223,6 @@ app.get("/people/original/:companyId",(req,res)=>{
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -256,30 +231,49 @@ app.get("/people/original/:companyId",(req,res)=>{
 })
 
 app.get("/history/:id", (req, res) => {
-    // Todo for Aaron, make this function return all employee history related to the recieved IndividualID.
-    // Look at client/EmploymentHistpryTable.tsx for more info
-    // Make sure to use .toLocaleDateString() to make Date types strings or just shove the date in there if
-    // you recieve it as a string from the DB.
-    try {
-      //Temp until function is implemented
-      const results = [
-        { id: 1, company: "Joojle",    position: "CEO",  start: new Date(2014,9,18).toLocaleDateString(), end: "Present"},
-        { id: 0, company: "HardCode",    position: "Developer", start: new Date(2002,11,23).toLocaleDateString(), end: new Date(2007,7,7).toLocaleDateString()}
-      ];
-  
-      res.json({ data: results });
-      res.sendStatus(200);
-    } catch (error) {
-      res.sendStatus(500);
-    }
+    let be = new BackendProcessing()
+    let individualID = req.params.id;
+    let g = be.getHistoryOfIndividual(individualID)
+    g.then((results)=>{
+      res.json({data:results})
+    })
+    g.catch((error)=>{
+      res.sendStatus(500)
+    })
 });
 
 app.put("/history", (req, res) => {
-  // Update history
+  let be = new BackendProcessing()
+  let history = req.body;
+  let ins = be.insertHistory(history)
+  ins.then((result)=>{
+    if (result){
+      res.sendStatus(200)
+    }
+    else{
+      res.sendStatus(500)
+    }
+  })
+  ins.catch((error)=>{
+    res.sendStatus(500)
+  })
 });
 
 app.post("/history/:id", (req, res) => {
-  // Add history
+  let be = new BackendProcessing()
+  let history = req.body;
+  let upd = be.updateHistory(history)
+  upd.then((result)=>{
+    if (result){
+      res.sendStatus(200)
+    }
+    else{
+      res.sendStatus(500)
+    }
+  })
+  upd.catch((error)=>{
+    res.sendStatus(500)
+  })
 });
 
 app.delete("/history", (req, res) => {
