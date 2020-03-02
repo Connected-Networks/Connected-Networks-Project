@@ -1,16 +1,38 @@
 const express = require("express");
 const path = require("path");
 const papa = require("papaparse");
+const session = require("express-session");
+const passport = require("./config/passport");
 const app = express();
 import BackendProcessing from "./backend-processing";
-import { rejects } from "assert";
-import { type } from "os";
+
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(
+  session({
+    secret: "http://bitly.com/98K8eH",
+    resave: false,
+    saveUninitialized: false
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+app.post("/login", passport.authenticate("local"), (req, res) => {
+  res.json({ username: req.user.username });
+});
+
+app.get("/user", (req, res) => {
+  if (req.user) {
+    res.json({ username: req.user.username });
+  } else {
+    res.sendStatus(401);
+  }
+});
 
 app.post("/csv", (req, res) => {
   try {
@@ -32,7 +54,6 @@ app.get("/people", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -50,7 +71,6 @@ app.get("/people/:companyId", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -68,7 +88,6 @@ app.get("/people/original/:companyId", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -123,7 +142,6 @@ app.get("/company", (req, res) => {
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
@@ -179,29 +197,25 @@ app.get("/funds", (req, res) => {
   try {
     let be = new BackendProcessing();
     let results = be.retrieveFundsFromDatabase();
-    results.then((funds)=>{
-      res.json({ data: funds});
-      res.sendStatus(200);
-    })
-    results.catch(()=>{
-      res.sendStatus(500)
-    })
+    results.then(funds => {
+      res.json({ data: funds });
+    });
+    results.catch(() => {
+      res.sendStatus(500);
+    });
   } catch (error) {
     res.sendStatus(500);
   }
 });
-app.post("/funds",(req,res)=>{
+app.post("/funds", (req, res) => {
   let be = new BackendProcessing();
   console.log("Adding fund: " + req.body.newFundName + " to the database");
   let fund = req.body.newFundName;
-  be.insert_fund(fund).then((result)=>{
-    if (result)
-      res.sendStatus(200)
-    else
-      res.sendStatus(500)
-  })
-})
-
+  be.insert_fund(fund).then(result => {
+    if (result) res.sendStatus(200);
+    else res.sendStatus(500);
+  });
+});
 
 app.put("/funds", (req, res) => {
   //Todo for Aaron, implement this function so it updates an existing fund, the fund can be accessed by req.body.fund,
@@ -210,35 +224,30 @@ app.put("/funds", (req, res) => {
   let be = new BackendProcessing();
   console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
   let fund = req.body.fund;
-  be.update_fund(fund).then((result)=>{
-    if (result)
-      res.sendStatus(200)
-    else
-      res.sendStatus(500)
-  })
+  be.update_fund(fund).then(result => {
+    if (result) res.sendStatus(200);
+    else res.sendStatus(500);
+  });
 });
 
 app.get("/funds/:id", (req, res) => {
   try {
     let be = new BackendProcessing();
     let fundID = req.params.id;
-    console.log("params: "+JSON.stringify(req.params))
-    console.log("type: "+typeof(fundID))
-    console.log("string: "+fundID)
+    console.log("params: " + JSON.stringify(req.params));
+    console.log("type: " + typeof fundID);
+    console.log("string: " + fundID);
     let data = be.retrieveCompaniesFromFund(fundID).then(results => {
-        if (results!=null){
-          res.json({data: results});
-          res.sendStatus(200);
-        }
-        else
-          res.sendStatus(500)
-      })
+      if (results != null) {
+        res.json({ data: results });
+      } else res.sendStatus(500);
+    });
   } catch (error) {
     res.sendStatus(500);
   }
 });
 
-app.get("/people/original/:companyId",(req,res)=>{
+app.get("/people/original/:companyId", (req, res) => {
   try {
     let be = new BackendProcessing();
     let companyID = req.params.id;
@@ -247,31 +256,35 @@ app.get("/people/original/:companyId",(req,res)=>{
         res.sendStatus(500);
       } else {
         res.json({ data: results });
-        res.sendStatus(200);
       }
     });
   } catch (error) {
     res.sendStatus(500);
   }
-})
+});
 
 app.get("/history/:id", (req, res) => {
-    // Todo for Aaron, make this function return all employee history related to the recieved IndividualID.
-    // Look at client/EmploymentHistpryTable.tsx for more info
-    // Make sure to use .toLocaleDateString() to make Date types strings or just shove the date in there if
-    // you recieve it as a string from the DB.
-    try {
-      //Temp until function is implemented
-      const results = [
-        { id: 1, company: "Joojle",    position: "CEO",  start: new Date(2014,9,18).toLocaleDateString(), end: "Present"},
-        { id: 0, company: "HardCode",    position: "Developer", start: new Date(2002,11,23).toLocaleDateString(), end: new Date(2007,7,7).toLocaleDateString()}
-      ];
-  
-      res.json({ data: results });
-      res.sendStatus(200);
-    } catch (error) {
-      res.sendStatus(500);
-    }
+  // Todo for Aaron, make this function return all employee history related to the recieved IndividualID.
+  // Look at client/EmploymentHistpryTable.tsx for more info
+  // Make sure to use .toLocaleDateString() to make Date types strings or just shove the date in there if
+  // you recieve it as a string from the DB.
+  try {
+    //Temp until function is implemented
+    const results = [
+      { id: 1, company: "Joojle", position: "CEO", start: new Date(2014, 9, 18).toLocaleDateString(), end: "Present" },
+      {
+        id: 0,
+        company: "HardCode",
+        position: "Developer",
+        start: new Date(2002, 11, 23).toLocaleDateString(),
+        end: new Date(2007, 7, 7).toLocaleDateString()
+      }
+    ];
+
+    res.json({ data: results });
+  } catch (error) {
+    res.sendStatus(500);
+  }
 });
 
 app.put("/history", (req, res) => {
@@ -285,7 +298,6 @@ app.post("/history/:id", (req, res) => {
 app.delete("/history", (req, res) => {
   //delete History
 });
-
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
