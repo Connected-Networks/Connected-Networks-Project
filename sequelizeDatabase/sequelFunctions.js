@@ -226,8 +226,6 @@ modifyFund = (FundID, alteredFundName) => {
         }).catch(reject());
     })
 }
-
-modifyHistory = ()
     
     
     
