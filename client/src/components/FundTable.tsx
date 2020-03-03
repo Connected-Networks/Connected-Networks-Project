@@ -29,6 +29,19 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
     return this.DATA_END_POINT;
   }
 
+  actions = [
+    {
+      icon: "person_add",
+      tooltip: "Share fund",
+      isFreeAction: true,
+      onClick: () => this.shareFund()
+    }
+  ];
+
+  shareFund = () => {
+    alert("fund shared");
+  };
+
   get editableObject(): EditableObject<DisplayFundCompany> {
     return {
       onRowAdd: this.addRow,
