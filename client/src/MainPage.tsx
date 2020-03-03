@@ -19,6 +19,7 @@ export interface MainPageState {
 
 interface MainPageProps {
   user: User;
+  handleLogout: Function;
 }
 
 export default class MainPage extends React.Component<MainPageProps, MainPageState> {
@@ -62,6 +63,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
             open={this.state.openSideMenu}
             tableTypes={this.tablesFactory.getAvailableTables()}
             handleSwitchTable={this.switchTables}
+            handleLogout={this.props.handleLogout}
           />
           {this.tablesFactory.getTableComponent(this.state.tableType, this.state.fundName)}
         </Content>

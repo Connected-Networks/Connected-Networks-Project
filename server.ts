@@ -34,6 +34,16 @@ app.get("/user", (req, res) => {
   }
 });
 
+app.post("/logout", (req, res) => {
+  if (req.user) {
+    req.session.destroy();
+    res.clearCookie("connect.sid");
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(500);
+  }
+});
+
 app.post("/csv", (req, res) => {
   try {
     let data = req.body.data;
