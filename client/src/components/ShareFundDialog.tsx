@@ -38,7 +38,12 @@ export default class ShareFundDialog extends React.Component<ShareFundDialogProp
 
   getUsers = async () => {
     return new Promise<User[]>((resolve, reject) => {
-      resolve([{ username: "user2" }]);
+      Axios.get("/users")
+        .then(response => resolve(response.data.users))
+        .catch(function(error) {
+          console.log(error);
+          reject();
+        });
     });
   };
 

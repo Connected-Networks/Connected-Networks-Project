@@ -34,6 +34,19 @@ app.get("/user", (req, res) => {
   }
 });
 
+app.get("/users", (req, res) => {
+  //Todo for Aaron: Get all users except the current user using the User object defined in LoginPage, and return the results in
+  //an array
+
+  //Temp
+  const users = [
+    { id: 0, username: "user2" },
+    { id: 1, username: "user3" },
+    { id: 2, username: "user4" }
+  ];
+  res.json({ users });
+});
+
 app.post("/csv", (req, res) => {
   try {
     let data = req.body.data;
