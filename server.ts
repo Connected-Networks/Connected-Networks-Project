@@ -47,6 +47,14 @@ app.get("/users", (req, res) => {
   res.json({ users });
 });
 
+app.post("/shareFund", (req, res) => {
+  //Todo for Aaron: Share the given fund using res.body.fundId with user using res.body.user
+
+  //Temp
+  console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
+  res.sendStatus(200);
+});
+
 app.post("/csv", (req, res) => {
   try {
     let data = req.body.data;

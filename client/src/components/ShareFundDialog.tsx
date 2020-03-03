@@ -53,12 +53,21 @@ export default class ShareFundDialog extends React.Component<ShareFundDialogProp
 
   handleShare = () => {
     if (this.state.selectedUser) {
-      this.shareFundWithUser(this.props.fundId, this.state.selectedUser);
+      this.shareFundWithUser(this.props.fundId, this.state.selectedUser).finally(() => {
+        this.props.handleClose();
+      });
     }
   };
 
-  shareFundWithUser = (fundId: string, user: User) => {
-    alert(`Fund: ${fundId} shared with User: ${user.username}`);
+  shareFundWithUser = async (fundId: string, user: User) => {
+    return new Promise<User[]>((resolve, reject) => {
+      Axios.post("/shareFund", { fundId, user })
+        .then(response => resolve())
+        .catch(function(error) {
+          console.log(error);
+          reject();
+        });
+    });
   };
 
   render() {
