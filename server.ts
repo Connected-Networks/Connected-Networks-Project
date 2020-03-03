@@ -22,6 +22,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+app.post("/signup", (req, res) => {
+  //Todo for Aaron: Check if email, usernames are correct and not already taken then create a new user and add it to the database
+  //and then confirm with 200, if username or email is already taken then send 409. If something goes wrong send 500
+
+  //Temp
+  if (req.body.username === "user1" && req.body.password === "123") {
+    res.sendStatus(200);
+  } else if (req.body.username === "user2") {
+    res.sendStatus(409);
+  } else {
+    res.sendStatus(500);
+  }
+});
+
 app.post("/login", passport.authenticate("local"), (req, res) => {
   res.json({ username: req.user.username });
 });
