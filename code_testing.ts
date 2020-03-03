@@ -20,12 +20,11 @@ function delay(ms: number)
 
 function test_new_function(){
     let be = new BackendProcessing()
-    let fund = {
-        name : "First Fund",
-        id : 1
-    }
-    be.update_fund(fund).then((result)=>{
-        console.log(result)
-    }).catch(()=>{console.log("xxx")})
+    let username = "new user"
+    let email = "new email"
+    let password = "new password"
+    be.handleSignup(username,email,password).then((result)=>{
+        console.log(`result: ${result}`)
+    }).catch((error)=>{console.log(`an error was thrown`)})
 }
 test_new_function()

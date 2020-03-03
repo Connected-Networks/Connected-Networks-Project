@@ -401,4 +401,46 @@ export default class BackendProcessing {
 
 
   }
+
+  //returns false if username or email is unavailable
+  handleSignup(username,email,password):Promise<Boolean>{
+    return new Promise<Boolean>((resolve,reject)=>{
+      if(username==null || email==null || password==null)
+        resolve(false)
+      database.checkUsageofUsername(username).then((result1)=>{
+        database.checkUsageofEmail(email).then((result2)=>{
+          if (result1>1) console.log(`Warning: multiple accounts found with username: ${username}`)
+          if (result2>1) console.log(`Warning: multiple accounts found with email: ${email}`)
+          if (result1>0 || result2>0)
+            resolve(false)
+          this.createAccount(username,email,password).then(()=>{
+            resolve(true)
+          }).catch((error)=>{
+            console.error("Error in handleSignup: createAccount")
+            console.error(error)
+            reject(error)
+          })
+        }).catch((error)=>{
+          console.error("Error in handleSignup: email")
+          console.error(error)
+          reject(error)
+        })
+      }).catch((error)=>{
+        console.error("Error in handleSignup: username")
+        console.error(error)
+        reject(error)
+      })
+    })
+  }
+  createAccount(username,email,password):Promise<void>{
+    return new Promise<void>((resolve,reject)=>{
+      //TODO: hash password
+      console.log(`credentials: ${username},${email},${password}`)
+      let su = database.createAccount(username,email,password)
+      su.then((result)=>{resolve()})
+      su.catch((error)=>{
+        console.error(`An error occurred creating an account`)
+        reject()})
+    })
+  }
 }

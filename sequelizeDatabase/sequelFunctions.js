@@ -334,6 +334,37 @@ retrieveFundName = (fundID) => {
     })
 }
 
+//returns the number of accounts with the specified username
+checkUsageofUsername = (username) => {
+    return new Promise((resolve,reject)=>{
+        models.User.findAll({
+            where: {
+                Username: username
+            }
+        })
+        .then((results)=>{resolve(results.length)})
+        .catch((error)=>{reject(error)})
+    })
+}
+
+//returns the number of accounts with the specified email
+checkUsageofEmail = (email) => {
+    return new Promise((resolve,reject)=>{
+        models.User.findAll({
+            where: {
+                Email: email
+            }
+        })
+        .then((results)=>{resolve(results.length)})
+        .catch((error)=>{reject(error)})
+    })
+}
+
+createAccount = (username,email,password) => {
+    return models.User.create({Username:username,Password:password,Email:email})
+}
+
+
     
 module.exports = {
     getAllUsers,
@@ -357,5 +388,8 @@ module.exports = {
     retrieveCompaniesByFunds,
     retrieveCurrentEmployeesOfCompany,
     retrieveFundName,
-    insertFund
+    insertFund,
+    checkUsageofUsername,
+    checkUsageofEmail,
+    createAccount
 }
