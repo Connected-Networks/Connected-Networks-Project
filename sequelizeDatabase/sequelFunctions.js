@@ -416,11 +416,23 @@ retrieveFundName = fundID => {
   });
 };
 
-getUser = username => {
+getUserByUsername = username => {
   return new Promise((resolve, reject) => {
     models.User.findOne({
       where: {
         Username: username
+      }
+    }).then(user => {
+      user !== null ? resolve(user) : reject();
+    });
+  });
+};
+
+getUserByEmail = email => {
+  return new Promise((resolve, reject) => {
+    models.User.findOne({
+      where: {
+        Email: email
       }
     }).then(user => {
       user !== null ? resolve(user) : reject();

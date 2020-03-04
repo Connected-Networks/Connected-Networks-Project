@@ -350,10 +350,19 @@ export default class BackendProcessing {
     return null;
   }
 
-  userExists(username: string) {
+  usernameIsTaken(username: string) {
     return new Promise<boolean>(resolve => {
       database
-        .getUser(username)
+        .getUserByUsername(username)
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    });
+  }
+
+  emailIsTaken(email: string) {
+    return new Promise<boolean>(resolve => {
+      database
+        .getUserByEmail(email)
         .then(() => resolve(true))
         .catch(() => resolve(false));
     });

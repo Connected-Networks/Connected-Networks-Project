@@ -24,13 +24,14 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 app.post("/signup", (req, res) => {
   const be = new BackendProcessing();
+  const { email, username, password } = req.body;
 
-  if (be.userExists(req.body.username)) {
+  if (be.emailIsTaken(email) || be.usernameIsTaken(username)) {
     res.sendStatus(409);
   }
 
-  if (be.emailIsValid(req.body.email) && be.passwordIsValid(req.body.password)) {
-    be.insertUser(req.body.email, req.body.username, req.body.password)
+  if (be.emailIsValid(email) && be.passwordIsValid(password)) {
+    be.insertUser(email, username, password)
       .then(() => res.sendStatus(200))
       .catch(() => res.sendStatus(500));
   }
