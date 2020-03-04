@@ -23,16 +23,16 @@ app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 app.post("/signup", (req, res) => {
-  //Todo for Aaron: Check if email, usernames are correct and not already taken then create a new user and add it to the database
-  //and then confirm with 200, if username or email is already taken then send 409. If something goes wrong send 500
-
-  //Temp
-  if (req.body.username === "user1" && req.body.password === "123") {
-    res.sendStatus(200);
-  } else if (req.body.username === "user2") {
+  const be = new BackendProcessing();
+  
+  if (be.userExists(req.body.username)) {
     res.sendStatus(409);
-  } else {
-    res.sendStatus(500);
+  }
+
+  if (be.emailIsValid(req.body.email) && be.passwordIsValid(req.body.password)) {
+    be.insertUser(req.body.email, req.body.username, req.body.password)
+      .then(() => res.sendStatus(200))
+      .catch(() => res.sendStatus(500));
   }
 });
 
