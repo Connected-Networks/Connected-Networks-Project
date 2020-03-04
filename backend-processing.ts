@@ -381,6 +381,11 @@ export default class BackendProcessing {
   }
 
   insertUser(email: string, username: string, password: string) {
-    return new Promise<void>((resolve, reject) => {});
+    return new Promise<void>((resolve, reject) => {
+      database
+        .insertUser(username, password, email)
+        .then(() => resolve())
+        .catch(() => reject());
+    });
   }
 }
