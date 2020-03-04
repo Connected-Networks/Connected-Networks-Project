@@ -368,7 +368,7 @@ export default class BackendProcessing {
   }
 
   passwordIsValid(password: string): boolean {
-    return false;
+    return password.length >= 6;
   }
 
   insertUser(email: string, username: string, password: string) {
