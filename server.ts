@@ -24,7 +24,7 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 app.post("/signup", (req, res) => {
   const be = new BackendProcessing();
-  
+
   if (be.userExists(req.body.username)) {
     res.sendStatus(409);
   }

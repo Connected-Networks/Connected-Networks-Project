@@ -350,8 +350,13 @@ export default class BackendProcessing {
     return null;
   }
 
-  userExists(username: string): boolean {
-    return false;
+  userExists(username: string) {
+    return new Promise<boolean>(resolve => {
+      database
+        .getUser(username)
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    });
   }
 
   emailIsValid(email: string): boolean {
@@ -363,8 +368,6 @@ export default class BackendProcessing {
   }
 
   insertUser(email: string, username: string, password: string) {
-    return new Promise<void>((resolve, reject) => {
-      
-    });
+    return new Promise<void>((resolve, reject) => {});
   }
 }
