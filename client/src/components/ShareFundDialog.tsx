@@ -89,7 +89,7 @@ export default class ShareFundDialog extends React.Component<ShareFundDialogProp
             Cancel
           </Button>
           <Button color="primary" onClick={() => this.handleShare()}>
-            Upload
+            Share
           </Button>
         </DialogActions>
       </Dialog>
