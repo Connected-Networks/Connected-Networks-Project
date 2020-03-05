@@ -22,20 +22,35 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
   const be = new BackendProcessing();
   const { email, username, password } = req.body;
 
-  if (be.emailIsTaken(email) || be.usernameIsTaken(username)) {
-    res.sendStatus(409);
+  if (await be.emailIsTaken(email)) {
+    res.sendStatus(409); //TODO: Add error message
   }
 
-  if (be.emailIsValid(email) && be.passwordIsValid(password)) {
-    be.insertUser(email, username, password)
-      .then(() => res.sendStatus(200))
-      .catch(() => res.sendStatus(500));
+  if (await be.usernameIsTaken(email)) {
+    res.sendStatus(409); //TODO: Add a different error message
   }
-  res.sendStatus(406);
+
+  if (!be.emailIsValid(email) || !be.passwordIsValid(password)) {
+    res.sendStatus(406);
+  }
+
+  be.insertUser(email, username, password)
+    .then(() => res.sendStatus(200))
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(500);
+    });
+});
+
+app.get("/users", (req, res) => {
+  const be = new BackendProcessing();
+  be.getAllUsers().then(users => {
+    res.json({ users });
+  });
 });
 
 app.post("/login", passport.authenticate("local"), (req, res) => {

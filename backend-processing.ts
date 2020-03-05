@@ -388,4 +388,15 @@ export default class BackendProcessing {
         .catch(() => reject());
     });
   }
+
+  //For Testing purposes
+  //TODO: Remove this once done.
+  getAllUsers() {
+    return new Promise((resolve, reject) => {
+      database
+        .getAllUsers()
+        .then(users => resolve(users))
+        .catch(() => reject());
+    });
+  }
 }

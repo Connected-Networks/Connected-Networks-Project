@@ -461,5 +461,8 @@ module.exports = {
   retrieveCompaniesByFunds,
   retrieveCurrentEmployeesOfCompany,
   retrieveFundName,
-  insertFund
+  insertFund,
+  getUserByUsername,
+  getUserByEmail,
+  insertUser
 };
