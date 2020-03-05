@@ -35,6 +35,7 @@ app.post("/signup", (req, res) => {
       .then(() => res.sendStatus(200))
       .catch(() => res.sendStatus(500));
   }
+  res.sendStatus(406);
 });
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
