@@ -4,6 +4,8 @@ const papa = require("papaparse");
 const session = require("express-session");
 const passport = require("./config/passport");
 const app = express();
+const models = require("./sequelizeDatabase/modelSetup");
+const SessionStore = require("express-session-sequelize")(session.Store);
 import BackendProcessing from "./backend-processing";
 
 const port = process.env.PORT || 5000;
@@ -12,6 +14,7 @@ app.use(express.json());
 app.use(
   session({
     secret: "http://bitly.com/98K8eH",
+    store: new SessionStore({ db: models.sequelize }),
     resave: false,
     saveUninitialized: false
   })
