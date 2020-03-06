@@ -1,26 +1,22 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const database = require("../sequelizeDatabase/sequelFunctions");
 
 const strategy = new LocalStrategy((username, password, done) => {
   //Temp until we integrate with the database
   //Todo for Aaron: Authenticate user here. Should check if username and passwords are matching with the ones in the database.
-  if (username === "user1" && password === "123") {
-    const user = {
-      _id: 0,
-      username: "user1",
-      email: "never@gonna.com"
-    };
-    return done(null, user);
-  }
-  if (username === "user2" && password === "123") {
-    const user = {
-      _id: 1,
-      username: "user2",
-      email: "give@you.up"
-    };
-    return done(null, user);
-  }
-  return done(null, false, { message: "Incorrect username" });
+  database
+    .getUserByUsername(username)
+    .then(user => {
+      if (user.Password !== password) {
+        return done(null, false, { message: "Incorrect password" });
+      }
+
+      return done(null, user);
+    })
+    .catch(err => {
+      return done(err);
+    });
 });
 
 passport.serializeUser((user, done) => {
