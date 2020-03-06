@@ -440,6 +440,18 @@ getUserByEmail = email => {
   });
 };
 
+getUserById = id => {
+  return new Promise((resolve, reject) => {
+    models.User.findOne({
+      where: {
+        UserID: id
+      }
+    }).then(user => {
+      user !== null ? resolve(user) : reject();
+    });
+  });
+};
+
 module.exports = {
   getAllUsers,
   getAllIndividuals,
@@ -464,5 +476,6 @@ module.exports = {
   insertFund,
   getUserByUsername,
   getUserByEmail,
-  insertUser
+  insertUser,
+  getUserById
 };

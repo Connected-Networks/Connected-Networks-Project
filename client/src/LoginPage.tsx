@@ -22,6 +22,8 @@ export default function LoginPage(props: LoginPageProps) {
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     login(username, password).then((user: User) => {
+      console.log(JSON.stringify(user));
+
       props.goToMainPage(user);
     });
   };

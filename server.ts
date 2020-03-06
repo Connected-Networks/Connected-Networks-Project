@@ -54,12 +54,12 @@ app.get("/users", (req, res) => {
 });
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json({ username: req.user.username });
+  res.json({ username: req.user.Username });
 });
 
 app.get("/user", (req, res) => {
   if (req.user) {
-    res.json({ username: req.user.username });
+    res.json({ username: req.user.Username });
   } else {
     res.sendStatus(401);
   }
