@@ -1,12 +1,13 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const database = require("../sequelizeDatabase/sequelFunctions");
+const bcrypt = require("bcryptjs");
 
 const strategy = new LocalStrategy((username, password, done) => {
   database
     .getUserByUsername(username)
     .then(user => {
-      if (user.Password !== password) {
+      if (bcrypt.compareSync(user.Password, password)) {
         return done(null, false, { message: "Incorrect password" });
       }
 
