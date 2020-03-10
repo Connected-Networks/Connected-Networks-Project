@@ -24,16 +24,13 @@ interface DisplayFund {
 
 export default class BackendProcessing {
 
-  processRawCSV(data: string) {
+  processRawCSV(data: string,fileName:string) {
     //First line is commented and ignored
     //Second line is treated as header
 
-
-
-
     //TODO: add logic
     //currently this is hardcoded
-    let fundName = "First Fund";
+    let fundName = fileName;
     let userID = 1;
 
 
@@ -54,6 +51,7 @@ export default class BackendProcessing {
       return new Promise((resolve,reject)=>{
         database.insertFund(fundName,userID).then((fund)=>{
           return Promise.all(results.data.map((element)=>{if (element["name"]!=null) this.call_from_csv_line(element,fund.FundID,userID)})).then(()=>{
+            
             resolve(true)
           })
         })
