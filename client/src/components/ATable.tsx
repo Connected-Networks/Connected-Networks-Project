@@ -7,6 +7,7 @@ import axios from "axios";
 export interface TableState<T extends Object> {
   data: T[];
   columns: Array<Column<T>>;
+  dialog?: JSX.Element;
 }
 
 export default abstract class ATable<T extends Object, TableProps = {}> extends React.Component<TableProps, TableState<T>> {
@@ -45,23 +46,30 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
     });
   };
 
+  handleCloseDialog = () => {
+    this.setState({ dialog: undefined });
+  };
+
   render() {
     return (
-      <Container>
-        <MaterialTable
-          columns={this.state.columns}
-          data={this.state.data}
-          editable={this.editableObject}
-          title={this.name}
-          actions={this.actions}
-          components={this.components}
-          detailPanel={this.getDetailPanel}
-          onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
-          options={{
-            actionsColumnIndex: -1
-          }}
-        />
-      </Container>
+      <>
+        <Container>
+          <MaterialTable
+            columns={this.state.columns}
+            data={this.state.data}
+            editable={this.editableObject}
+            title={this.name}
+            actions={this.actions}
+            components={this.components}
+            detailPanel={this.getDetailPanel}
+            onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
+            options={{
+              actionsColumnIndex: -1
+            }}
+          />
+        </Container>
+        {this.state.dialog}
+      </>
     );
   }
 }
