@@ -247,5 +247,6 @@ sequelize.authenticate()
     SharedFunds,
     Companies,
     EmployeeHistory,
-    OriginalFundPosition
+    OriginalFundPosition,
+    sequelize
   }
