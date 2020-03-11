@@ -5,6 +5,7 @@ import MainPage from "./MainPage";
 import LoginPage, { User } from "./LoginPage";
 import Axios from "axios";
 import { createBrowserHistory } from "history";
+import SignupPage from "./SignupPage";
 
 interface AppState {
   isAuthenticated: boolean;
@@ -17,23 +18,27 @@ export default class App extends React.Component<any, AppState> {
 
   componentDidMount() {
     this.checkIfLoggedIn().then((user: User) => {
-      this.handleLogin(user);
+      this.goToMainPage(user);
     });
   }
 
   checkIfLoggedIn = () => {
     return new Promise<User>((resolve, reject) => {
-      console.log("sent");
-
       Axios.get(`/user`)
         .then(response => resolve(response.data))
         .catch(() => reject());
     });
   };
 
-  handleLogin = (user: User) => {
+  goToMainPage = (user: User) => {
     this.setState({ isAuthenticated: true, user });
     this.history.push("/");
+  };
+
+  handleLogout = () => {
+    Axios.post(`/logout`)
+      .then(() => this.setState({ isAuthenticated: false, user: undefined }))
+      .catch(error => console.log(error));
   };
 
   render() {
@@ -41,9 +46,18 @@ export default class App extends React.Component<any, AppState> {
       <Router history={this.history}>
         <Switch>
           <Route path="/login">
-            <LoginPage handleLogin={this.handleLogin} />
+            <LoginPage goToMainPage={this.goToMainPage} />
           </Route>
-          <Route path="/">{this.state.isAuthenticated ? <MainPage user={this.state.user!} /> : <Redirect to="/login" />}</Route>
+          <Route path="/signup">
+            <SignupPage goToMainPage={this.goToMainPage} />
+          </Route>
+          <Route path="/">
+            {this.state.isAuthenticated ? (
+              <MainPage user={this.state.user!} handleLogout={this.handleLogout} />
+            ) : (
+              <Redirect to="/login" />
+            )}
+          </Route>
         </Switch>
       </Router>
     );

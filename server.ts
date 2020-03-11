@@ -4,6 +4,8 @@ const papa = require("papaparse");
 const session = require("express-session");
 const passport = require("./config/passport");
 const app = express();
+const models = require("./sequelizeDatabase/modelSetup");
+const SessionStore = require("express-session-sequelize")(session.Store);
 import BackendProcessing from "./backend-processing";
 
 const port = process.env.PORT || 5000;
@@ -12,6 +14,7 @@ app.use(express.json());
 app.use(
   session({
     secret: "http://bitly.com/98K8eH",
+    store: new SessionStore({ db: models.sequelize }),
     resave: false,
     saveUninitialized: false
   })
@@ -22,16 +25,79 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+app.post("/signup", async (req, res) => {
+  const be = new BackendProcessing();
+  const { email, username, password } = req.body;
+
+  if (await be.emailIsTaken(email)) {
+    res.sendStatus(409); //TODO: Add error message
+  }
+
+  if (await be.usernameIsTaken(email)) {
+    res.sendStatus(409); //TODO: Add a different error message
+  }
+
+  if (!be.emailIsValid(email) || !be.passwordIsValid(password)) {
+    res.sendStatus(406);
+  }
+
+  be.insertUser(email, username, password)
+    .then(() => res.sendStatus(200))
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(500);
+    });
+});
+
+app.get("/users", (req, res) => {
+  const be = new BackendProcessing();
+  be.getAllUsers().then(users => {
+    res.json({ users });
+  });
+});
+
 app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json({ username: req.user.username });
+  res.json({ username: req.user.Username });
 });
 
 app.get("/user", (req, res) => {
   if (req.user) {
-    res.json({ username: req.user.username });
+    res.json({ username: req.user.Username });
   } else {
     res.sendStatus(401);
   }
+});
+
+app.post("/logout", (req, res) => {
+  if (req.user) {
+    req.session.destroy(() => {
+      res.clearCookie("connect.sid");
+      res.sendStatus(200);
+    });
+  } else {
+    res.sendStatus(500);
+  }
+});
+
+app.get("/users", (req, res) => {
+  //Todo for Aaron: Get all users except the current user using the User object defined in LoginPage, and return the results in
+  //an array
+
+  //Temp
+  const users = [
+    { id: 0, username: "user2" },
+    { id: 1, username: "user3" },
+    { id: 2, username: "user4" }
+  ];
+  res.json({ users });
+});
+
+app.post("/shareFund", (req, res) => {
+  //Todo for Aaron: Share the given fund using res.body.fundId with user using res.body.user
+
+  //Temp
+  console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
+  res.sendStatus(200);
 });
 
 app.post("/csv", (req, res) => {

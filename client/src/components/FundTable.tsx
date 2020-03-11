@@ -2,6 +2,8 @@ import * as React from "react";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import CompanyDetailsTable from "./CompanyDetailsTable";
+import { User } from "../LoginPage";
+import ShareFundDialog from "./ShareFundDialog";
 
 interface FundTableProps {
   fundId: string;
@@ -28,6 +30,19 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
   get dataEndPoint(): string {
     return this.DATA_END_POINT;
   }
+
+  actions = [
+    {
+      icon: "person_add",
+      tooltip: "Share fund",
+      isFreeAction: true,
+      onClick: () => this.showShareDialog()
+    }
+  ];
+
+  showShareDialog = () => {
+    this.setState({ dialog: <ShareFundDialog fundId={this.props.fundId} handleClose={this.handleCloseDialog} /> });
+  };
 
   get editableObject(): EditableObject<DisplayFundCompany> {
     return {
