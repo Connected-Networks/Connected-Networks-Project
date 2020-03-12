@@ -23,20 +23,19 @@ app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 app.post("/signup", (req, res) => {
-  let username = req.body.username
-  let password = req.body.password
-  let email = req.body.email
-  let be = new BackendProcessing()
-  let su = be.handleSignup(username,email,password)
-  su.then((result)=>{
+  let username = req.body.username;
+  let password = req.body.password;
+  let email = req.body.email;
+  let be = new BackendProcessing();
+  let su = be.handleSignup(username, email, password);
+  su.then(result => {
     if (result) res.sendStatus(200);
     else res.sendStatus(409);
-  })
-  su.catch((error)=>{
+  });
+  su.catch(error => {
     console.error("Error encountered during signup");
     res.sendStatus(500);
-  })
-
+  });
 });
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
@@ -273,49 +272,49 @@ app.get("/people/original/:companyId", (req, res) => {
 });
 
 app.get("/history/:id", (req, res) => {
-    let be = new BackendProcessing()
-    let individualID = req.params.id;
-    let g = be.getHistoryOfIndividual(individualID)
-    g.then((results)=>{
-      res.json({data:results})
-    })
-    g.catch((error)=>{
-      res.sendStatus(500)
-    })
+  let be = new BackendProcessing();
+  let individualID = req.params.id;
+  let g = be.getHistoryOfIndividual(individualID);
+  g.then(results => {
+    res.json({ data: results });
+  });
+  g.catch(error => {
+    res.sendStatus(500);
+  });
 });
 
 app.put("/history", (req, res) => {
-  let be = new BackendProcessing()
+  let be = new BackendProcessing();
   let history = req.body;
-  let ins = be.insertHistory(history)
-  ins.then((result)=>{
-    if (result){
-      res.sendStatus(200)
+  let userID = req.user.UserID;
+  let individual = req.employee;
+  let ins = be.insertHistory(history, individual, userID);
+  ins.then(result => {
+    if (result) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
     }
-    else{
-      res.sendStatus(500)
-    }
-  })
-  ins.catch((error)=>{
-    res.sendStatus(500)
-  })
+  });
+  ins.catch(error => {
+    res.sendStatus(500);
+  });
 });
 
 app.post("/history/:id", (req, res) => {
-  let be = new BackendProcessing()
+  let be = new BackendProcessing();
   let history = req.body;
-  let upd = be.updateHistory(history)
-  upd.then((result)=>{
-    if (result){
-      res.sendStatus(200)
+  let upd = be.updateHistory(history);
+  upd.then(result => {
+    if (result) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
     }
-    else{
-      res.sendStatus(500)
-    }
-  })
-  upd.catch((error)=>{
-    res.sendStatus(500)
-  })
+  });
+  upd.catch(error => {
+    res.sendStatus(500);
+  });
 });
 
 app.delete("/history", (req, res) => {
