@@ -103,8 +103,10 @@ app.post("/shareFund", (req, res) => {
 app.post("/csv", (req, res) => {
   try {
     let data = req.body.data;
+    let fileName = req.body.fileName;
+    let userID = req.user.UserID;
     let be = new BackendProcessing();
-    be.processRawCSV(data).then(results => {
+    be.processRawCSV(data,fileName,userID).then(results => {
       res.sendStatus(200);
     });
   } catch (error) {
@@ -114,6 +116,7 @@ app.post("/csv", (req, res) => {
 
 app.get("/people", (req, res) => {
   try {
+    let userID = req.user.UserID;
     let be = new BackendProcessing();
     let data = be.retrievePeopleFromDatabase().then(results => {
       if (!results) {
