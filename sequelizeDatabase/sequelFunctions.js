@@ -8,7 +8,11 @@ getAllUsers = () => {
     .then(users => {
       return users;
     })
+<<<<<<< HEAD
     .catch(err => console.err(err));
+=======
+    .catch(err => console.error(err));
+>>>>>>> milestone-9
 };
 
 getAllIndividuals = () => {
@@ -151,6 +155,7 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
     })
     .catch(err => console.error("Error in insertEmployeeHistory", err));
 };
+<<<<<<< HEAD
 
 updateEmployeeHistory = (historyID, userID, individualID, companyID, positionName, startDate, endDate) => {
   return new Promise((resolve, reject) => {});
@@ -230,6 +235,83 @@ getIndividualEmployeeHistory = IndividualID => {
   });
 };
 
+=======
+
+insertFromCsvLine = (
+  UserID,
+  FundID,
+  PortfolioCompanyName,
+  EmployeeName,
+  OriginalPostion,
+  OriginalStartDate,
+  OriginalEndDate,
+  CurrentEmployer,
+  CurrentPostion,
+  LinkedInUrl,
+  Comments
+) => {
+  console.log(
+    "\n\n Fields are:, ",
+    UserID,
+    FundID,
+    PortfolioCompanyName,
+    EmployeeName,
+    OriginalPostion,
+    OriginalStartDate,
+    OriginalEndDate,
+    CurrentEmployer,
+    CurrentPostion,
+    LinkedInUrl,
+    Comments,
+    "\n"
+  );
+  insertPerson(FundID, EmployeeName, LinkedInUrl, Comments)
+    .then(newPerson => {
+      insertCompany(PortfolioCompanyName, FundID).then(originalCompany => {
+        insertOriginalFundPosition(newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion)
+          .then(() => {
+            //NOTE: I'm hoping it doesn't freak out that I included no arguements here.
+            insertEmployeeHistory(
+              UserID,
+              newPerson.IndividualID,
+              originalCompany.CompanyID,
+              OriginalPostion,
+              OriginalStartDate,
+              OriginalEndDate
+            ).then(() => {
+              insertCompany(CurrentEmployer, FundID).then(newCompany => {
+                insertEmployeeHistory(
+                  UserID,
+                  newPerson.IndividualID,
+                  newCompany.CompanyID,
+                  CurrentPostion,
+                  OriginalStartDate,
+                  OriginalEndDate
+                );
+              });
+            });
+          })
+          .catch(err => console.error(">>ERROR ini insertFromCSVLine, in insertOriginal Position."));
+      });
+    })
+    .catch(err => console.error('Error in "insertFromCsvLine", ', err));
+};
+
+getIndividualEmployeeHistory = IndividualID => {
+  return models.EmployeeHistory.findAll({
+    where: { IndividualID: IndividualID },
+    order: [["EndDate", "DESC"]],
+    include: [
+      {
+        model: models.Companies
+      }
+    ]
+  }).then(wholeHistory => {
+    return wholeHistory;
+  });
+};
+
+>>>>>>> milestone-9
 getIndividualCurrentEmployement = IndividualID => {
   return getIndividualEmployeeHistory(IndividualID).then(IndividualHistory => {
     return IndividualHistory[0];
@@ -407,6 +489,7 @@ retrieveCurrentEmployeesOfCompany = CompanyID => {
   });
 };
 
+<<<<<<< HEAD
 retrieveIndividualsByOriginalCompany = companyID => {
   return models.OriginalFundPosition.findAll({
     where: { CompanyID: companyID },
@@ -418,6 +501,8 @@ retrieveIndividualsByOriginalCompany = companyID => {
   });
 };
 
+=======
+>>>>>>> milestone-9
 retrieveFundName = fundID => {
   return new Promise((resolve, reject) => {
     models.Funds.findAll({
@@ -431,6 +516,7 @@ retrieveFundName = fundID => {
   });
 };
 
+<<<<<<< HEAD
 //Assumes company names are unique in a fund, or companies in the same fund with the same name are substitutable
 retrieveCompanyByName = (companyName, fundID) => {
   return new Promise((resolve, reject) => {
@@ -487,6 +573,44 @@ createAccount = (username, email, password) => {
   return models.User.create({ Username: username, Password: password, Email: email });
 };
 
+=======
+getUserByUsername = username => {
+  return new Promise((resolve, reject) => {
+    models.User.findOne({
+      where: {
+        Username: username
+      }
+    }).then(user => {
+      user !== null ? resolve(user) : reject();
+    });
+  });
+};
+
+getUserByEmail = email => {
+  return new Promise((resolve, reject) => {
+    models.User.findOne({
+      where: {
+        Email: email
+      }
+    }).then(user => {
+      user !== null ? resolve(user) : reject();
+    });
+  });
+};
+
+getUserById = id => {
+  return new Promise((resolve, reject) => {
+    models.User.findOne({
+      where: {
+        UserID: id
+      }
+    }).then(user => {
+      user !== null ? resolve(user) : reject();
+    });
+  });
+};
+
+>>>>>>> milestone-9
 module.exports = {
   getAllUsers,
   getAllIndividuals,
@@ -499,7 +623,10 @@ module.exports = {
   insertFromCsvLine,
   getIndividualEmployeeHistory,
   getIndividualCurrentEmployement,
+<<<<<<< HEAD
   retrieveIndividualsByOriginalCompany,
+=======
+>>>>>>> milestone-9
   modifyIndividual,
   deleteIndividual,
   modifyCompany,
@@ -507,6 +634,7 @@ module.exports = {
   deleteFund,
   modifyFund,
   retrieveCompaniesByFunds,
+<<<<<<< HEAD
   retrieveCompanyByName,
   retrieveCurrentEmployeesOfCompany,
   retrieveFundName,
@@ -514,4 +642,13 @@ module.exports = {
   checkUsageofUsername,
   checkUsageofEmail,
   createAccount
+=======
+  retrieveCurrentEmployeesOfCompany,
+  retrieveFundName,
+  insertFund,
+  getUserByUsername,
+  getUserByEmail,
+  insertUser,
+  getUserById
+>>>>>>> milestone-9
 };

@@ -5,6 +5,7 @@ const denv = require("dotenv").config();
 const mysql = require("mysql");
 const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
+const bcrypt = require("bcryptjs");
 
 interface DisplayPerson {
   id: number;
@@ -501,6 +502,57 @@ export default class BackendProcessing {
         console.error(`An error occurred creating an account`);
         reject();
       });
+    });
+  }
+
+  usernameIsTaken(username: string) {
+    return new Promise<boolean>(resolve => {
+      database
+        .getUserByUsername(username)
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    });
+  }
+
+  emailIsTaken(email: string) {
+    return new Promise<boolean>(resolve => {
+      database
+        .getUserByEmail(email)
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    });
+  }
+
+  emailIsValid(email: string): boolean {
+    const emailRegex = new RegExp(
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+
+    return emailRegex.test(String(email).toLowerCase());
+  }
+
+  passwordIsValid(password: string): boolean {
+    return password.length >= 6;
+  }
+
+  insertUser(email: string, username: string, password: string) {
+    return new Promise<void>((resolve, reject) => {
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      database
+        .insertUser(username, hashedPassword, email)
+        .then(() => resolve())
+        .catch(() => reject());
+    });
+  }
+
+  //For Testing purposes
+  //TODO: Remove this once done.
+  getAllUsers() {
+    return new Promise((resolve, reject) => {
+      database
+        .getAllUsers()
+        .then(users => resolve(users))
+        .catch(() => reject());
     });
   }
 }
