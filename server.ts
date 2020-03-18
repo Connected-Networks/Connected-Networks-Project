@@ -25,21 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-<<<<<<< HEAD
-app.post("/signup", (req, res) => {
-  let username = req.body.username;
-  let password = req.body.password;
-  let email = req.body.email;
-  let be = new BackendProcessing();
-  let su = be.handleSignup(username, email, password);
-  su.then(result => {
-    if (result) res.sendStatus(200);
-    else res.sendStatus(409);
-  });
-  su.catch(error => {
-    console.error("Error encountered during signup");
-    res.sendStatus(500);
-=======
 app.post("/signup", async (req, res) => {
   const be = new BackendProcessing();
   const { email, username, password } = req.body;
@@ -68,7 +53,6 @@ app.get("/users", (req, res) => {
   const be = new BackendProcessing();
   be.getAllUsers().then(users => {
     res.json({ users });
->>>>>>> milestone-9
   });
 });
 
@@ -109,11 +93,19 @@ app.get("/users", (req, res) => {
 });
 
 app.post("/shareFund", (req, res) => {
-  //Todo for Aaron: Share the given fund using res.body.fundId with user using res.body.user
-
-  //Temp
-  console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
-  res.sendStatus(200);
+  let fundID = res.body.fundId;
+  let user = res.body.user;
+  let be = new BackendProcessing();
+  be.sharefund(fundID, user)
+    .then(boolean => {
+      if (boolean) {
+        console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
+        res.sendStatus(200);
+      } else res.sendStatus(500);
+    })
+    .catch(error => {
+      res.sendStatus(500);
+    });
 });
 
 app.post("/csv", (req, res) => {
@@ -360,7 +352,9 @@ app.put("/history", (req, res) => {
 app.post("/history/:id", (req, res) => {
   let be = new BackendProcessing();
   let history = req.body;
-  let upd = be.updateHistory(history);
+  let individual = req.employee;
+  let userID = req.user.UserID;
+  let upd = be.updateHistory(history, individual, userID);
   upd.then(result => {
     if (result) {
       res.sendStatus(200);

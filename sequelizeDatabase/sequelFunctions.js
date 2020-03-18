@@ -153,7 +153,27 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
 };
 
 updateEmployeeHistory = (historyID, userID, individualID, companyID, positionName, startDate, endDate) => {
-  return new Promise((resolve, reject) => {});
+  return new Promise((resolve, reject) => {
+    models.EmployeeHistory.findOne({
+      where: {
+        HistoryID: historyID
+      }
+    }).then(result => {
+      if (result == null) reject();
+      result
+        .update({
+          UserID: userID,
+          IndividualID: individualID,
+          CompanyID: companyID,
+          PositionName: positionName,
+          StartDate: startDate,
+          EndDate: endDate
+        })
+        .then(result => {
+          resolve();
+        });
+    });
+  });
 };
 
 insertFromCsvLine = (
@@ -431,6 +451,19 @@ retrieveFundName = fundID => {
   });
 };
 
+sharefund = (fundID, userID) => {
+  return new Promise((resolve, reject) => {
+    models.SharedFunds.findOrCreate({
+      where: {
+        FundID: fundID,
+        UserID: userID
+      }
+    }).then(result => {
+      resolve(result);
+    });
+  });
+};
+
 //Assumes company names are unique in a fund, or companies in the same fund with the same name are substitutable
 retrieveCompanyByName = (companyName, fundID) => {
   return new Promise((resolve, reject) => {
@@ -556,5 +589,7 @@ module.exports = {
   getUserByUsername,
   getUserByEmail,
   insertUser,
-  getUserById
+  getUserById,
+  updateEmployeeHistory,
+  sharefund
 };

@@ -436,15 +436,17 @@ export default class BackendProcessing {
       database
         .retrieveCompanyByName(history.company, fundID)
         .then(resultCompany => {
-          let updt = {
-            HistoryID: history.HistoryID,
-            UserID: userID,
-            IndividualID: individual.IndividualID,
-            CompanyID: resultCompany.CompanyID,
-            PositionName: history.position,
-            StartDate: history.start,
-            EndDate: history.end
-          };
+          database
+            .updateHistory(
+              history.HistoryID,
+              userID,
+              individual.IndividualID,
+              resultCompany.CompanyID,
+              history.position,
+              history.start,
+              history.end
+            )
+            .then(resolve(true));
         })
         .catch(error => {
           console.error("An error occurred while retrieving company information");
@@ -542,6 +544,19 @@ export default class BackendProcessing {
         .insertUser(username, hashedPassword, email)
         .then(() => resolve())
         .catch(() => reject());
+    });
+  }
+
+  sharefund(fundID, user) {
+    return new Promise<Boolean>((resolve, reject) => {
+      database
+        .sharefund(fundID, user.UserID)
+        .then(result => {
+          resolve(true);
+        })
+        .catch(error => {
+          resolve(false);
+        });
     });
   }
 
