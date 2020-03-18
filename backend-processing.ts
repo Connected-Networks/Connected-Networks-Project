@@ -1,4 +1,5 @@
 import { resolve } from "dns";
+import { start } from "repl";
 
 const denv = require("dotenv").config();
 const mysql = require("mysql");
@@ -401,21 +402,54 @@ export default class BackendProcessing {
 
   insertHistory(history, individual, userID): Promise<Boolean> {
     return new Promise<Boolean>((resolve, reject) => {
-      return new Promise<Boolean>((resolve, reject) => {
-        database
-          .insertEmployeeHistory(userID, history.id, companyID, history.position, history.start, history.end)
-          .then(result => {
-            if (result != null) resolve(true);
-            else resolve(false);
-          })
-          .catch(resolve(false));
-      });
+      let fundID = individual.FundID;
+      database
+        .retrieveCompanyByName(history.company, fundID)
+        .then(resultCompany => {
+          database
+            .insertEmployeeHistory(userID, history.id, resultCompany.CompanyID, history.position, history.start, history.end)
+            .then(result => {
+              if (result != null) resolve(true);
+              else resolve(false);
+            })
+            .catch(error => {
+              console.error("An error occurred while inserting employee history");
+              console.error(error);
+              resolve(false);
+            });
+        })
+        .catch(error => {
+          console.error("An error occurred while retrieving company information");
+          console.error(error);
+          resolve(false);
+        });
     });
   }
 
-  updateHistory(history): Promise<Boolean> {
+  //The information passed into this function pertains to individuals, employeeHistory (except company ID), and company name
+  //This function assumes that the individualID part of employeeHistory may change, but the details about the individual will not be changed here,
+  //there is a seperate function for that. Similarly, this function assumes that the companyID may change, but the name of the specified company is not changing.
+  updateHistory(history, individual, userID): Promise<Boolean> {
     return new Promise<Boolean>((resolve, reject) => {
-      database.updateHistory();
+      let fundID = individual.FundID;
+      database
+        .retrieveCompanyByName(history.company, fundID)
+        .then(resultCompany => {
+          let updt = {
+            HistoryID: history.HistoryID,
+            UserID: userID,
+            IndividualID: individual.IndividualID,
+            CompanyID: resultCompany.CompanyID,
+            PositionName: history.position,
+            StartDate: history.start,
+            EndDate: history.end
+          };
+        })
+        .catch(error => {
+          console.error("An error occurred while retrieving company information");
+          console.error(error);
+          resolve(false);
+        });
     });
   }
 

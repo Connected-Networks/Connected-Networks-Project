@@ -152,6 +152,10 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
     .catch(err => console.error("Error in insertEmployeeHistory", err));
 };
 
+updateEmployeeHistory = (historyID, userID, individualID, companyID, positionName, startDate, endDate) => {
+  return new Promise((resolve, reject) => {});
+};
+
 insertFromCsvLine = (
   UserID,
   FundID,
@@ -427,13 +431,21 @@ retrieveFundName = fundID => {
   });
 };
 
-retrieveFundOfIndividual = individualID => {
+//Assumes company names are unique in a fund, or companies in the same fund with the same name are substitutable
+retrieveCompanyByName = (companyName, fundID) => {
   return new Promise((resolve, reject) => {
-    models.Individuals.find({
+    models.Companies.find({
       where: {
-        IndividualID: individualID
+        FundID: fundID,
+        CompanyName: companyName
       }
-    });
+    })
+      .then(result => {
+        resolve(result);
+      })
+      .catch(error => {
+        reject(error);
+      });
   });
 };
 
@@ -495,6 +507,7 @@ module.exports = {
   deleteFund,
   modifyFund,
   retrieveCompaniesByFunds,
+  retrieveCompanyByName,
   retrieveCurrentEmployeesOfCompany,
   retrieveFundName,
   insertFund,
