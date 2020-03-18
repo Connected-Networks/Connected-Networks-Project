@@ -16,22 +16,18 @@ function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-<<<<<<< HEAD
-function test_new_function(){
-    let be = new BackendProcessing()
-    let username = "new user"
-    let email = "new email"
-    let password = "new password"
-    be.handleSignup(username,email,password).then((result)=>{
-        console.log(`result: ${result}`)
-    }).catch((error)=>{console.log(`an error was thrown`)})
-=======
 function test_new_function() {
   let be = new BackendProcessing();
-  be.getAllUsers().then(users => {
-    console.log(users);
-  });
->>>>>>> milestone-9
+  let username = "new user";
+  let email = "new email";
+  let password = "new password";
+  be.handleSignup(username, email, password)
+    .then(result => {
+      console.log(`result: ${result}`);
+    })
+    .catch(error => {
+      console.log(`an error was thrown`);
+    });
 }
 
 test_new_function();
