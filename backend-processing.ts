@@ -32,14 +32,13 @@ interface DisplayHistory {
 }
 
 export default class BackendProcessing {
-  processRawCSV(data: string) {
+
+  processRawCSV(data: string,fileName:string,userID) {
     //First line is commented and ignored
     //Second line is treated as header
 
-    //TODO: add logic
-    //currently this is hardcoded
-    let fundName = "First Fund";
-    let userID = 1;
+    
+    let fundName = fileName;
 
     var results = papa.parse("#" + data, {
       //Adding a # causes the parser to skip the first row, treat the second row as header
