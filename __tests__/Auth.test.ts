@@ -1,6 +1,7 @@
 require("mysql2/node_modules/iconv-lite").encodingExists("foo");
 import app from "../server";
 import * as supertest from "supertest";
+const router = require("./routes");
 const request = supertest.agent(app);
 
 jest.setTimeout(30000);
