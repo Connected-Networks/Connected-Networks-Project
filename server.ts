@@ -2,10 +2,9 @@ const express = require("express");
 const path = require("path");
 const session = require("express-session");
 const passport = require("./config/passport");
-const app = express();
 const models = require("./sequelizeDatabase/modelSetup");
 const SessionStore = require("express-session-sequelize")(session.Store);
-const router = require("./routes");
+const app = require("./routes");
 
 const port = process.env.PORT || 5000;
 
@@ -30,5 +29,3 @@ app.get("*", (req, res) => {
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
-export default app;
