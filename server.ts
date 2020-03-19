@@ -1,11 +1,11 @@
 const express = require("express");
 const path = require("path");
-const papa = require("papaparse");
 const session = require("express-session");
 const passport = require("./config/passport");
 const app = express();
 const models = require("./sequelizeDatabase/modelSetup");
 const SessionStore = require("express-session-sequelize")(session.Store);
+
 import BackendProcessing from "./backend-processing";
 
 const port = process.env.PORT || 5000;
@@ -24,6 +24,10 @@ app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+app.get("/test", (req, res) => {
+  res.sendStatus(200);
+});
 
 app.post("/signup", async (req, res) => {
   const be = new BackendProcessing();
@@ -368,3 +372,5 @@ app.delete("/history", (req, res) => {
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
+
+export default app;
