@@ -1,13 +1,14 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
-const passport = require("./config/passport");
+// const passport = require("./config/passport");
 const models = require("./sequelizeDatabase/modelSetup");
 const SessionStore = require("express-session-sequelize")(session.Store);
-const app = require("./routes");
+import { app, Passport } from "./app";
 
 const port = process.env.PORT || 5000;
 
+models.sequelize.connect();
 app.use(express.json());
 app.use(
   session({
@@ -17,12 +18,10 @@ app.use(
     saveUninitialized: false
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(Passport.initialize());
+app.use(Passport.session());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
-
-app.use("/", router);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));

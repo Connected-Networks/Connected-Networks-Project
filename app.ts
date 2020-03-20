@@ -1,5 +1,5 @@
 import BackendProcessing from "./backend-processing";
-const passport = require("./config/passport");
+import Passport from "./config/passport";
 const express = require("express");
 const app = express();
 
@@ -38,7 +38,7 @@ app.get("/users", (req, res) => {
   });
 });
 
-app.post("/login", passport.authenticate("local"), (req, res) => {
+app.post("/login", Passport.authenticate("local"), (req, res) => {
   res.json({ username: req.user.Username });
 });
 
@@ -347,4 +347,4 @@ app.delete("/history", (req, res) => {
   //delete History
 });
 
-module.exports = app;
+export { app, Passport };

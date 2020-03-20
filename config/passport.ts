@@ -31,4 +31,4 @@ passport.deserializeUser((user, done) => {
 
 passport.use(strategy);
 
-module.exports = passport;
+export default passport;
