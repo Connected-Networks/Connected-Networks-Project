@@ -2,6 +2,8 @@ import BackendProcessing from "./backend-processing";
 import Passport from "./config/passport";
 const express = require("express");
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/test", (req, res) => {
   res.sendStatus(200);
@@ -13,14 +15,17 @@ app.post("/signup", async (req, res) => {
 
   if (await be.emailIsTaken(email)) {
     res.sendStatus(409); //TODO: Add error message
+    return;
   }
 
-  if (await be.usernameIsTaken(email)) {
+  if (await be.usernameIsTaken(username)) {
     res.sendStatus(409); //TODO: Add a different error message
+    return;
   }
 
   if (!be.emailIsValid(email) || !be.passwordIsValid(password)) {
     res.sendStatus(406);
+    return;
   }
 
   be.insertUser(email, username, password)

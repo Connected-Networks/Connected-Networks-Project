@@ -1,15 +1,29 @@
 require("mysql2/node_modules/iconv-lite").encodingExists("foo");
-import * as supertest from "supertest";
-import BackendProcessing from "../backend-processing";
 jest.mock("../backend-processing");
-const app = require("../routes");
-const request = supertest(app);
+import { app } from "../app";
+import BackendProcessing from "../backend-processing";
+import * as supertest from "supertest";
 
 describe("Authentication", () => {
-  it("should check that credentials are not taken or invalid before inserting user in Signup", done => {
-    request.get("/test").then(response => {
-      expect(response.status).toEqual(200);
-      done();
-    });
+  const mockedBackendProcessing = BackendProcessing as jest.Mock<BackendProcessing>;
+  const request = supertest(app);
+
+  // beforeEach(() => {
+  //   mockedBackendProcessing.mockClear();
+  // });
+
+  it("should check that credentials are not taken before inserting user in Signup", async () => {
+    const mockEmail = "mock@test.com";
+    const mockPassword = "12345678";
+    const mockUsername = "TestUser";
+    await request.post("/signup").send({ email: mockEmail, username: mockUsername, password: mockPassword });
+
+    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+
+    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledWith(mockEmail);
+
+    expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledWith(mockUsername);
   });
 });
