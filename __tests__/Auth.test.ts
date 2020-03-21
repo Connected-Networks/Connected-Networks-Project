@@ -84,4 +84,26 @@ describe("Signup", () => {
     expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledTimes(1);
     expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledWith(mockUsername);
   });
+
+  it("should insert user and return 200 if credentials are satisfactory", async () => {
+    const mockEmail = "mock@test.com";
+    const mockPassword = "1234567";
+    const mockUsername = "TestUser";
+
+    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
+    jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
+
+    jest.spyOn(BackendProcessing.prototype, "insertUser").mockResolvedValue();
+
+    const response = await request.post("/signup").send({ email: mockEmail, username: mockUsername, password: mockPassword });
+
+    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+
+    expect(response.status).toBe(200);
+
+    expect(mockedBackendProcessingInstance.insertUser).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.insertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
+  });
 });
