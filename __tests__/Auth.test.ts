@@ -1,13 +1,12 @@
-require("mysql2/node_modules/iconv-lite").encodingExists("foo");
 import { app } from "../app";
-jest.mock("../backend-processing");
-import BackendProcessing from "../backend-processing";
 import * as supertest from "supertest";
+jest.mock("../backend-processing"); //You need to mock before importing BackendProcessing since it runs some code on import
+import BackendProcessing from "../backend-processing";
+
+const mockedBackendProcessing = BackendProcessing as jest.Mock<BackendProcessing>;
+const request = supertest(app);
 
 describe("Signup", () => {
-  const mockedBackendProcessing = BackendProcessing as jest.Mock<BackendProcessing>;
-  const request = supertest(app);
-
   it("should return 406 if email is invalid", async () => {
     const mockEmail = "mock@test.com";
     const mockPassword = "1234567";
