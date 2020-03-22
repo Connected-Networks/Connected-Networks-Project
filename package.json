@@ -7,7 +7,8 @@
     "start": "ts-node server.ts",
     "heroku-postbuild": "cd client && npm install && npm run build",
     "dev": "ts-node-dev server.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "npm test -- --coverage"
   },
   "jest": {
     "preset": "ts-jest",
