@@ -1,10 +1,10 @@
-import { app } from "../app";
 import * as supertest from "supertest";
-jest.mock("../backend-processing"); //You need to mock before importing BackendProcessing since it runs some code on import
-import BackendProcessing from "../backend-processing";
+jest.mock("../../backend-processing"); //You need to mock before importing BackendProcessing since it runs some code on import
+import BackendProcessing from "../../backend-processing";
+import { app } from "../../app";
 
-const mockedBackendProcessing = BackendProcessing as jest.Mock<BackendProcessing>;
 const request = supertest(app);
+const mockedBackendProcessing = BackendProcessing as jest.Mock<BackendProcessing>;
 
 describe("Signup", () => {
   it("should return 406 if email is invalid", async () => {
