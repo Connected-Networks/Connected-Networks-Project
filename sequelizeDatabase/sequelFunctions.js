@@ -18,6 +18,11 @@ getAllIndividuals = () => {
     })
     .catch(err => console.error(err));
 };
+getAllIndividualsOfUser = userID => {
+  return new Promise((resolve, reject) => {
+    models.Funds.Individual;
+  });
+};
 getAllCompanies = () => {
   return models.Companies.findAll()
     .then(companies => {

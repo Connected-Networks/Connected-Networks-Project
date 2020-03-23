@@ -30,14 +30,16 @@ interface DisplayHistory {
   start: string;
   end: string;
 }
+interface SimpleUser {
+  id: number;
+  username: string;
+}
 
 export default class BackendProcessing {
-
-  processRawCSV(data: string,fileName:string,userID) {
+  processRawCSV(data: string, fileName: string, userID) {
     //First line is commented and ignored
     //Second line is treated as header
 
-    
     let fundName = fileName;
 
     var results = papa.parse("#" + data, {
@@ -108,7 +110,7 @@ export default class BackendProcessing {
     );
   }
 
-  retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {
+  retrievePeopleFromDatabase(userID): Promise<DisplayPerson[]> {
     return new Promise<DisplayPerson[]>((resolve, reject) => {
       database.getAllIndividuals().then(individuals => {
         resolve(
@@ -555,6 +557,22 @@ export default class BackendProcessing {
         })
         .catch(error => {
           resolve(false);
+        });
+    });
+  }
+
+  getOtherUsers(currentUserID) {
+    return new Promise<SimpleUser[]>((resolve, reject) => {
+      database
+        .getAllUsers()
+        .then(users => {
+          let filteredList = users.filter(user => {
+            return user.UserID == currentUserID;
+          });
+          resolve(filteredList);
+        })
+        .catch(error => {
+          reject(error);
         });
     });
   }

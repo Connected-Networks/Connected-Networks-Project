@@ -79,17 +79,18 @@ app.post("/logout", (req, res) => {
   }
 });
 
+//Returns all users except the current user
 app.get("/users", (req, res) => {
-  //Todo for Aaron: Get all users except the current user using the User object defined in LoginPage, and return the results in
-  //an array
-
-  //Temp
-  const users = [
-    { id: 0, username: "user2" },
-    { id: 1, username: "user3" },
-    { id: 2, username: "user4" }
-  ];
-  res.json({ users });
+  let userID = req.user.UserID;
+  let be = new BackendProcessing();
+  be.getOtherUsers(userID)
+    .then(users => {
+      res.json({ users });
+    })
+    .catch(error => {
+      console.error("An error occurred while retrieving users");
+      console.error(error);
+    });
 });
 
 app.post("/shareFund", (req, res) => {
@@ -114,7 +115,7 @@ app.post("/csv", (req, res) => {
     let fileName = req.body.fileName;
     let userID = req.user.UserID;
     let be = new BackendProcessing();
-    be.processRawCSV(data,fileName,userID).then(results => {
+    be.processRawCSV(data, fileName, userID).then(results => {
       res.sendStatus(200);
     });
   } catch (error) {
@@ -126,7 +127,7 @@ app.get("/people", (req, res) => {
   try {
     let userID = req.user.UserID;
     let be = new BackendProcessing();
-    let data = be.retrievePeopleFromDatabase().then(results => {
+    let data = be.retrievePeopleFromDatabase(userID).then(results => {
       if (!results) {
         res.sendStatus(500);
       } else {
