@@ -20,7 +20,26 @@ getAllIndividuals = () => {
 };
 getAllIndividualsOfUser = userID => {
   return new Promise((resolve, reject) => {
-    models.Funds.Individual;
+    models.Funds.findAll({
+      where: { UserID: userID }
+    }).then(originalFundResults => {
+      models.SharedFunds.findAll({
+        where: { UserID: userID }
+      }).then(sharedFundResults => {
+        let oids = originalFundResults.map(x => {
+          return x.FundID;
+        });
+        let sids = sharedFundResults.map(x => {
+          return x.FundID;
+        });
+        let ids = oids.concat(sids);
+        models.Individuals.findAll({
+          where: { FundID: ids }
+        }).then(results => {
+          resolve(results);
+        });
+      });
+    });
   });
 };
 getAllCompanies = () => {
@@ -596,5 +615,6 @@ module.exports = {
   insertUser,
   getUserById,
   updateEmployeeHistory,
-  sharefund
+  sharefund,
+  getAllIndividualsOfUser
 };

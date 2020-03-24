@@ -112,7 +112,7 @@ export default class BackendProcessing {
 
   retrievePeopleFromDatabase(userID): Promise<DisplayPerson[]> {
     return new Promise<DisplayPerson[]>((resolve, reject) => {
-      database.getAllIndividuals().then(individuals => {
+      database.getAllIndividualsOfUser(userID).then(individuals => {
         resolve(
           Promise.all(
             individuals.map(
