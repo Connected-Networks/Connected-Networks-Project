@@ -11,4 +11,24 @@ describe("Logout", () => {
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(500);
   });
+
+  it("should destroy session and clear cookies", () => {
+    const mockUsername = "TestUser";
+    const mockDestroy = jest.fn(callback => callback());
+    const mockReq = { user: { Username: mockUsername }, session: { destroy: mockDestroy } };
+
+    const mockSendStatus = jest.fn();
+    const mockClearCookie = jest.fn();
+    const mockRes = { sendStatus: mockSendStatus, clearCookie: mockClearCookie };
+
+    AuthController.logout(mockReq, mockRes);
+
+    expect(mockDestroy).toBeCalledTimes(1);
+
+    expect(mockClearCookie).toBeCalledTimes(1);
+    expect(mockClearCookie).toBeCalledWith("connect.sid");
+
+    expect(mockSendStatus).toBeCalledTimes(1);
+    expect(mockSendStatus).toBeCalledWith(200);
+  });
 });
