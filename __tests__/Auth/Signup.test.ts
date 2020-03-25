@@ -28,23 +28,27 @@ describe("Signup", () => {
     expect(mockSendStatus).toBeCalledWith(406);
   });
 
-  // it("should return 406 if password is invalid", async () => {
-  //   const mockEmail = "mock@test.com";
-  //   const mockPassword = "1234567";
-  //   const mockUsername = "TestUser";
+  it("should return 406 if password is invalid", async () => {
+    const mockEmail = "mock@test.com";
+    const mockPassword = "1234567";
+    const mockUsername = "TestUser";
+    const mockReq = { body: { email: mockEmail, username: mockUsername, password: mockPassword } };
 
-  //   jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-  //   jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(false);
+    const mockSendStatus = jest.fn();
+    const mockRes = { sendStatus: mockSendStatus };
 
-  //   const response = await request.post("/signup").send({ email: mockEmail, username: mockUsername, password: mockPassword });
+    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(false);
 
-  //   const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+    AuthController.signup(mockReq, mockRes);
 
-  //   expect(response.status).toBe(406);
+    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+    expect(mockedBackendProcessingInstance.passwordIsValid).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.passwordIsValid).toBeCalledWith(mockPassword);
 
-  //   expect(mockedBackendProcessingInstance.passwordIsValid).toBeCalledTimes(1);
-  //   expect(mockedBackendProcessingInstance.passwordIsValid).toBeCalledWith(mockPassword);
-  // });
+    expect(mockSendStatus).toBeCalledTimes(1);
+    expect(mockSendStatus).toBeCalledWith(406);
+  });
 
   // it("should return 409 if email is taken", async () => {
   //   const mockEmail = "mock@test.com";
