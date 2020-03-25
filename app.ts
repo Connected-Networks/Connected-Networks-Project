@@ -25,16 +25,7 @@ app.get("/user", (req, res) => {
   }
 });
 
-app.post("/logout", (req, res) => {
-  if (req.user) {
-    req.session.destroy(() => {
-      res.clearCookie("connect.sid");
-      res.sendStatus(200);
-    });
-  } else {
-    res.sendStatus(500);
-  }
-});
+app.post("/logout", AuthController.logout);
 
 app.get("/users", (req, res) => {
   //Todo for Aaron: Get all users except the current user using the User object defined in LoginPage, and return the results in

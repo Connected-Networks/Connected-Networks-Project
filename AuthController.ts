@@ -31,4 +31,15 @@ export default class AuthController {
   static handleLoginSuccess = (req, res) => {
     res.json({ username: req.user.Username });
   };
+
+  static logout = (req, res) => {
+    if (req.user) {
+      req.session.destroy(() => {
+        res.clearCookie("connect.sid");
+        res.sendStatus(200);
+      });
+    } else {
+      res.sendStatus(500);
+    }
+  };
 }
