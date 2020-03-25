@@ -8,6 +8,7 @@
     "heroku-postbuild": "cd client && npm install && npm run build",
     "dev": "ts-node-dev server.ts",
     "test": "jest",
+    "test:watch": "npm test -- --watch",
     "test:coverage": "npm test -- --coverage"
   },
   "jest": {
