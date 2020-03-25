@@ -27,4 +27,8 @@ export default class AuthController {
         res.sendStatus(500);
       });
   };
+
+  static handleLoginSuccess = (req, res) => {
+    res.json({ username: req.user.Username });
+  };
 }

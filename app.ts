@@ -15,9 +15,7 @@ app.get("/users", (req, res) => {
   });
 });
 
-app.post("/login", Passport.authenticate("local"), (req, res) => {
-  res.json({ username: req.user.Username });
-});
+app.post("/login", Passport.authenticate("local"), AuthController.handleLoginSuccess);
 
 app.get("/user", (req, res) => {
   if (req.user) {
