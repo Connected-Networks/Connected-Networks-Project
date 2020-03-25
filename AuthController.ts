@@ -30,7 +30,7 @@ export default class AuthController {
   }
 
   static handleLoginSuccess(req, res) {
-    res.json({ username: req.user.Username });
+    res.send({ username: req.user.Username });
   }
 
   static logout(req, res) {
