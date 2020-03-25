@@ -99,25 +99,29 @@ describe("Signup", () => {
     expect(mockSendStatus).toBeCalledWith(409);
   });
 
-  // it("should insert user and return 200 if credentials are satisfactory", async () => {
-  //   const mockEmail = "mock@test.com";
-  //   const mockPassword = "1234567";
-  //   const mockUsername = "TestUser";
+  it("should insert user and return 200 if credentials are satisfactory", async () => {
+    const mockEmail = "mock@test.com";
+    const mockPassword = "1234567";
+    const mockUsername = "TestUser";
+    const mockReq = { body: { email: mockEmail, username: mockUsername, password: mockPassword } };
 
-  //   jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-  //   jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
-  //   jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
-  //   jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
+    const mockSendStatus = jest.fn();
+    const mockRes = { sendStatus: mockSendStatus };
 
-  //   jest.spyOn(BackendProcessing.prototype, "insertUser").mockResolvedValue();
+    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
+    jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
 
-  //   const response = await request.post("/signup").send({ email: mockEmail, username: mockUsername, password: mockPassword });
+    jest.spyOn(BackendProcessing.prototype, "insertUser").mockResolvedValue();
 
-  //   const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+    await AuthController.signup(mockReq, mockRes);
 
-  //   expect(response.status).toBe(200);
+    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+    expect(mockedBackendProcessingInstance.insertUser).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.insertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
 
-  //   expect(mockedBackendProcessingInstance.insertUser).toBeCalledTimes(1);
-  //   expect(mockedBackendProcessingInstance.insertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
-  // });
+    expect(mockSendStatus).toBeCalledTimes(1);
+    expect(mockSendStatus).toBeCalledWith(200);
+  });
 });
