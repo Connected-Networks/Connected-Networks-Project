@@ -1,4 +1,3 @@
-import * as supertest from "supertest";
 jest.mock("../../backend-processing"); //You need to mock before importing BackendProcessing since it runs some code on import
 import BackendProcessing from "../../backend-processing";
 import AuthController from "../../AuthController";
@@ -123,5 +122,31 @@ describe("Signup", () => {
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(200);
+  });
+
+  it("should return 500 if something went wrong while inserting user", async () => {
+    const mockEmail = "mock@test.com";
+    const mockPassword = "1234567";
+    const mockUsername = "TestUser";
+    const mockReq = { body: { email: mockEmail, username: mockUsername, password: mockPassword } };
+
+    const mockSendStatus = jest.fn();
+    const mockRes = { sendStatus: mockSendStatus };
+
+    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
+    jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
+
+    jest.spyOn(BackendProcessing.prototype, "insertUser").mockImplementation(() => Promise.reject(new Error("Mock error")));
+
+    await AuthController.signup(mockReq, mockRes);
+
+    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+    expect(mockedBackendProcessingInstance.insertUser).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.insertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
+
+    expect(mockSendStatus).toBeCalledTimes(1);
+    expect(mockSendStatus).toBeCalledWith(500);
   });
 });
