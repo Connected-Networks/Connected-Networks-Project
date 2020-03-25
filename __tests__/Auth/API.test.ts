@@ -51,4 +51,35 @@ describe("API", () => {
     expect(passedReq.body.username).toBe(mockUsername);
     expect(passedReq.body.password).toBe(mockPassword);
   });
+
+  it("should call AuthController.handleLoginSuccess as success callback for passport.authenticate for ./login", async () => {
+    let passportReq, passportRes;
+    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => (req, res, next) => {
+      passportReq = req;
+      passportRes = res;
+      next();
+    });
+    const mockHandleLoginSuccess = jest
+      .spyOn(AuthController, "handleLoginSuccess")
+      .mockImplementation((req, res) => res.sendStatus(200));
+
+    let app;
+    jest.isolateModules(() => {
+      app = require("../../app").app;
+    });
+    const request = supertest(app);
+
+    const mockUsername = "TestUser";
+    const mockPassword = "1234567";
+    await request.post("/login").send({ username: mockUsername, password: mockPassword });
+
+    expect(Passport.authenticate).toBeCalledTimes(1);
+    expect(Passport.authenticate).toBeCalledWith("local");
+
+    expect(mockHandleLoginSuccess).toBeCalledTimes(1);
+    const passedReq = mockHandleLoginSuccess.mock.calls[0][0];
+    const passedRes = mockHandleLoginSuccess.mock.calls[0][1];
+    expect(passedReq).toBe(passedReq);
+    expect(passedRes).toBe(passedRes);
+  });
 });
