@@ -1,7 +1,7 @@
 import BackendProcessing from "./backend-processing";
 
 export default class AuthController {
-  static signup = async (req, res) => {
+  static async signup(req, res) {
     const be = new BackendProcessing();
     const { email, username, password } = req.body;
 
@@ -26,13 +26,13 @@ export default class AuthController {
         console.log(error);
         res.sendStatus(500);
       });
-  };
+  }
 
-  static handleLoginSuccess = (req, res) => {
+  static handleLoginSuccess(req, res) {
     res.json({ username: req.user.Username });
-  };
+  }
 
-  static logout = (req, res) => {
+  static logout(req, res) {
     if (req.user) {
       req.session.destroy(() => {
         res.clearCookie("connect.sid");
@@ -41,5 +41,5 @@ export default class AuthController {
     } else {
       res.sendStatus(500);
     }
-  };
+  }
 }
