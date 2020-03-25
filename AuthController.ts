@@ -11,7 +11,7 @@ export default class AuthController {
     }
 
     if (await be.emailIsTaken(email)) {
-      res.sendStatus(409); //TODO: Add error message
+      res.sendStatus(409);
       return;
     }
 

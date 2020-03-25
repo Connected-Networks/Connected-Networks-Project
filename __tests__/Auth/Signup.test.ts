@@ -18,7 +18,7 @@ describe("Signup", () => {
     jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(false);
     jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
 
-    AuthController.signup(mockReq, mockRes);
+    await AuthController.signup(mockReq, mockRes);
 
     const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
     expect(mockedBackendProcessingInstance.emailIsValid).toBeCalledTimes(1);
@@ -40,7 +40,7 @@ describe("Signup", () => {
     jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
     jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(false);
 
-    AuthController.signup(mockReq, mockRes);
+    await AuthController.signup(mockReq, mockRes);
 
     const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
     expect(mockedBackendProcessingInstance.passwordIsValid).toBeCalledTimes(1);
@@ -50,25 +50,29 @@ describe("Signup", () => {
     expect(mockSendStatus).toBeCalledWith(406);
   });
 
-  // it("should return 409 if email is taken", async () => {
-  //   const mockEmail = "mock@test.com";
-  //   const mockPassword = "1234567";
-  //   const mockUsername = "TestUser";
+  it("should return 409 if email is taken", async () => {
+    const mockEmail = "mock@test.com";
+    const mockPassword = "1234567";
+    const mockUsername = "TestUser";
+    const mockReq = { body: { email: mockEmail, username: mockUsername, password: mockPassword } };
 
-  //   jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-  //   jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    const mockSendStatus = jest.fn();
+    const mockRes = { sendStatus: mockSendStatus };
 
-  //   jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(true);
+    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
 
-  //   const response = await request.post("/signup").send({ email: mockEmail, username: mockUsername, password: mockPassword });
+    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(true);
 
-  //   const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+    await AuthController.signup(mockReq, mockRes);
 
-  //   expect(response.status).toBe(409);
+    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
+    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledWith(mockEmail);
 
-  //   expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledTimes(1);
-  //   expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledWith(mockEmail);
-  // });
+    expect(mockSendStatus).toBeCalledTimes(1);
+    expect(mockSendStatus).toBeCalledWith(409);
+  });
 
   // it("should return 409 if username is taken", async () => {
   //   const mockEmail = "mock@test.com";
