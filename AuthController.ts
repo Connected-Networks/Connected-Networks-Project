@@ -20,12 +20,13 @@ export default class AuthController {
       return;
     }
 
-    be.insertUser(email, username, password)
-      .then(() => res.sendStatus(200))
-      .catch(error => {
-        console.log(error);
-        res.sendStatus(500);
-      });
+    try {
+      await be.insertUser(email, username, password);
+      res.sendStatus(200);
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
   }
 
   static handleLoginSuccess(req, res) {
