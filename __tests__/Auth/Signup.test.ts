@@ -92,8 +92,8 @@ describe("Signup", () => {
     await AuthController.signup(mockReq, mockRes);
 
     const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
-    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledTimes(1);
-    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledWith(mockEmail);
+    expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledTimes(1);
+    expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledWith(mockUsername);
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(409);
