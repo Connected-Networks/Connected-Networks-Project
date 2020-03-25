@@ -82,4 +82,20 @@ describe("API", () => {
     expect(passedReq).toBe(passedReq);
     expect(passedRes).toBe(passedRes);
   });
+
+  it("should call AuthController.logout for ./logout", async () => {
+    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => jest.fn()); //Not needed for testing just added so the code compiles
+
+    const mockLogout = jest.spyOn(AuthController, "logout").mockImplementation((req, res) => res.sendStatus(200));
+
+    let app;
+    jest.isolateModules(() => {
+      app = require("../../app").app;
+    });
+    const request = supertest(app);
+
+    await request.post("/logout");
+
+    expect(mockLogout).toBeCalledTimes(1);
+  });
 });
