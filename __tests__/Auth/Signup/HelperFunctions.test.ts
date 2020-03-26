@@ -70,61 +70,94 @@ describe("passwordIsValid", () => {
     const testPassword = undefined;
     expect(AuthController.passwordIsValid(testPassword)).toBe(false);
   });
+});
 
-  describe("usernameIsTaken", () => {
-    const database = require("../../../sequelizeDatabase/sequelFunctions");
-    it("should call database.getUserByUsername", async () => {
-      const mockGetUserByUsername = jest.fn();
-      database.getUserByUsername = mockGetUserByUsername;
+describe("usernameIsTaken", () => {
+  const database = require("../../../sequelizeDatabase/sequelFunctions");
+  it("should call database.getUserByUsername", async () => {
+    const mockGetUserByUsername = jest.fn();
+    database.getUserByUsername = mockGetUserByUsername;
 
-      const mockUsername = "TestUser";
-      await AuthController.usernameIsTaken(mockUsername);
+    const mockUsername = "TestUser";
+    await AuthController.usernameIsTaken(mockUsername);
 
-      expect(mockGetUserByUsername).toBeCalledTimes(1);
-      expect(mockGetUserByUsername).toBeCalledWith(mockUsername);
-    });
-
-    it("should return false if database return null", async () => {
-      const mockGetUserByUsername = jest.fn().mockResolvedValue(null);
-      database.getUserByUsername = mockGetUserByUsername;
-
-      const mockUsername = "TestUser";
-      expect(await AuthController.usernameIsTaken(mockUsername)).toBe(false);
-    });
-
-    it("should return true if database return a user object", async () => {
-      const mockUsername = "TestUser";
-      const mockGetUserByUsername = jest.fn().mockResolvedValue({ username: mockUsername });
-      database.getUserByUsername = mockGetUserByUsername;
-
-      expect(await AuthController.usernameIsTaken(mockUsername)).toBe(true);
-    });
+    expect(mockGetUserByUsername).toBeCalledTimes(1);
+    expect(mockGetUserByUsername).toBeCalledWith(mockUsername);
   });
 
-  describe("emailIsTaken", () => {
+  it("should return false if database return null", async () => {
+    const mockGetUserByUsername = jest.fn().mockResolvedValue(null);
+    database.getUserByUsername = mockGetUserByUsername;
+
+    const mockUsername = "TestUser";
+    expect(await AuthController.usernameIsTaken(mockUsername)).toBe(false);
+  });
+
+  it("should return true if database return a user object", async () => {
+    const mockUsername = "TestUser";
+    const mockGetUserByUsername = jest.fn().mockResolvedValue({ username: mockUsername });
+    database.getUserByUsername = mockGetUserByUsername;
+
+    expect(await AuthController.usernameIsTaken(mockUsername)).toBe(true);
+  });
+});
+
+describe("emailIsTaken", () => {
+  const database = require("../../../sequelizeDatabase/sequelFunctions");
+  it("should call database.emailIsTaken", async () => {
+    database.getUserByEmail = jest.fn();
+
+    const mockEmail = "TestUser";
+    await AuthController.emailIsTaken(mockEmail);
+
+    expect(database.getUserByEmail).toBeCalledTimes(1);
+    expect(database.getUserByEmail).toBeCalledWith(mockEmail);
+  });
+
+  it("should return false if database return null", async () => {
+    database.getUserByEmail = jest.fn().mockResolvedValue(null);
+
+    const mockEmail = "TestUser";
+    expect(await AuthController.emailIsTaken(mockEmail)).toBe(false);
+  });
+
+  it("should return true if database return a user object", async () => {
+    const mockEmail = "TestUser";
+    database.getUserByEmail = jest.fn().mockResolvedValue({ email: mockEmail });
+
+    expect(await AuthController.emailIsTaken(mockEmail)).toBe(true);
+  });
+});
+
+describe("insertUser", () => {
+  const bcrypt = require("bcryptjs");
+  it("should hash password", async () => {
+    bcrypt.hashSync = jest.fn();
+
+    const mockEmail = "mock@test.com";
+    const mockPassword = "1234567";
+    const mockUsername = "TestUser";
+    await AuthController.insertUser(mockEmail, mockUsername, mockPassword);
+
+    expect(bcrypt.hashSync).toBeCalledTimes(1);
+    const passedPassword = bcrypt.hashSync.mock.calls[0][0];
+    expect(passedPassword).toBe(mockPassword);
+  });
+
+  it("should call database.insertUser", async () => {
     const database = require("../../../sequelizeDatabase/sequelFunctions");
-    it("should call database.emailIsTaken", async () => {
-      database.getUserByEmail = jest.fn();
 
-      const mockEmail = "TestUser";
-      await AuthController.emailIsTaken(mockEmail);
+    const mockHashedPassword = "HashedPassword";
+    bcrypt.hashSync = jest.fn().mockImplementation((password: string) => mockHashedPassword);
 
-      expect(database.getUserByEmail).toBeCalledTimes(1);
-      expect(database.getUserByEmail).toBeCalledWith(mockEmail);
-    });
+    database.insertUser = jest.fn();
 
-    it("should return false if database return null", async () => {
-      database.getUserByEmail = jest.fn().mockResolvedValue(null);
+    const mockEmail = "mock@test.com";
+    const mockPassword = "1234567";
+    const mockUsername = "TestUser";
+    await AuthController.insertUser(mockEmail, mockUsername, mockPassword);
 
-      const mockEmail = "TestUser";
-      expect(await AuthController.emailIsTaken(mockEmail)).toBe(false);
-    });
-
-    it("should return true if database return a user object", async () => {
-      const mockEmail = "TestUser";
-      database.getUserByEmail = jest.fn().mockResolvedValue({ email: mockEmail });
-
-      expect(await AuthController.emailIsTaken(mockEmail)).toBe(true);
-    });
+    expect(database.insertUser).toBeCalledTimes(1);
+    expect(database.insertUser).toBeCalledWith(mockUsername, mockHashedPassword, mockEmail);
   });
 });

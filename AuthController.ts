@@ -51,14 +51,9 @@ export default class AuthController {
     return user !== null;
   }
 
-  static insertUser(email: string, username: string, password: string) {
-    return new Promise<void>((resolve, reject) => {
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      database
-        .insertUser(username, hashedPassword, email)
-        .then(() => resolve())
-        .catch(() => reject());
-    });
+  static async insertUser(email: string, username: string, password: string) {
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    await database.insertUser(username, hashedPassword, email);
   }
 
   static handleLoginSuccess(req, res) {
