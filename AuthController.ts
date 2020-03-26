@@ -1,10 +1,8 @@
 const database = require("./sequelizeDatabase/sequelFunctions");
 const bcrypt = require("bcryptjs");
-import BackendProcessing from "./backend-processing";
 
 export default class AuthController {
   static async signup(req, res) {
-    const be = new BackendProcessing();
     const { email, username, password } = req.body;
 
     if (!this.emailIsValid(email) || !this.passwordIsValid(password)) {
