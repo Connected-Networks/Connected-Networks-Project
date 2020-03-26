@@ -98,4 +98,20 @@ describe("API", () => {
 
     expect(mockLogout).toBeCalledTimes(1);
   });
+
+  it("should call AuthController.getCurrentUser for ./user", async () => {
+    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => jest.fn()); //Not needed for testing just added so the code compiles
+
+    const mockGetCurrentUser = jest.spyOn(AuthController, "getCurrentUser").mockImplementation((req, res) => res.sendStatus(200));
+
+    let app;
+    jest.isolateModules(() => {
+      app = require("../../app").app;
+    });
+    const request = supertest(app);
+
+    await request.get("/user");
+
+    expect(mockGetCurrentUser).toBeCalledTimes(1);
+  });
 });
