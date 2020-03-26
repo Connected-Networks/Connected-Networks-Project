@@ -2,29 +2,34 @@ const database = require("../sequelizeDatabase/sequelFunctions");
 const bcrypt = require("bcryptjs");
 
 export default class PassportController {
-  static localStrategy(username, password, done) {
-    database
-      .getUserByUsername(username)
-      .then(user => {
-        if (bcrypt.compareSync(user.Password, password)) {
-          return done(null, false, { message: "Incorrect password" });
-        }
+  static async localStrategy(username, password, done) {
+    try {
+      const user = await database.getUserByUsername(username);
 
-        return done(null, user);
-      })
-      .catch(err => {
-        return done(err);
-      });
+      if (user === null) {
+        return done(null, false, { message: "No user found" });
+      }
+
+      if (!bcrypt.compareSync(user.Password, password)) {
+        return done(null, false, { message: "Incorrect password" });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
   }
 
   static serializeUser(user, done) {
     done(null, { id: user.UserID });
   }
 
-  static deserializeUser(user, done) {
-    database
-      .getUserById(user.id)
-      .then(user => done(null, user))
-      .catch(err => done(err));
+  static async deserializeUser(user, done) {
+    try {
+      const foundUser = await database.getUserById(user.id);
+      done(null, foundUser);
+    } catch (err) {
+      done(err);
+    }
   }
 }
