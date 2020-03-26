@@ -10,7 +10,7 @@ export default class PassportController {
         return done(null, false, { message: "No user found" });
       }
 
-      if (!bcrypt.compareSync(user.Password, password)) {
+      if (!(await bcrypt.compareSync(password, user.Password))) {
         return done(null, false, { message: "Incorrect password" });
       }
 
