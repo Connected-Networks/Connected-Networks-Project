@@ -1,7 +1,7 @@
-jest.mock("../../backend-processing");
-jest.mock("../../sequelizeDatabase/sequelFunctions");
+jest.mock("../../../backend-processing");
+jest.mock("../../../sequelizeDatabase/sequelFunctions");
 jest.mock("bcryptjs");
-import AuthController from "../../AuthController";
+import AuthController from "../../../AuthController";
 
 describe("Signup", () => {
   it("should return 406 if email is invalid", async () => {
