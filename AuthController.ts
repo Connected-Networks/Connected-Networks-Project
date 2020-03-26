@@ -43,4 +43,12 @@ export default class AuthController {
       res.sendStatus(500);
     }
   }
+
+  static getCurrentUser(req, res) {
+    if (req.user) {
+      res.json({ username: req.user.Username });
+    } else {
+      res.sendStatus(401);
+    }
+  }
 }
