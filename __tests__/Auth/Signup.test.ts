@@ -1,5 +1,6 @@
 jest.mock("../../backend-processing"); //You need to mock before importing BackendProcessing since it runs some code on import
 import BackendProcessing from "../../backend-processing";
+jest.mock("../../sequelizeDatabase/sequelFunctions");
 import AuthController from "../../AuthController";
 
 const mockedBackendProcessing = BackendProcessing as jest.Mock<BackendProcessing>;
@@ -19,7 +20,6 @@ describe("Signup", () => {
 
     await AuthController.signup(mockReq, mockRes);
 
-    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
     expect(mockEmailIsValid).toBeCalledTimes(1);
     expect(mockEmailIsValid).toBeCalledWith(mockEmail);
 
@@ -41,7 +41,6 @@ describe("Signup", () => {
 
     await AuthController.signup(mockReq, mockRes);
 
-    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
     expect(mockPasswordIsValid).toBeCalledTimes(1);
     expect(mockPasswordIsValid).toBeCalledWith(mockPassword);
 
@@ -61,13 +60,12 @@ describe("Signup", () => {
     jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
     jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
 
-    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(true);
+    const mockEmailIsTaken = jest.spyOn(AuthController, "emailIsTaken").mockResolvedValue(true);
 
     await AuthController.signup(mockReq, mockRes);
 
-    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
-    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledTimes(1);
-    expect(mockedBackendProcessingInstance.emailIsTaken).toBeCalledWith(mockEmail);
+    expect(mockEmailIsTaken).toBeCalledTimes(1);
+    expect(mockEmailIsTaken).toBeCalledWith(mockEmail);
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(409);
@@ -84,15 +82,14 @@ describe("Signup", () => {
 
     jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
     jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
+    jest.spyOn(AuthController, "emailIsTaken").mockResolvedValue(false);
 
-    jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(true);
+    const mockUsernameIsTaken = jest.spyOn(AuthController, "usernameIsTaken").mockResolvedValue(true);
 
     await AuthController.signup(mockReq, mockRes);
 
-    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
-    expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledTimes(1);
-    expect(mockedBackendProcessingInstance.usernameIsTaken).toBeCalledWith(mockUsername);
+    expect(mockUsernameIsTaken).toBeCalledTimes(1);
+    expect(mockUsernameIsTaken).toBeCalledWith(mockUsername);
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(409);
@@ -109,8 +106,8 @@ describe("Signup", () => {
 
     jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
     jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
-    jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
+    jest.spyOn(AuthController, "emailIsTaken").mockResolvedValue(false);
+    jest.spyOn(AuthController, "usernameIsTaken").mockResolvedValue(false);
 
     jest.spyOn(BackendProcessing.prototype, "insertUser").mockResolvedValue();
 
@@ -135,8 +132,8 @@ describe("Signup", () => {
 
     jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
     jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
-    jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
+    jest.spyOn(AuthController, "emailIsTaken").mockResolvedValue(false);
+    jest.spyOn(AuthController, "usernameIsTaken").mockResolvedValue(false);
 
     jest.spyOn(BackendProcessing.prototype, "insertUser").mockImplementation(() => Promise.reject(new Error("Mock error")));
     console.log = jest.fn();

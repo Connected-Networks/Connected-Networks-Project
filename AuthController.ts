@@ -1,4 +1,5 @@
 import BackendProcessing from "./backend-processing";
+const database = require("./sequelizeDatabase/sequelFunctions");
 
 export default class AuthController {
   static async signup(req, res) {
@@ -10,12 +11,12 @@ export default class AuthController {
       return;
     }
 
-    if (await be.emailIsTaken(email)) {
+    if (await this.emailIsTaken(email)) {
       res.sendStatus(409);
       return;
     }
 
-    if (await be.usernameIsTaken(username)) {
+    if (await this.usernameIsTaken(username)) {
       res.sendStatus(409); //TODO: Add a different error message
       return;
     }
@@ -39,6 +40,24 @@ export default class AuthController {
 
   static passwordIsValid(password: string): boolean {
     return password.length >= 6;
+  }
+
+  static usernameIsTaken(username: string) {
+    return new Promise<boolean>(resolve => {
+      database
+        .getUserByUsername(username)
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    });
+  }
+
+  static emailIsTaken(email: string) {
+    return new Promise<boolean>(resolve => {
+      database
+        .getUserByEmail(email)
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    });
   }
 
   static handleLoginSuccess(req, res) {

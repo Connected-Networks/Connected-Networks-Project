@@ -351,24 +351,6 @@ export default class BackendProcessing {
     return null;
   }
 
-  usernameIsTaken(username: string) {
-    return new Promise<boolean>(resolve => {
-      database
-        .getUserByUsername(username)
-        .then(() => resolve(true))
-        .catch(() => resolve(false));
-    });
-  }
-
-  emailIsTaken(email: string) {
-    return new Promise<boolean>(resolve => {
-      database
-        .getUserByEmail(email)
-        .then(() => resolve(true))
-        .catch(() => resolve(false));
-    });
-  }
-
   insertUser(email: string, username: string, password: string) {
     return new Promise<void>((resolve, reject) => {
       const hashedPassword = bcrypt.hashSync(password, 10);
