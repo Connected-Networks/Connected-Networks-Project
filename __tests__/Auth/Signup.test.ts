@@ -14,14 +14,14 @@ describe("Signup", () => {
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
-    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(false);
-    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    const mockEmailIsValid = jest.spyOn(AuthController, "emailIsValid").mockReturnValue(false);
+    const mockPasswordIsValid = jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
 
     await AuthController.signup(mockReq, mockRes);
 
     const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
-    expect(mockedBackendProcessingInstance.emailIsValid).toBeCalledTimes(1);
-    expect(mockedBackendProcessingInstance.emailIsValid).toBeCalledWith(mockEmail);
+    expect(mockEmailIsValid).toBeCalledTimes(1);
+    expect(mockEmailIsValid).toBeCalledWith(mockEmail);
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(406);
@@ -36,14 +36,14 @@ describe("Signup", () => {
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
-    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(false);
+    const mockEmailIsValid = jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
+    const mockPasswordIsValid = jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(false);
 
     await AuthController.signup(mockReq, mockRes);
 
     const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
-    expect(mockedBackendProcessingInstance.passwordIsValid).toBeCalledTimes(1);
-    expect(mockedBackendProcessingInstance.passwordIsValid).toBeCalledWith(mockPassword);
+    expect(mockPasswordIsValid).toBeCalledTimes(1);
+    expect(mockPasswordIsValid).toBeCalledWith(mockPassword);
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(406);
@@ -58,8 +58,8 @@ describe("Signup", () => {
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
-    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
 
     jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(true);
 
@@ -82,8 +82,8 @@ describe("Signup", () => {
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
-    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
     jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
 
     jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(true);
@@ -107,8 +107,8 @@ describe("Signup", () => {
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
-    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
     jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
     jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
 
@@ -133,18 +133,21 @@ describe("Signup", () => {
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
-    jest.spyOn(BackendProcessing.prototype, "emailIsValid").mockReturnValue(true);
-    jest.spyOn(BackendProcessing.prototype, "passwordIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "emailIsValid").mockReturnValue(true);
+    jest.spyOn(AuthController, "passwordIsValid").mockReturnValue(true);
     jest.spyOn(BackendProcessing.prototype, "emailIsTaken").mockResolvedValue(false);
     jest.spyOn(BackendProcessing.prototype, "usernameIsTaken").mockResolvedValue(false);
 
     jest.spyOn(BackendProcessing.prototype, "insertUser").mockImplementation(() => Promise.reject(new Error("Mock error")));
+    console.log = jest.fn();
 
     await AuthController.signup(mockReq, mockRes);
 
     const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
     expect(mockedBackendProcessingInstance.insertUser).toBeCalledTimes(1);
     expect(mockedBackendProcessingInstance.insertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
+
+    expect(console.log).toHaveBeenCalled();
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(500);
