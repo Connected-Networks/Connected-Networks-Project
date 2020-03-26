@@ -38,7 +38,7 @@ export default class AuthController {
   }
 
   static passwordIsValid(password: string): boolean {
-    return password.length >= 6;
+    return password !== undefined && password.length >= 6;
   }
 
   static usernameIsTaken(username: string) {

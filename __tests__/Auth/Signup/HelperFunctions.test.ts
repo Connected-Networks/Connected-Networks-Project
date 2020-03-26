@@ -43,4 +43,31 @@ describe("emailIsValid", () => {
     const testEmail = "";
     expect(AuthController.emailIsValid(testEmail)).toBe(false);
   });
+
+  it("should reject undefined", () => {
+    const testEmail = undefined;
+    expect(AuthController.emailIsValid(testEmail)).toBe(false);
+  });
+});
+
+describe("passwordIsValid", () => {
+  it("should accept passwords longer than 6 characters", () => {
+    const testPassword = "1234567";
+    expect(AuthController.passwordIsValid(testPassword)).toBe(true);
+  });
+
+  it("should accept passwords of length 6 characters", () => {
+    const testPassword = "123456";
+    expect(AuthController.passwordIsValid(testPassword)).toBe(true);
+  });
+
+  it("should reject passwords shorter than 6 characters", () => {
+    const testPassword = "12345";
+    expect(AuthController.passwordIsValid(testPassword)).toBe(false);
+  });
+
+  it("should reject undefined", () => {
+    const testPassword = undefined;
+    expect(AuthController.passwordIsValid(testPassword)).toBe(false);
+  });
 });
