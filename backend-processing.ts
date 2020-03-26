@@ -4,7 +4,6 @@ const denv = require("dotenv").config();
 const mysql = require("mysql");
 const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
-const bcrypt = require("bcryptjs");
 
 interface DisplayPerson {
   id: number;
@@ -349,16 +348,6 @@ export default class BackendProcessing {
     //TODO: complete this function
     //This function will be simpler after the schema changes
     return null;
-  }
-
-  insertUser(email: string, username: string, password: string) {
-    return new Promise<void>((resolve, reject) => {
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      database
-        .insertUser(username, hashedPassword, email)
-        .then(() => resolve())
-        .catch(() => reject());
-    });
   }
 
   //For Testing purposes

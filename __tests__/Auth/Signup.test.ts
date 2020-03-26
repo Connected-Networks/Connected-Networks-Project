@@ -1,6 +1,7 @@
 jest.mock("../../backend-processing"); //You need to mock before importing BackendProcessing since it runs some code on import
 import BackendProcessing from "../../backend-processing";
 jest.mock("../../sequelizeDatabase/sequelFunctions");
+jest.mock("bcryptjs");
 import AuthController from "../../AuthController";
 
 const mockedBackendProcessing = BackendProcessing as jest.Mock<BackendProcessing>;
@@ -109,13 +110,12 @@ describe("Signup", () => {
     jest.spyOn(AuthController, "emailIsTaken").mockResolvedValue(false);
     jest.spyOn(AuthController, "usernameIsTaken").mockResolvedValue(false);
 
-    jest.spyOn(BackendProcessing.prototype, "insertUser").mockResolvedValue();
+    const mockInsertUser = jest.spyOn(AuthController, "insertUser").mockResolvedValue();
 
     await AuthController.signup(mockReq, mockRes);
 
-    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
-    expect(mockedBackendProcessingInstance.insertUser).toBeCalledTimes(1);
-    expect(mockedBackendProcessingInstance.insertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
+    expect(mockInsertUser).toBeCalledTimes(1);
+    expect(mockInsertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
 
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(200);
@@ -135,14 +135,16 @@ describe("Signup", () => {
     jest.spyOn(AuthController, "emailIsTaken").mockResolvedValue(false);
     jest.spyOn(AuthController, "usernameIsTaken").mockResolvedValue(false);
 
-    jest.spyOn(BackendProcessing.prototype, "insertUser").mockImplementation(() => Promise.reject(new Error("Mock error")));
+    const mockInsertUser = jest
+      .spyOn(AuthController, "insertUser")
+      .mockImplementation(() => Promise.reject(new Error("Mock error")));
+
     console.log = jest.fn();
 
     await AuthController.signup(mockReq, mockRes);
 
-    const mockedBackendProcessingInstance = mockedBackendProcessing.mock.instances[0];
-    expect(mockedBackendProcessingInstance.insertUser).toBeCalledTimes(1);
-    expect(mockedBackendProcessingInstance.insertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
+    expect(mockInsertUser).toBeCalledTimes(1);
+    expect(mockInsertUser).toBeCalledWith(mockEmail, mockUsername, mockPassword);
 
     expect(console.log).toHaveBeenCalled();
 

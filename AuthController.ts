@@ -1,5 +1,6 @@
-import BackendProcessing from "./backend-processing";
 const database = require("./sequelizeDatabase/sequelFunctions");
+const bcrypt = require("bcryptjs");
+import BackendProcessing from "./backend-processing";
 
 export default class AuthController {
   static async signup(req, res) {
@@ -22,7 +23,7 @@ export default class AuthController {
     }
 
     try {
-      await be.insertUser(email, username, password);
+      await this.insertUser(email, username, password);
       res.sendStatus(200);
     } catch (error) {
       console.log(error);
@@ -57,6 +58,16 @@ export default class AuthController {
         .getUserByEmail(email)
         .then(() => resolve(true))
         .catch(() => resolve(false));
+    });
+  }
+
+  static insertUser(email: string, username: string, password: string) {
+    return new Promise<void>((resolve, reject) => {
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      database
+        .insertUser(username, hashedPassword, email)
+        .then(() => resolve())
+        .catch(() => reject());
     });
   }
 
