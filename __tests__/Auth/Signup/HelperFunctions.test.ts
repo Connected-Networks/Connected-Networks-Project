@@ -8,4 +8,9 @@ describe("emailIsValid", () => {
     const testEmail = "something@something.com";
     expect(AuthController.emailIsValid(testEmail)).toBe(true);
   });
+
+  it("should rejects emails in the form of something@something", () => {
+    const testEmail = "something@something";
+    expect(AuthController.emailIsValid(testEmail)).toBe(false);
+  });
 });
