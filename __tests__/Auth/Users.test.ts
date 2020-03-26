@@ -11,4 +11,16 @@ describe("getCurrentUser", () => {
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(401);
   });
+
+  it("should return username if user is logged in", () => {
+    const mockUsername = "TestUser";
+    const mockReq = { user: { Username: mockUsername } };
+    const mockSend = jest.fn();
+    const mockRes = { send: mockSend };
+
+    AuthController.getCurrentUser(mockReq, mockRes);
+
+    expect(mockSend).toBeCalledTimes(1);
+    expect(mockSend).toBeCalledWith({ username: mockUsername });
+  });
 });

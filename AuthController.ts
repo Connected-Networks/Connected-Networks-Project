@@ -46,7 +46,7 @@ export default class AuthController {
 
   static getCurrentUser(req, res) {
     if (req.user) {
-      res.json({ username: req.user.Username });
+      res.send({ username: req.user.Username });
     } else {
       res.sendStatus(401);
     }
