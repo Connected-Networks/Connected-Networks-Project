@@ -422,9 +422,7 @@ getUserByUsername = username => {
       where: {
         Username: username
       }
-    }).then(user => {
-      user !== null ? resolve(user) : reject();
-    });
+    }).then(user => resolve(user));
   });
 };
 

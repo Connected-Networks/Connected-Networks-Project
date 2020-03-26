@@ -70,4 +70,34 @@ describe("passwordIsValid", () => {
     const testPassword = undefined;
     expect(AuthController.passwordIsValid(testPassword)).toBe(false);
   });
+
+  describe("usernameIsTaken", () => {
+    const database = require("../../../sequelizeDatabase/sequelFunctions");
+    it("should call database.getUserByUsername", async () => {
+      const mockGetUserByUsername = jest.fn();
+      database.getUserByUsername = mockGetUserByUsername;
+
+      const mockUsername = "TestUser";
+      await AuthController.usernameIsTaken(mockUsername);
+
+      expect(mockGetUserByUsername).toBeCalledTimes(1);
+      expect(mockGetUserByUsername).toBeCalledWith(mockUsername);
+    });
+
+    it("should return false if database return null", async () => {
+      const mockGetUserByUsername = jest.fn().mockResolvedValue(null);
+      database.getUserByUsername = mockGetUserByUsername;
+
+      const mockUsername = "TestUser";
+      expect(await AuthController.usernameIsTaken(mockUsername)).toBe(false);
+    });
+
+    it("should return true if database return a user object", async () => {
+      const mockUsername = "TestUser";
+      const mockGetUserByUsername = jest.fn().mockResolvedValue({ username: mockUsername });
+      database.getUserByUsername = mockGetUserByUsername;
+
+      expect(await AuthController.usernameIsTaken(mockUsername)).toBe(true);
+    });
+  });
 });

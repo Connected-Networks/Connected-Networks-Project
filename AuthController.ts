@@ -41,13 +41,9 @@ export default class AuthController {
     return password !== undefined && password.length >= 6;
   }
 
-  static usernameIsTaken(username: string) {
-    return new Promise<boolean>(resolve => {
-      database
-        .getUserByUsername(username)
-        .then(() => resolve(true))
-        .catch(() => resolve(false));
-    });
+  static async usernameIsTaken(username: string) {
+    const user = await database.getUserByUsername(username);
+    return user !== null;
   }
 
   static emailIsTaken(email: string) {
