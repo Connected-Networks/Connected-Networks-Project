@@ -5,23 +5,23 @@ export default class AuthController {
   static async signup(req, res) {
     const { email, username, password } = req.body;
 
-    if (!this.emailIsValid(email) || !this.passwordIsValid(password)) {
+    if (!AuthController.emailIsValid(email) || !AuthController.passwordIsValid(password)) {
       res.sendStatus(406);
       return;
     }
 
-    if (await this.emailIsTaken(email)) {
+    if (await AuthController.emailIsTaken(email)) {
       res.sendStatus(409);
       return;
     }
 
-    if (await this.usernameIsTaken(username)) {
+    if (await AuthController.usernameIsTaken(username)) {
       res.sendStatus(409); //TODO: Add a different error message
       return;
     }
 
     try {
-      await this.insertUser(email, username, password);
+      await AuthController.insertUser(email, username, password);
       res.sendStatus(200);
     } catch (error) {
       console.log(error);
