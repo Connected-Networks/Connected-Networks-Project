@@ -105,3 +105,41 @@ describe("serializeUser", () => {
     expect(idObject).toHaveProperty("id", mockUserID);
   });
 });
+
+describe("deserializeUser", () => {
+  it("should call done() with null and the user object", async () => {
+    const mockFoundUser = { Username: "TestUser", Password: "1234567" };
+    database.getUserById = jest.fn().mockResolvedValue(mockFoundUser);
+
+    const mockDone = jest.fn();
+    const mockUser = { id: "1234" };
+    await PassportController.deserializeUser(mockUser, mockDone);
+
+    expect(mockDone).toBeCalledTimes(1);
+    expect(mockDone).toBeCalledWith(null, mockFoundUser);
+  });
+  it("should call done() with an error if user not found", async () => {
+    database.getUserById = jest.fn().mockResolvedValue(null);
+
+    const mockDone = jest.fn();
+    const mockUser = { id: "1234" };
+    await PassportController.deserializeUser(mockUser, mockDone);
+
+    expect(mockDone).toBeCalledTimes(1);
+    expect(mockDone).toBeCalledWith(expect.any(Error));
+  });
+
+  it("should call done() with an error if database threw an error", async () => {
+    const mockError = new Error("mock error");
+    database.getUserById = jest.fn(() => {
+      throw mockError;
+    });
+
+    const mockDone = jest.fn();
+    const mockUser = { id: "1234" };
+    await PassportController.deserializeUser(mockUser, mockDone);
+
+    expect(mockDone).toBeCalledTimes(1);
+    expect(mockDone).toBeCalledWith(mockError);
+  });
+});
