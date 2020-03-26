@@ -146,4 +146,6 @@ describe("Signup", () => {
     expect(mockSendStatus).toBeCalledTimes(1);
     expect(mockSendStatus).toBeCalledWith(500);
   });
+
+  //TODO: add tests for the cases where any of helper functions throw an error
 });

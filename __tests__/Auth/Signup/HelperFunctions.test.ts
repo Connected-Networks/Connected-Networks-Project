@@ -100,4 +100,31 @@ describe("passwordIsValid", () => {
       expect(await AuthController.usernameIsTaken(mockUsername)).toBe(true);
     });
   });
+
+  describe("emailIsTaken", () => {
+    const database = require("../../../sequelizeDatabase/sequelFunctions");
+    it("should call database.emailIsTaken", async () => {
+      database.getUserByEmail = jest.fn();
+
+      const mockEmail = "TestUser";
+      await AuthController.emailIsTaken(mockEmail);
+
+      expect(database.getUserByEmail).toBeCalledTimes(1);
+      expect(database.getUserByEmail).toBeCalledWith(mockEmail);
+    });
+
+    it("should return false if database return null", async () => {
+      database.getUserByEmail = jest.fn().mockResolvedValue(null);
+
+      const mockEmail = "TestUser";
+      expect(await AuthController.emailIsTaken(mockEmail)).toBe(false);
+    });
+
+    it("should return true if database return a user object", async () => {
+      const mockEmail = "TestUser";
+      database.getUserByEmail = jest.fn().mockResolvedValue({ email: mockEmail });
+
+      expect(await AuthController.emailIsTaken(mockEmail)).toBe(true);
+    });
+  });
 });

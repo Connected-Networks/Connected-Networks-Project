@@ -46,13 +46,9 @@ export default class AuthController {
     return user !== null;
   }
 
-  static emailIsTaken(email: string) {
-    return new Promise<boolean>(resolve => {
-      database
-        .getUserByEmail(email)
-        .then(() => resolve(true))
-        .catch(() => resolve(false));
-    });
+  static async emailIsTaken(email: string) {
+    const user = await database.getUserByEmail(email);
+    return user !== null;
   }
 
   static insertUser(email: string, username: string, password: string) {

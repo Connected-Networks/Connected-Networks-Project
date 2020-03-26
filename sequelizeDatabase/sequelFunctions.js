@@ -432,9 +432,7 @@ getUserByEmail = email => {
       where: {
         Email: email
       }
-    }).then(user => {
-      user !== null ? resolve(user) : reject();
-    });
+    }).then(user => resolve(user));
   });
 };
 
