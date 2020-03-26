@@ -89,3 +89,19 @@ describe("localStrategy", () => {
     expect(mockDone).toBeCalledWith(mockError);
   });
 });
+
+describe("serializeUser", () => {
+  it("should call done() with null and an object with the user's id", async () => {
+    const mockUserID = "432";
+    const mockUser = { UserID: mockUserID };
+    const mockDone = jest.fn();
+
+    PassportController.serializeUser(mockUser, mockDone);
+
+    expect(mockDone).toBeCalledTimes(1);
+    const doneArgs = mockDone.mock.calls[0];
+    expect(doneArgs[0]).toBe(null);
+    const idObject = doneArgs[1];
+    expect(idObject).toHaveProperty("id", mockUserID);
+  });
+});
