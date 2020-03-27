@@ -2,25 +2,24 @@ import BackendProcessing from "./backend-processing";
 import Passport from "./config/passport";
 import AuthController from "./AuthController";
 const express = require("express");
-var app = express.Router();
-// const app = express();
+const router = express.Router();
 
-app.post("/signup", AuthController.signup);
+router.post("/signup", AuthController.signup);
 
-app.get("/users", (req, res) => {
+router.get("/users", (req, res) => {
   const be = new BackendProcessing();
   be.getAllUsers().then(users => {
     res.json({ users });
   });
 });
 
-app.post("/login", Passport.authenticate("local"), AuthController.handleLoginSuccess);
+router.post("/login", Passport.authenticate("local"), AuthController.handleLoginSuccess);
 
-app.get("/user", AuthController.getCurrentUser);
+router.get("/user", AuthController.getCurrentUser);
 
-app.post("/logout", AuthController.logout);
+router.post("/logout", AuthController.logout);
 
-app.get("/users", (req, res) => {
+router.get("/users", (req, res) => {
   //Todo for Aaron: Get all users except the current user using the User object defined in LoginPage, and return the results in
   //an array
 
@@ -33,7 +32,7 @@ app.get("/users", (req, res) => {
   res.json({ users });
 });
 
-app.post("/shareFund", (req, res) => {
+router.post("/shareFund", (req, res) => {
   //Todo for Aaron: Share the given fund using res.body.fundId with user using res.body.user
 
   //Temp
@@ -41,7 +40,7 @@ app.post("/shareFund", (req, res) => {
   res.sendStatus(200);
 });
 
-app.post("/csv", (req, res) => {
+router.post("/csv", (req, res) => {
   try {
     let data = req.body.data;
     let be = new BackendProcessing();
@@ -53,7 +52,7 @@ app.post("/csv", (req, res) => {
   }
 });
 
-app.get("/people", (req, res) => {
+router.get("/people", (req, res) => {
   try {
     let be = new BackendProcessing();
     let data = be.retrievePeopleFromDatabase().then(results => {
@@ -68,7 +67,7 @@ app.get("/people", (req, res) => {
   }
 });
 
-app.get("/people/:companyId", (req, res) => {
+router.get("/people/:companyId", (req, res) => {
   //Todo for Aaron: implement this function to get all the people who work in a certain company to show them in the company details panel.
   try {
     let be = new BackendProcessing();
@@ -85,7 +84,7 @@ app.get("/people/:companyId", (req, res) => {
   }
 });
 
-app.get("/people/original/:companyId", (req, res) => {
+router.get("/people/original/:companyId", (req, res) => {
   //Todo for Aaron: implement this function to get all the people who **originally** worked in a certain company to show them in the fund details panel.
   try {
     let be = new BackendProcessing();
@@ -102,7 +101,7 @@ app.get("/people/original/:companyId", (req, res) => {
   }
 });
 
-app.put("/people", (req, res) => {
+router.put("/people", (req, res) => {
   //update person
   let be = new BackendProcessing();
   //console.log("body: "+JSON.stringify(req.body))
@@ -117,7 +116,7 @@ app.put("/people", (req, res) => {
   });
 });
 
-app.post("/people", (req, res) => {
+router.post("/people", (req, res) => {
   //add person
   let be = new BackendProcessing();
   let person = req.body.newData;
@@ -129,7 +128,7 @@ app.post("/people", (req, res) => {
   i.catch(res.sendStatus(500));
 });
 
-app.delete("/people/:id", (req, res) => {
+router.delete("/people/:id", (req, res) => {
   //delete person
   let be = new BackendProcessing();
   let person = req.params.id;
@@ -141,7 +140,7 @@ app.delete("/people/:id", (req, res) => {
   d.catch(res.sendStatus(500));
 });
 
-app.get("/company", (req, res) => {
+router.get("/company", (req, res) => {
   try {
     let be = new BackendProcessing();
     let data = be.retrieveCompaniesFromDatabase().then(results => {
@@ -156,7 +155,7 @@ app.get("/company", (req, res) => {
   }
 });
 
-app.put("/company", (req, res) => {
+router.put("/company", (req, res) => {
   //update company
   let be = new BackendProcessing();
   //console.log("body: "+JSON.stringify(req.body))
@@ -173,7 +172,7 @@ app.put("/company", (req, res) => {
   });
 });
 
-app.post("/company", (req, res) => {
+router.post("/company", (req, res) => {
   //add company
   let be = new BackendProcessing();
   let company = req.body.newData;
@@ -187,7 +186,7 @@ app.post("/company", (req, res) => {
   i.catch(res.sendStatus(500));
 });
 
-app.delete("/company/:id", (req, res) => {
+router.delete("/company/:id", (req, res) => {
   //delete company
   let be = new BackendProcessing();
   let company = req.params.id;
@@ -199,7 +198,7 @@ app.delete("/company/:id", (req, res) => {
   d.catch(res.sendStatus(500));
 });
 
-app.get("/funds", (req, res) => {
+router.get("/funds", (req, res) => {
   //return type should be an Array of SideMenuFund objects as defined in App.tsx.
   try {
     let be = new BackendProcessing();
@@ -214,7 +213,7 @@ app.get("/funds", (req, res) => {
     res.sendStatus(500);
   }
 });
-app.post("/funds", (req, res) => {
+router.post("/funds", (req, res) => {
   let be = new BackendProcessing();
   console.log("Adding fund: " + req.body.newFundName + " to the database");
   let fund = req.body.newFundName;
@@ -224,7 +223,7 @@ app.post("/funds", (req, res) => {
   });
 });
 
-app.put("/funds", (req, res) => {
+router.put("/funds", (req, res) => {
   //Todo for Aaron, implement this function so it updates an existing fund, the fund can be accessed by req.body.fund,
   //req.body.fund.name is probably gonna be the thing that always change
   //Temp until function is implemented
@@ -237,7 +236,7 @@ app.put("/funds", (req, res) => {
   });
 });
 
-app.get("/funds/:id", (req, res) => {
+router.get("/funds/:id", (req, res) => {
   try {
     let be = new BackendProcessing();
     let fundID = req.params.id;
@@ -254,7 +253,7 @@ app.get("/funds/:id", (req, res) => {
   }
 });
 
-app.get("/people/original/:companyId", (req, res) => {
+router.get("/people/original/:companyId", (req, res) => {
   try {
     let be = new BackendProcessing();
     let companyID = req.params.id;
@@ -270,7 +269,7 @@ app.get("/people/original/:companyId", (req, res) => {
   }
 });
 
-app.get("/history/:id", (req, res) => {
+router.get("/history/:id", (req, res) => {
   // Todo for Aaron, make this function return all employee history related to the recieved IndividualID.
   // Look at client/EmploymentHistpryTable.tsx for more info
   // Make sure to use .toLocaleDateString() to make Date types strings or just shove the date in there if
@@ -294,18 +293,16 @@ app.get("/history/:id", (req, res) => {
   }
 });
 
-app.put("/history", (req, res) => {
+router.put("/history", (req, res) => {
   // Update history
 });
 
-app.post("/history/:id", (req, res) => {
+router.post("/history/:id", (req, res) => {
   // Add history
 });
 
-app.delete("/history", (req, res) => {
+router.delete("/history", (req, res) => {
   //delete History
 });
 
-// export { app, Passport };
-
-module.exports = app;
+module.exports = router;
