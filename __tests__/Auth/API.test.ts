@@ -1,117 +1,102 @@
-jest.mock("../../AuthController");
-import AuthController from "../../AuthController";
+require("mysql2/node_modules/iconv-lite").encodingExists("foo"); //Required due to some bug in Jest
 jest.mock("../../config/passport");
 import Passport from "../../config/passport";
-import * as supertest from "supertest";
+jest.mock("express");
+const express = require("express");
+import AuthController from "../../AuthController";
 
 describe("API", () => {
-  it("should call AuthController.signup for ./signup", async () => {
-    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => jest.fn()); //Not needed for testing just added so the code compiles
+  const mockRouter = { post: jest.fn(), get: jest.fn(), put: jest.fn(), delete: jest.fn() };
 
-    const mockSignup = jest.spyOn(AuthController, "signup").mockImplementation(async (req, res) => res.sendStatus(200));
+  it("should use AuthController.signup for ./signup", async () => {
+    express.Router = jest.fn().mockReturnValue(mockRouter);
 
-    let app;
-    jest.isolateModules(() => {
-      app = require("../../app").app;
-    });
-    const request = supertest(app);
+    require("../../router");
 
-    const mockEmail = "mock@test.com";
-    const mockPassword = "1234567";
-    const mockUsername = "TestUser";
-    await request.post("/signup").send({ email: mockEmail, username: mockUsername, password: mockPassword });
-
-    expect(mockSignup).toBeCalledTimes(1);
-
-    const passedReq = mockSignup.mock.calls[0][0];
-    expect(passedReq.body.email).toBe(mockEmail);
-    expect(passedReq.body.password).toBe(mockPassword);
-    expect(passedReq.body.username).toBe(mockUsername);
+    expect(mockRouter.post).toBeCalledWith("/signup", AuthController.signup);
   });
 
-  it("should use passport.authenticate as middleware for ./login", async () => {
-    const mockAuthenticationProcess = jest.fn((req, res) => res.sendStatus(200));
-    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => mockAuthenticationProcess);
+  // it("should use passport.authenticate as middleware for ./login", async () => {
+  //   const mockAuthenticationProcess = jest.fn((req, res) => res.sendStatus(200));
+  //   jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => mockAuthenticationProcess);
 
-    let app;
-    jest.isolateModules(() => {
-      app = require("../../app").app;
-    });
-    const request = supertest(app);
+  //   let app;
+  //   app = require("../../app").app;
 
-    const mockUsername = "TestUser";
-    const mockPassword = "1234567";
-    await request.post("/login").send({ username: mockUsername, password: mockPassword });
+  //   const request = supertest(app);
 
-    expect(Passport.authenticate).toBeCalledTimes(1);
-    expect(Passport.authenticate).toBeCalledWith("local");
+  //   const mockUsername = "TestUser";
+  //   const mockPassword = "1234567";
+  //   await request.post("/login").send({ username: mockUsername, password: mockPassword });
 
-    expect(mockAuthenticationProcess).toBeCalledTimes(1);
-    const passedReq = mockAuthenticationProcess.mock.calls[0][0];
-    expect(passedReq.body.username).toBe(mockUsername);
-    expect(passedReq.body.password).toBe(mockPassword);
-  });
+  //   expect(Passport.authenticate).toBeCalledTimes(1);
+  //   expect(Passport.authenticate).toBeCalledWith("local");
 
-  it("should call AuthController.handleLoginSuccess as success callback for passport.authenticate for ./login", async () => {
-    let passportReq, passportRes;
-    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => (req, res, next) => {
-      passportReq = req;
-      passportRes = res;
-      next();
-    });
-    const mockHandleLoginSuccess = jest
-      .spyOn(AuthController, "handleLoginSuccess")
-      .mockImplementation((req, res) => res.sendStatus(200));
+  //   expect(mockAuthenticationProcess).toBeCalledTimes(1);
+  //   const passedReq = mockAuthenticationProcess.mock.calls[0][0];
+  //   expect(passedReq.body.username).toBe(mockUsername);
+  //   expect(passedReq.body.password).toBe(mockPassword);
+  // });
 
-    let app;
-    jest.isolateModules(() => {
-      app = require("../../app").app;
-    });
-    const request = supertest(app);
+  // it("should call AuthController.handleLoginSuccess as success callback for passport.authenticate for ./login", async () => {
+  //   let passportReq, passportRes;
+  //   jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => (req, res, next) => {
+  //     passportReq = req;
+  //     passportRes = res;
+  //     next();
+  //   });
+  //   const mockHandleLoginSuccess = jest
+  //     .spyOn(AuthController, "handleLoginSuccess")
+  //     .mockImplementation((req, res) => res.sendStatus(200));
 
-    const mockUsername = "TestUser";
-    const mockPassword = "1234567";
-    await request.post("/login").send({ username: mockUsername, password: mockPassword });
+  //   let app;
+  //   app = require("../../app").app;
 
-    expect(Passport.authenticate).toBeCalledTimes(1);
-    expect(Passport.authenticate).toBeCalledWith("local");
+  //   const request = supertest(app);
 
-    expect(mockHandleLoginSuccess).toBeCalledTimes(1);
-    const passedReq = mockHandleLoginSuccess.mock.calls[0][0];
-    const passedRes = mockHandleLoginSuccess.mock.calls[0][1];
-    expect(passedReq).toBe(passedReq);
-    expect(passedRes).toBe(passedRes);
-  });
+  //   const mockUsername = "TestUser";
+  //   const mockPassword = "1234567";
+  //   await request.post("/login").send({ username: mockUsername, password: mockPassword });
 
-  it("should call AuthController.logout for ./logout", async () => {
-    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => jest.fn()); //Not needed for testing just added so the code compiles
+  //   expect(Passport.authenticate).toBeCalledTimes(1);
+  //   expect(Passport.authenticate).toBeCalledWith("local");
 
-    const mockLogout = jest.spyOn(AuthController, "logout").mockImplementation((req, res) => res.sendStatus(200));
+  //   expect(mockHandleLoginSuccess).toBeCalledTimes(1);
+  //   const passedReq = mockHandleLoginSuccess.mock.calls[0][0];
+  //   const passedRes = mockHandleLoginSuccess.mock.calls[0][1];
+  //   expect(passedReq).toBe(passedReq);
+  //   expect(passedRes).toBe(passedRes);
+  // });
 
-    let app;
-    jest.isolateModules(() => {
-      app = require("../../app").app;
-    });
-    const request = supertest(app);
+  // it("should call AuthController.logout for ./logout", async () => {
+  //   jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => jest.fn()); //Not needed for testing just added so the code compiles
 
-    await request.post("/logout");
+  //   const mockLogout = jest.spyOn(AuthController, "logout").mockImplementation((req, res) => res.sendStatus(200));
 
-    expect(mockLogout).toBeCalledTimes(1);
-  });
+  //   let app;
 
-  it("should call AuthController.getCurrentUser for ./user", async () => {
-    jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => jest.fn()); //Not needed for testing just added so the code compiles
+  //   app = require("../../app").app;
 
-    const mockGetCurrentUser = jest.spyOn(AuthController, "getCurrentUser").mockImplementation((req, res) => res.sendStatus(200));
+  //   const request = supertest(app);
 
-    let app;
-    jest.isolateModules(() => {
-      app = require("../../app").app;
-    });
-    const request = supertest(app);
+  //   await request.post("/logout");
 
-    await request.get("/user");
+  //   expect(mockLogout).toBeCalledTimes(1);
+  // });
 
-    expect(mockGetCurrentUser).toBeCalledTimes(1);
-  });
+  // it("should call AuthController.getCurrentUser for ./user", async () => {
+  //   jest.spyOn(Passport, "authenticate").mockImplementation((type: string) => jest.fn()); //Not needed for testing just added so the code compiles
+
+  //   const mockGetCurrentUser = jest.spyOn(AuthController, "getCurrentUser").mockImplementation((req, res) => res.sendStatus(200));
+
+  //   let app;
+
+  //   app = require("../../app").app;
+
+  //   const request = supertest(app);
+
+  //   await request.get("/user");
+
+  //   expect(mockGetCurrentUser).toBeCalledTimes(1);
+  // });
 });
