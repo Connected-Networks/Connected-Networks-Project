@@ -2,24 +2,8 @@ import BackendProcessing from "./backend-processing";
 import Passport from "./config/passport";
 import AuthController from "./AuthController";
 const express = require("express");
-const app = express();
-const models = require("./sequelizeDatabase/modelSetup");
-const session = require("express-session");
-const SessionStore = require("express-session-sequelize")(session.Store);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-models.sequelize.connect();
-app.use(
-  session({
-    secret: "http://bitly.com/98K8eH",
-    store: new SessionStore({ db: models.sequelize }),
-    resave: false,
-    saveUninitialized: false
-  })
-);
-app.use(Passport.initialize());
-app.use(Passport.session());
+var app = express.Router();
+// const app = express();
 
 app.post("/signup", AuthController.signup);
 
@@ -322,4 +306,6 @@ app.delete("/history", (req, res) => {
   //delete History
 });
 
-export { app, Passport };
+// export { app, Passport };
+
+module.exports = app;
