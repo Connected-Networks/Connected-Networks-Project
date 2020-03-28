@@ -7,6 +7,7 @@ const app = express();
 const models = require("./sequelizeDatabase/modelSetup");
 const SessionStore = require("express-session-sequelize")(session.Store);
 import BackendProcessing from "./backend-processing";
+import NotificationController from "./NotificationController";
 
 const port = process.env.PORT || 5000;
 
@@ -24,6 +25,8 @@ app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client/build")));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+NotificationController.sendEmail();
 
 app.post("/signup", async (req, res) => {
   const be = new BackendProcessing();
