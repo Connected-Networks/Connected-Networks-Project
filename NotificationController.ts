@@ -10,7 +10,7 @@ export interface EmploymentHistory {
   company: string;
   position: string;
   startingDate: string;
-  endingDate: string;
+  endingDate?: string;
 }
 
 export interface Person {
@@ -32,13 +32,6 @@ export default class NotificationController {
       pass: "Yf%#RX]R7q4n[X{~"
     }
   });
-
-  static mailOptions = {
-    from: "Connected Networks Notifications <Test@gmail.com>",
-    to: "Mohammad Baqer <baqermt@rose-hulman.edu>",
-    subject: "Testing Testing",
-    html: "<p>Your html here</p>"
-  };
 
   static async notifyUsers(users: User[], changes: Change[]) {
     const mailOptions = NotificationController.getMailOptions(users, changes);
@@ -66,6 +59,21 @@ export default class NotificationController {
   }
 
   static getHtmlString(changes: Change[]): string {
-    return "<p>Your html here</p>";
+    let htmlString = "<ul>";
+    for (const change of changes) {
+      htmlString += NotificationController.getChangeHtmlString(change);
+    }
+    htmlString += "</ul>";
+    return htmlString;
+  }
+
+  static getChangeHtmlString(change: Change) {
+    let changeString = "";
+    changeString += "<li>";
+    changeString += `<a href="${change.employee.hyperlink}">${change.employee.name}</a> (${change.employee.fund})`;
+    changeString += ` moved from ${change.from.company} (${change.from.position})`;
+    changeString += ` to ${change.to.company} (${change.to.position})`;
+    changeString += "</li>";
+    return changeString;
   }
 }

@@ -4,9 +4,14 @@
 
 import NotificationController from "./NotificationController";
 
-const users = [
-  { username: "mtbaqer", email: "mtbaqer@gmail.com" },
-  { username: "baqermt", email: "baqermt@rose-hulman.edu" }
-];
+const users = [{ username: "mtbaqer", email: "mtbaqer@gmail.com" }];
 
-NotificationController.notifyUsers(users, []);
+const employee = { name: "Bill Gates", fund: "fund1", hyperlink: "https://www.linkedin.com/in/williamhgates" };
+const from = { company: "Microsoft", position: "Co-founder", startingDate: "1975", endingDate: "2019" };
+const to = { company: "Bill & Melinda Gates Foundation", position: "Co-chair", startingDate: "1975", endingDate: undefined };
+
+const changes = [{ employee, from, to }];
+
+// console.log(NotificationController.getHtmlString(changes));
+
+NotificationController.notifyUsers(users, changes);
