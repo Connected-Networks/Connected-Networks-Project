@@ -4,4 +4,9 @@
 
 import NotificationController from "./NotificationController";
 
-NotificationController.sendEmail();
+const users = [
+  { username: "mtbaqer", email: "mtbaqer@gmail.com" },
+  { username: "baqermt", email: "baqermt@rose-hulman.edu" }
+];
+
+NotificationController.notifyUsers(users, []);

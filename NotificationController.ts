@@ -1,25 +1,25 @@
 const nodemailer = require("nodemailer");
 
-interface Change {
+export interface Change {
   employee: Person;
   from: EmploymentHistory;
   to: EmploymentHistory;
 }
 
-interface EmploymentHistory {
+export interface EmploymentHistory {
   company: string;
   position: string;
   startingDate: string;
   endingDate: string;
 }
 
-interface Person {
+export interface Person {
   name: string;
   fund: string;
   hyperlink: string;
 }
 
-interface User {
+export interface User {
   username: string;
   email: string;
 }
@@ -58,7 +58,11 @@ export default class NotificationController {
   }
 
   static getToString(users: User[]): string {
-    throw new Error("Method not implemented.");
+    let toString = "";
+    for (const user of users) {
+      toString += `${user.username} <${user.email}>, `; //Nodemailer simply ignores the last comma
+    }
+    return toString;
   }
 
   static getHtmlString(changes: Change[]): string {
