@@ -40,12 +40,28 @@ export default class NotificationController {
     html: "<p>Your html here</p>"
   };
 
-  static sendEmail() {
-    NotificationController.transporter.sendMail(NotificationController.mailOptions, (err, info) => {
-      if (err) console.log(err);
-      else console.log(info);
-    });
+  static async notifyUsers(users: User[], changes: Change[]) {
+    const mailOptions = NotificationController.getMailOptions(users, changes);
+
+    const info = await NotificationController.transporter.sendMail(mailOptions);
+
+    console.log(info);
   }
 
-  static notifyUsers(users: User[], changes: Change[]) {}
+  static getMailOptions(users: User[], changes: Change[]) {
+    return {
+      from: "Connected Networks Notifications <ConnectedNetworksNodeMailer@gmail.com>",
+      to: NotificationController.getToString(users),
+      subject: "New Changes Detected",
+      html: NotificationController.getHtmlString(changes)
+    };
+  }
+
+  static getToString(users: User[]): string {
+    throw new Error("Method not implemented.");
+  }
+
+  static getHtmlString(changes: Change[]): string {
+    return "<p>Your html here</p>";
+  }
 }
