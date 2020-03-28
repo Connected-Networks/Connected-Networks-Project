@@ -1,28 +1,6 @@
+import { User, Change } from "./UpdatesController";
+
 const nodemailer = require("nodemailer");
-
-export interface Change {
-  employee: Person;
-  from: EmploymentHistory;
-  to: EmploymentHistory;
-}
-
-export interface EmploymentHistory {
-  company: string;
-  position: string;
-  startingDate: string;
-  endingDate?: string;
-}
-
-export interface Person {
-  name: string;
-  fund: string;
-  hyperlink: string;
-}
-
-export interface User {
-  username: string;
-  email: string;
-}
 
 export default class NotificationController {
   private static transporter = nodemailer.createTransport({
@@ -32,6 +10,15 @@ export default class NotificationController {
       pass: "Yf%#RX]R7q4n[X{~"
     }
   });
+
+  static async notifyOfChanges(changes: Change[]) {
+    const users = NotificationController.getUsersToNotify(changes);
+    await NotificationController.notifyUsers(users, changes);
+  }
+
+  static getUsersToNotify(changes: Change[]): User[] {
+    throw new Error("Method not implemented.");
+  }
 
   static async notifyUsers(users: User[], changes: Change[]) {
     const mailOptions = NotificationController.getMailOptions(users, changes);
