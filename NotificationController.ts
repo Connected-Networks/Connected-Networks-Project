@@ -25,7 +25,7 @@ export interface User {
 }
 
 export default class NotificationController {
-  static transporter = nodemailer.createTransport({
+  private static transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
       user: "ConnectedNetworksNodeMailer@gmail.com",
