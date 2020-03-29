@@ -452,6 +452,14 @@ getUserById = id => {
   });
 };
 
+getIndividualByLinkedIn = async LinkedInUrl => {
+  return await models.Individuals.findOne({ where: { LinkedInUrl } });
+};
+
+getCompanyById = async CompanyID => {
+  return await models.Companies.findOne({ where: { CompanyID } });
+};
+
 module.exports = {
   getAllUsers,
   getAllIndividuals,
@@ -477,5 +485,7 @@ module.exports = {
   getUserByUsername,
   getUserByEmail,
   insertUser,
-  getUserById
+  getUserById,
+  getIndividualByLinkedIn,
+  getCompanyById
 };

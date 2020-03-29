@@ -1,4 +1,9 @@
-import { User, Change } from "./UpdatesController";
+import { Change } from "./UpdatesController";
+
+export interface User {
+  username: string;
+  email: string;
+}
 
 const nodemailer = require("nodemailer");
 
@@ -57,7 +62,7 @@ export default class NotificationController {
   static getChangeHtmlString(change: Change) {
     let changeString = "";
     changeString += "<li>";
-    changeString += `<a href="${change.employee.hyperlink}">${change.employee.name}</a> (${change.employee.fund})`;
+    changeString += `<a href="${change.employee.linkedInUrl}">${change.employee.name}</a> (${change.employee.fund})`;
     changeString += ` moved from ${change.from.company} (${change.from.position})`;
     changeString += ` to ${change.to.company} (${change.to.position})`;
     changeString += "</li>";
