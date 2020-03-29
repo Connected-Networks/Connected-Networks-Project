@@ -43,7 +43,8 @@ export default class UpdatesController {
       const currentEmployment = await UpdatesController.getCurrentEmployment(employee.IndividualID);
 
       if (update.company !== currentEmployment.company || update.position !== currentEmployment.position) {
-        changes.push(UpdatesController.getChangeObject(employee, currentEmployment, update));
+        const change = await UpdatesController.getChangeObject(employee, currentEmployment, update);
+        changes.push(change);
       }
     }
 
@@ -64,7 +65,24 @@ export default class UpdatesController {
     return currentEmployment;
   }
 
-  static getChangeObject(employee, currentEmployment: Employment, update: Update): Change {
-    return null;
+  static async getChangeObject(changedEmployee, currentEmployment: Employment, update: Update) {
+    const employee: Person = {
+      name: changedEmployee.Name,
+      fund: await UpdatesController.getFundName(changedEmployee.FundID),
+      linkedInUrl: changedEmployee.LinkedInUrl
+    };
+
+    const from: Employment = { ...currentEmployment, endDate: UpdatesController.getTodaysDate() };
+    const to: Employment = { ...update, startDate: UpdatesController.getTodaysDate() };
+
+    return { employee, from, to };
+  }
+
+  static async getFundName(FundID: string) {
+    return await database.retrieveFundName(FundID);
+  }
+
+  static getTodaysDate(): string {
+    return "6969-06-09";
   }
 }
