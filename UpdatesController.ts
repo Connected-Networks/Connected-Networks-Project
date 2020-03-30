@@ -8,7 +8,7 @@ interface Update {
 }
 
 export interface Change {
-  employee: Person;
+  employee: Employee;
   from: Employment;
   to: Employment;
 }
@@ -20,9 +20,9 @@ interface Employment {
   endDate?: string;
 }
 
-interface Person {
+interface Employee {
   name: string;
-  fundId: string;
+  fundId: number;
   linkedInUrl: string;
 }
 
@@ -67,7 +67,7 @@ export default class UpdatesController {
   }
 
   static async getChangeObject(changedEmployee, currentEmployment: Employment, update: Update) {
-    const employee: Person = {
+    const employee: Employee = {
       name: changedEmployee.Name,
       fundId: changedEmployee.FundID,
       linkedInUrl: changedEmployee.LinkedInUrl

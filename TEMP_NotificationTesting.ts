@@ -2,16 +2,10 @@
 //this is for code meant to be executed to test the functionality of code being developed
 //Only temporary and will removed later
 
-import UpdatesController from "./UpdatesController";
+import UpdatesController, { Change } from "./UpdatesController";
 import NotificationController from "./NotificationController";
 const database = require("./sequelizeDatabase/sequelFunctions");
 
-const main = async () => {
-  //   const linkedInUrl = "https://www.linkedin.com/in/williamhgates/";
-  //   const update = { linkedInUrl, company: "Joojle", position: "boss" };
-  //   const req = { body: { updates: [update] } };
-  //   UpdatesController.receiveUpdates(req, {});
-  //   console.log(database.getAllSharedFunds());
-};
+const main = async () => {};
 
 main();
