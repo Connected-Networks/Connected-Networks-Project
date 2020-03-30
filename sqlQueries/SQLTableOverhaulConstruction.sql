@@ -11,7 +11,7 @@ CREATE TABLE Funds (
 	FundName varchar(255),
     UserID int NOT NULL,
     PRIMARY KEY (FundID),
-	FOREIGN KEY (UserID) REFERENCES User (UserID) 
+	FOREIGN KEY (UserID) REFERENCES User (UserID) ON DELETE CASCADE
 );
 
 CREATE TABLE Individuals (
