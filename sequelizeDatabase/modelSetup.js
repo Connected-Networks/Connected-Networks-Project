@@ -66,7 +66,7 @@ sequelize.authenticate()
 
   // NOTE: "ClassThatTakesForeignKey.BELONGSTO(ClassWithForeignKey)"
   Funds.belongsTo(User, {foreignKey:'UserID'});
-  User.hasMany(Funds, {foreignKey: 'UserID'});
+  User.hasMany(Funds, {foreignKey: 'UserID', onDelete: 'CASCADE'});
 
   const Individuals = sequelize.define('individuals',{
     IndividualID: {

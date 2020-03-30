@@ -259,23 +259,15 @@ deleteIndividual = IndividualID => {
   //
   // Modfying this to avoid a race condition -- Aaron
   return new Promise((resolve, reject) => {
-    models.EmployeeHistory.destroy({
-      where: {
-        IndividualID: IndividualID
-      }
-    })
-      .then(deletedHistory => {
-        models.Individuals.destroy({
-          where: {
-            IndividualID: IndividualID
-          }
-        }).then(deletedIndividual => {
-          console.log("deletion resolved");
-          resolve(deletedIndividual);
-        });
-      })
-      .catch(err => {
-        console.error(err);
+      models.Individuals.destroy({
+        where: {
+          IndividualID: IndividualID
+        }
+      }).then(deletedIndividual => {
+        console.log("New deletion of an individual.");
+        resolve(deletedIndividual);
+      }).catch(err => {
+        console.err("\n\n-->Error in deleteIndividual: ",err);
         reject(err);
       });
   });
