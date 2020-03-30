@@ -26,19 +26,23 @@ export default class NotificationController {
 
   static async mapUsersToChanges(changes: Change[]): Promise<Map<User, Change[]>> {
     const usersToChanges = new Map<User, Change[]>();
+
     for (const change of changes) {
-      const users = await this.getUsersRelatedToChange(change);
+      const users = await this.getUsersToNotify(change);
       this.addUsersAndChanges(usersToChanges, users, change);
     }
+
     return usersToChanges;
+  }
+
+  static async getUsersToNotify(change: Change): Promise<User[]> {
+    const users = await database.getAllUsersRelatedToFund(change.employee.fundId);
+
+    return users.map(user => ({ username: user.Username, email: user.Email }));
   }
 
   private static addUsersAndChanges(usersToChanges: Map<User, Change[]>, users: User[], change: Change) {
     return;
-  }
-
-  static async getUsersRelatedToChange(change: Change): Promise<User[]> {
-    return null;
   }
 
   static async notifyUser(user: User, changes: Change[]) {

@@ -22,7 +22,7 @@ interface Employment {
 
 interface Person {
   name: string;
-  fund: string;
+  fundId: string;
   linkedInUrl: string;
 }
 
@@ -69,7 +69,7 @@ export default class UpdatesController {
   static async getChangeObject(changedEmployee, currentEmployment: Employment, update: Update) {
     const employee: Person = {
       name: changedEmployee.Name,
-      fund: await UpdatesController.getFundName(changedEmployee.FundID),
+      fundId: changedEmployee.FundID,
       linkedInUrl: changedEmployee.LinkedInUrl
     };
 
@@ -77,10 +77,6 @@ export default class UpdatesController {
     const to: Employment = { ...update, startDate: UpdatesController.getTodaysDate() };
 
     return { employee, from, to };
-  }
-
-  static async getFundName(FundID: string) {
-    return await database.retrieveFundName(FundID);
   }
 
   static getTodaysDate(): string {
