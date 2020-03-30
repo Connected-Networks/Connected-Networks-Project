@@ -1,4 +1,5 @@
 import { Change } from "./UpdatesController";
+const database = require("./sequelizeDatabase/sequelFunctions");
 
 export interface User {
   username: string;
@@ -16,44 +17,51 @@ export default class NotificationController {
     }
   });
 
-  static async notifyOfChanges(changes: Change[]) {
-    const users = NotificationController.getUsersToNotify(changes);
-    await NotificationController.notifyUsers(users, changes);
+  static async notify(changes: Change[]) {
+    const usersToChanges = await this.mapUsersToChanges(changes);
+    for (const [user, changes] of usersToChanges) {
+      await this.notifyUser(user, changes);
+    }
   }
 
-  static getUsersToNotify(changes: Change[]): User[] {
-    throw new Error("Method not implemented.");
+  static async mapUsersToChanges(changes: Change[]): Promise<Map<User, Change[]>> {
+    const usersToChanges = new Map<User, Change[]>();
+    for (const change of changes) {
+      const users = await this.getUsersRelatedToChange(change);
+      this.addUsersAndChanges(usersToChanges, users, change);
+    }
+    return usersToChanges;
   }
 
-  static async notifyUsers(users: User[], changes: Change[]) {
-    const mailOptions = NotificationController.getMailOptions(users, changes);
+  private static addUsersAndChanges(usersToChanges: Map<User, Change[]>, users: User[], change: Change) {
+    return;
+  }
 
-    const info = await NotificationController.transporter.sendMail(mailOptions);
+  static async getUsersRelatedToChange(change: Change): Promise<User[]> {
+    return null;
+  }
+
+  static async notifyUser(user: User, changes: Change[]) {
+    const mailOptions = this.getMailOptions(user, changes);
+
+    const info = await this.transporter.sendMail(mailOptions);
 
     console.log(info);
   }
 
-  static getMailOptions(users: User[], changes: Change[]) {
+  static getMailOptions(user: User, changes: Change[]) {
     return {
       from: "Connected Networks Notifications <ConnectedNetworksNodeMailer@gmail.com>",
-      to: NotificationController.getToString(users),
+      to: `${user.username} <${user.email}>`,
       subject: "New Changes Detected",
-      html: NotificationController.getHtmlString(changes)
+      html: this.getHtmlString(changes)
     };
-  }
-
-  static getToString(users: User[]): string {
-    let toString = "";
-    for (const user of users) {
-      toString += `${user.username} <${user.email}>, `; //Nodemailer simply ignores the last comma
-    }
-    return toString;
   }
 
   static getHtmlString(changes: Change[]): string {
     let htmlString = "<ul>";
     for (const change of changes) {
-      htmlString += NotificationController.getChangeHtmlString(change);
+      htmlString += this.getChangeHtmlString(change);
     }
     htmlString += "</ul>";
     return htmlString;

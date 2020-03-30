@@ -460,6 +460,14 @@ getCompanyById = async CompanyID => {
   return await models.Companies.findOne({ where: { CompanyID } });
 };
 
+getFundUsers = async FundID => {
+  const ownerId = (await models.Funds.findOne({ where: { FundID } })).UserID;
+  const sharedWithIds = (await models.SharedFunds.findAll({ where: { FundID } })).map(sharedFund => sharedFund.UserID);
+
+  const allFundUsersIds = [ownerId, ...sharedWithIds];
+  return await models.User.findAll({ where: { UserID: allFundUsersIds } });
+};
+
 module.exports = {
   getAllUsers,
   getAllIndividuals,
@@ -487,5 +495,6 @@ module.exports = {
   insertUser,
   getUserById,
   getIndividualByLinkedIn,
-  getCompanyById
+  getCompanyById,
+  getFundUsers
 };

@@ -31,7 +31,7 @@ export default class UpdatesController {
     const { updates } = req.body;
     const changes = await UpdatesController.detectChanges(updates);
     if (changes.length > 0) {
-      NotificationController.notifyOfChanges(changes);
+      NotificationController.notify(changes);
     }
   }
 
@@ -53,6 +53,7 @@ export default class UpdatesController {
 
   static async getCurrentEmployment(id: string) {
     const foundCurrentEmployment = await database.getIndividualCurrentEmployement(id);
+    //CurrentEmployment does not have a company name, only the id
     const currentCompany = await database.getCompanyById(foundCurrentEmployment.CompanyID);
 
     const currentEmployment: Employment = {

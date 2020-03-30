@@ -3,15 +3,15 @@
 //Only temporary and will removed later
 
 import UpdatesController from "./UpdatesController";
+import NotificationController from "./NotificationController";
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 const main = async () => {
-  const linkedInUrl = "https://www.linkedin.com/in/williamhgates/";
-  const update = { linkedInUrl, company: "Joojle", position: "boss" };
-
-  const employee = await database.getIndividualByLinkedIn(linkedInUrl);
-  const currentEmployment = await UpdatesController.getCurrentEmployment(employee.IndividualID);
-  const change = await UpdatesController.getChangeObject(employee, currentEmployment, update);
-  console.log(change);
+  //   const linkedInUrl = "https://www.linkedin.com/in/williamhgates/";
+  //   const update = { linkedInUrl, company: "Joojle", position: "boss" };
+  //   const req = { body: { updates: [update] } };
+  //   UpdatesController.receiveUpdates(req, {});
+  //   console.log(database.getAllSharedFunds());
 };
+
 main();
