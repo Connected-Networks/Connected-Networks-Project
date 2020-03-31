@@ -500,7 +500,7 @@ module.exports = {
   getUserByEmail,
   insertUser,
   getUserById,
-  deleteSharedFunds,//<--TEST
+  deleteSharedFunds,
   deleteEmployeeHistory,
   insertSharedFunds,
   getAllSharedFunds
