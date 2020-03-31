@@ -18,7 +18,10 @@ getAllIndividuals = () => {
     })
     .catch(err => console.error(err));
 };
-getAllIndividualsOfUser = userID => {
+
+//This function returns an array of FundIDs representing funds the user can see.
+//It is important this returns an array of numbers rather than Fund JSON objects.
+getFundsUserCanSee = useID => {
   return new Promise((resolve, reject) => {
     models.Funds.findAll({
       where: { UserID: userID }
@@ -33,21 +36,50 @@ getAllIndividualsOfUser = userID => {
           return x.FundID;
         });
         let ids = oids.concat(sids);
-        models.Individuals.findAll({
-          where: { FundID: ids }
-        }).then(results => {
-          resolve(results);
-        });
+        resolve(ids);
+      });
+    });
+  });
+};
+
+getFundsUserCanChange = userID => {
+  return new Promise((resolve, reject) => {
+    models.Funds.findAll({ where: { UserID: userID } }).then(originalFundResults => {
+      return originalFundResults.map(x => {
+        return x.FundID;
+      });
+    });
+  });
+};
+
+getAllIndividualsOfUser = userID => {
+  return new Promise((resolve, reject) => {
+    getFundsUserCanSee(userID).then(ids => {
+      models.Individuals.findAll({
+        where: { FundID: ids }
+      }).then(results => {
+        resolve(results);
       });
     });
   });
 };
 getAllCompanies = () => {
-  return models.Companies.findAll()
+  return models.Companies.findAll({ where: {} })
     .then(companies => {
       return companies;
     })
     .catch(err => console.error(err));
+};
+getAllCompaniesOfUser = userID => {
+  return new Promise((resolve, reject) => {
+    getFundsUserCanSee(userID).then(fids => {
+      models.Funds.findAll({
+        where: { FundID: fids }
+      }).then(results => {
+        resolve(results);
+      });
+    });
+  });
 };
 getAllFunds = () => {
   return models.Funds.findAll()
@@ -281,6 +313,7 @@ getIndividualCurrentEmployement = IndividualID => {
 };
 
 //---------------Modify Existing Data Functions----------//
+//FundID should not be changeable.
 modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
   return models.Individuals.findOne({
     where: {
@@ -461,6 +494,11 @@ retrieveIndividualsByOriginalCompany = companyID => {
     ]
   });
 };
+retrieveIndividualByID = individualID => {
+  return models.Individuals.findAll({
+    where: { IndividualID: individualID }
+  });
+};
 
 retrieveFundName = fundID => {
   return new Promise((resolve, reject) => {
@@ -495,6 +533,22 @@ retrieveCompanyByName = (companyName, fundID) => {
       where: {
         FundID: fundID,
         CompanyName: companyName
+      }
+    })
+      .then(result => {
+        resolve(result);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+retrieveCompanyByID = companyID => {
+  return new Promise((resolve, reject) => {
+    models.Companies.find({
+      where: {
+        CompanyID: companyID
       }
     })
       .then(result => {
@@ -593,6 +647,7 @@ module.exports = {
   getIndividualEmployeeHistory,
   getIndividualCurrentEmployement,
   retrieveIndividualsByOriginalCompany,
+  retrieveIndividualByID,
   modifyIndividual,
   deleteIndividual,
   modifyCompany,
@@ -601,13 +656,13 @@ module.exports = {
   modifyFund,
   retrieveCompaniesByFunds,
   retrieveCompanyByName,
+  retrieveCompanyByID,
   retrieveCurrentEmployeesOfCompany,
   retrieveFundName,
   insertFund,
   checkUsageofUsername,
   checkUsageofEmail,
   createAccount,
-  retrieveCurrentEmployeesOfCompany,
   retrieveFundName,
   insertFund,
   getUserByUsername,
@@ -616,5 +671,7 @@ module.exports = {
   getUserById,
   updateEmployeeHistory,
   sharefund,
+  getFundsUserCanSee,
+  getFundsUserCanChange,
   getAllIndividualsOfUser
 };

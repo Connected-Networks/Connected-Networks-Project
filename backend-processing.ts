@@ -9,6 +9,7 @@ const bcrypt = require("bcryptjs");
 
 interface DisplayPerson {
   id: number;
+  fundID: number;
   name: string;
   company: string;
   position: string;
@@ -17,6 +18,7 @@ interface DisplayPerson {
 }
 interface DisplayCompany {
   id: number;
+  fundID: number;
   name: string;
 }
 interface DisplayFund {
@@ -131,6 +133,7 @@ export default class BackendProcessing {
       database.getIndividualCurrentEmployement(individual.IndividualID).then(employment => {
         let dp = {
           id: individual.IndividualID,
+          fundID: individual.FundID,
           name: individual.Name,
           company: "",
           position: "",
@@ -202,7 +205,7 @@ export default class BackendProcessing {
   //returns a promise boolean representing if the operation was successful
   insert_person(person) {
     return new Promise<boolean>((resolve, reject) => {
-      let insert = database.insertPerson(person.name, person.position, person.hyperlink, person.comment);
+      let insert = database.insertPerson(person.name, person.fundID, person.position, person.hyperlink, person.comment);
       insert.then(person => {
         resolve(true);
       });
@@ -214,9 +217,10 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
+  //NOTE: FundID is specifically excluded as changeable
   update_person(person) {
     return new Promise<boolean>((resolve, reject) => {
-      let update = database.modifyIndividual(person.id, person.name, person.position, person.hyperlink, person.comment);
+      let update = database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
       update.then(person => {
         resolve(true);
       });
@@ -269,12 +273,13 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
-  retrieveCompaniesFromDatabase(): Promise<DisplayCompany[]> {
+  retrieveCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
     return new Promise<DisplayCompany[]>((resolve, reject) => {
-      database.getAllCompanies().then(results => {
+      database.getAllCompaniesofUser(userID).then(results => {
         let list: DisplayCompany[] = results.map(element => {
           let company: DisplayCompany = {
             id: element.CompanyID,
+            fundID: element.FundID,
             name: element.CompanyName
           };
           return company;
@@ -312,17 +317,19 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
-  retrieveFundsFromDatabase(): Promise<DisplayFund[]> {
+  retrieveFundsFromDatabase(userID): Promise<DisplayFund[]> {
     return new Promise<DisplayFund[]>((resolve, reject) => {
-      database.getAllFunds().then(results => {
-        let list: DisplayFund[] = results.map(element => {
-          let fund: DisplayFund = {
-            id: element.FundID,
-            name: element.FundName
-          };
-          return fund;
+      database.getFundsUserCanSee(userID).then(availableFunds => {
+        database.getAllFunds().then(results => {
+          let list: DisplayFund[] = results.map(element => {
+            let fund: DisplayFund = {
+              id: element.FundID,
+              name: element.FundName
+            };
+            return fund;
+          });
+          resolve(list.filter(x => availableFunds.indexOf(x.id) >= 0));
         });
-        resolve(list);
       });
     });
   }
@@ -333,6 +340,7 @@ export default class BackendProcessing {
         let list: DisplayCompany[] = results.map(element => {
           let company: DisplayCompany = {
             id: element.CompanyID,
+            fundID: element.FundID,
             name: element.CompanyName
           };
           return company;
@@ -356,6 +364,7 @@ export default class BackendProcessing {
             results.map(entry => {
               let dp: DisplayPerson = {
                 id: entry.Individual.IndividualID,
+                fundID: entry.Individual.FundID,
                 name: entry.Individual.Name,
                 //should not be needed. If it ever is, the db function could easily be edited to include companies table, at the cost of running time.
                 company: null,
@@ -585,6 +594,75 @@ export default class BackendProcessing {
         .getAllUsers()
         .then(users => resolve(users))
         .catch(() => reject());
+    });
+  }
+
+  //Returns false if user cannot see the company, or the company doesn't exist
+  userSeesCompany(userID, companyID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database
+        .getFundsUserCanSee(userID)
+        .then(fundList => {
+          database
+            .retrieveCompanyByID(companyID)
+            .then(company => {
+              if (company == null) resolve(false);
+              let fundID = company.FundID;
+              if (fundList.indexOf(fundID) > -1) resolve(true);
+              else resolve(false);
+            })
+            .catch(error => {
+              console.error("an error occured while retrieving information on company " + companyID);
+            });
+        })
+        .catch(error => {
+          console.error("an error occured while finding funds related to user " + userID);
+        });
+    });
+  }
+
+  userSeesFund(userID, fundID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database
+        .getFundsUserCanSee(userID)
+        .then(fundList => {
+          if (fundList.indexOf(fundID) > -1) resolve(true);
+          else resolve(false);
+        })
+        .catch(error => {
+          console.error("an error occured while finding funds related to user " + userID);
+        });
+    });
+  }
+
+  userCanChangeFund(userID, fundID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database
+        .getFundsUserCanChange(userID)
+        .then(fundList => {
+          if (fundList.indexOf(fundID) > -1) resolve(true);
+          else resolve(false);
+        })
+        .catch(error => {
+          console.error("an error occured while finding funds changeable by user " + userID);
+        });
+    });
+  }
+
+  userCanSeeIndividual(userID, individualID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database.retrieveIndividualByID(individualID).then(individual => {
+        let fundID = individual.FundID;
+        return this.userSeesFund(userID, fundID);
+      });
+    });
+  }
+  userCanChangeIndividual(userID, individualID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database.retrieveIndividualByID(individualID).then(individual => {
+        let fundID = individual.FundID;
+        return this.userCanChangeFund(userID, fundID);
+      });
     });
   }
 }
