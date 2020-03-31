@@ -345,11 +345,11 @@ deleteFund = FundID => {
   });
 };
 
-deleteSharedFunds = FundID => {
+deleteSharedFunds = ShareID => {
   return new Promise((resolve, reject) => {
     models.SharedFunds.destroy({
       where: {
-        FundID: FundID
+        SharingID: ShareID
       }
     })
       .then(unsharedFund => {
@@ -501,5 +501,7 @@ module.exports = {
   insertUser,
   getUserById,
   deleteSharedFunds,//<--TEST
-  deleteEmployeeHistory
+  deleteEmployeeHistory,
+  insertSharedFunds,
+  getAllSharedFunds
 };

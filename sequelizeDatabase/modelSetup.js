@@ -100,7 +100,7 @@ sequelize.authenticate()
   Individuals.belongsTo(Funds, {foreignKey:'FundID'});
   Funds.hasMany(Individuals, {foreignKey: 'IndividualID', onDelete: 'CASCADE'});
 
-  const SharedFunds = sequelize.define('sharefunds',{
+  const SharedFunds = sequelize.define('sharedfunds',{
     SharingID: {
       type: Sequelize.INTEGER,
       allowNull: false,
