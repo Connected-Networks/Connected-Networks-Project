@@ -125,15 +125,12 @@ app.post("/csv", (req, res) => {
 
 app.get("/people", (req, res) => {
   try {
-    console.log("people requested");
     let userID = req.user.UserID;
     let be = new BackendProcessing();
     let data = be.retrievePeopleFromDatabase(userID).then(results => {
       if (!results) {
-        console.log("No people found");
         res.sendStatus(500);
       } else {
-        console.log("people found");
         res.json({ data: results });
       }
     });

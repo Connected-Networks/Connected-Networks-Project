@@ -20,8 +20,8 @@ getAllIndividuals = () => {
 };
 
 //This function returns an array of FundIDs representing funds the user can see.
-//It is important this returns an array of numbers rather than Fund JSON objects.
-getFundsUserCanSee = useID => {
+//It is important this returns an array of strings rather than Fund JSON objects.
+getFundsUserCanSee = userID => {
   return new Promise((resolve, reject) => {
     models.Funds.findAll({
       where: { UserID: userID }
@@ -29,14 +29,16 @@ getFundsUserCanSee = useID => {
       models.SharedFunds.findAll({
         where: { UserID: userID }
       }).then(sharedFundResults => {
-        let oids = originalFundResults.map(x => {
-          return x.FundID;
+        let originalFundNumbers = originalFundResults.map(x => {
+          //Converted to string to be more universal
+          return x.FundID.toString();
         });
-        let sids = sharedFundResults.map(x => {
-          return x.FundID;
+        let sharedFundNumbers = sharedFundResults.map(x => {
+          //Converted to string to be more universal
+          return x.FundID.toString();
         });
-        let ids = oids.concat(sids);
-        resolve(ids);
+        let fundNumbers = originalFundNumbers.concat(sharedFundNumbers);
+        resolve(fundNumbers);
       });
     });
   });
@@ -45,9 +47,11 @@ getFundsUserCanSee = useID => {
 getFundsUserCanChange = userID => {
   return new Promise((resolve, reject) => {
     models.Funds.findAll({ where: { UserID: userID } }).then(originalFundResults => {
-      return originalFundResults.map(x => {
-        return x.FundID;
-      });
+      resolve(
+        originalFundResults.map(x => {
+          return x.FundID.toString();
+        })
+      );
     });
   });
 };
@@ -72,9 +76,9 @@ getAllCompanies = () => {
 };
 getAllCompaniesOfUser = userID => {
   return new Promise((resolve, reject) => {
-    getFundsUserCanSee(userID).then(fids => {
-      models.Funds.findAll({
-        where: { FundID: fids }
+    getFundsUserCanSee(userID).then(fundids => {
+      models.Companies.findAll({
+        where: { FundID: fundids }
       }).then(results => {
         resolve(results);
       });
@@ -638,6 +642,7 @@ module.exports = {
   getAllUsers,
   getAllIndividuals,
   getAllCompanies,
+  getAllCompaniesOfUser,
   getAllFunds,
   getAllEmployeeHistory,
   insertPerson,

@@ -275,7 +275,8 @@ export default class BackendProcessing {
   //returns a promise boolean representing if the operation was successful
   retrieveCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
     return new Promise<DisplayCompany[]>((resolve, reject) => {
-      database.getAllCompaniesofUser(userID).then(results => {
+      database.getAllCompaniesOfUser(userID).then(results => {
+        console.log(JSON.stringify(results));
         let list: DisplayCompany[] = results.map(element => {
           let company: DisplayCompany = {
             id: element.CompanyID,
@@ -284,6 +285,7 @@ export default class BackendProcessing {
           };
           return company;
         });
+        console.log(JSON.stringify(list));
         resolve(list);
       });
     });
@@ -328,7 +330,7 @@ export default class BackendProcessing {
             };
             return fund;
           });
-          resolve(list.filter(x => availableFunds.indexOf(x.id) >= 0));
+          resolve(list.filter(x => availableFunds.indexOf(x.id.toString()) >= 0));
         });
       });
     });
@@ -608,7 +610,7 @@ export default class BackendProcessing {
             .then(company => {
               if (company == null) resolve(false);
               let fundID = company.FundID;
-              if (fundList.indexOf(fundID) > -1) resolve(true);
+              if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
               else resolve(false);
             })
             .catch(error => {
@@ -626,8 +628,11 @@ export default class BackendProcessing {
       database
         .getFundsUserCanSee(userID)
         .then(fundList => {
-          if (fundList.indexOf(fundID) > -1) resolve(true);
-          else resolve(false);
+          if (fundList.indexOf(fundID.toString()) > -1) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
         })
         .catch(error => {
           console.error("an error occured while finding funds related to user " + userID);
@@ -640,7 +645,7 @@ export default class BackendProcessing {
       database
         .getFundsUserCanChange(userID)
         .then(fundList => {
-          if (fundList.indexOf(fundID) > -1) resolve(true);
+          if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
           else resolve(false);
         })
         .catch(error => {
