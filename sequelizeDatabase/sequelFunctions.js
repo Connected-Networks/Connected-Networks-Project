@@ -344,23 +344,17 @@ deleteIndividual = IndividualID => {
   //
   // Modfying this to avoid a race condition -- Aaron
   return new Promise((resolve, reject) => {
-    models.EmployeeHistory.destroy({
+    models.Individuals.destroy({
       where: {
         IndividualID: IndividualID
       }
     })
-      .then(deletedHistory => {
-        models.Individuals.destroy({
-          where: {
-            IndividualID: IndividualID
-          }
-        }).then(deletedIndividual => {
-          console.log("deletion resolved");
-          resolve(deletedIndividual);
-        });
+      .then(deletedIndividual => {
+        console.log("New deletion of an individual.");
+        resolve(deletedIndividual);
       })
       .catch(err => {
-        console.error(err);
+        console.err("\n\n-->Error in deleteIndividual: ", err);
         reject(err);
       });
   });
@@ -404,23 +398,17 @@ modifyFund = (FundID, alteredFundName) => {
 
 deleteCompany = CompanyID => {
   return new Promise((resolve, reject) => {
-    models.EmployeeHistory.destroy({
+    models.Companies.destroy({
       where: {
         CompanyID: CompanyID
       }
     })
-      .then(deletedHistory => {
-        models.Companies.destroy({
-          where: {
-            CompanyID: CompanyID
-          }
-        }).then(deletedCompany => {
-          console.log("deletion resolved");
-          resolve(deletedCompany);
-        });
+      .then(deletedCompany => {
+        console.log("deletion resolved");
+        resolve(deletedCompany);
       })
       .catch(err => {
-        console.error(err);
+        console.error("Error in Delete company: ", err);
         reject(err);
       });
   });
@@ -436,6 +424,42 @@ deleteFund = FundID => {
       .then(deletedFund => {
         console.log("deleted ONLY a fund.");
         resolve(deletedFund);
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      });
+  });
+};
+
+deleteSharedFunds = ShareID => {
+  return new Promise((resolve, reject) => {
+    models.SharedFunds.destroy({
+      where: {
+        SharingID: ShareID
+      }
+    })
+      .then(unsharedFund => {
+        console.log("Fund is no longer shared.");
+        resolve(unsharedFund);
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      });
+  });
+};
+
+deleteEmployeeHistory = HistoryID => {
+  return new Promise((resolve, reject) => {
+    models.EmployeeHistory.destroy({
+      where: {
+        HistoryID: HistoryID
+      }
+    })
+      .then(deletedHistory => {
+        console.log("Deleted an single employment record.");
+        resolve(deletedHistory);
       })
       .catch(err => {
         console.error(err);
@@ -678,5 +702,9 @@ module.exports = {
   sharefund,
   getFundsUserCanSee,
   getFundsUserCanChange,
-  getAllIndividualsOfUser
+  getAllIndividualsOfUser,
+  deleteSharedFunds,
+  deleteEmployeeHistory,
+  insertSharedFunds,
+  getAllSharedFunds
 };

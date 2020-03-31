@@ -11,7 +11,7 @@ CREATE TABLE Funds (
 	FundName varchar(255),
     UserID int NOT NULL,
     PRIMARY KEY (FundID),
-	FOREIGN KEY (UserID) REFERENCES User (UserID)
+	FOREIGN KEY (UserID) REFERENCES User (UserID) ON DELETE CASCADE
 );
 
 CREATE TABLE Individuals (
@@ -21,7 +21,7 @@ CREATE TABLE Individuals (
 	LinkedInUrl varchar(500),
     Comments varchar(500),
     PRIMARY KEY (IndividualID),
-    FOREIGN KEY (FundID) REFERENCES Funds (FundID)
+    FOREIGN KEY (FundID) REFERENCES Funds (FundID) ON DELETE CASCADE
 );
 
 CREATE TABLE SharedFunds (
@@ -29,8 +29,8 @@ CREATE TABLE SharedFunds (
     FundID int NOT NULL,
     UserID int NOT NULL,
     PRIMARY KEY (SharingID),
-    FOREIGN KEY (UserID) REFERENCES User (UserID),
-    FOREIGN KEY (FundID) REFERENCES Funds (FundID)
+    FOREIGN KEY (UserID) REFERENCES User (UserID) ON DELETE CASCADE,
+    FOREIGN KEY (FundID) REFERENCES Funds (FundID) ON DELETE CASCADE
 );
 
 CREATE TABLE Companies (
@@ -38,7 +38,7 @@ CREATE TABLE Companies (
     FundID int NOT NULL,
 	CompanyName varchar(255),
     PRIMARY KEY (CompanyID),
-    FOREIGN KEY (FundID) REFERENCES Funds (FundID)
+    FOREIGN KEY (FundID) REFERENCES Funds (FundID) ON DELETE CASCADE
 );
 
 
@@ -50,9 +50,9 @@ CREATE TABLE EmployeeHistory (
 	PositionName varchar(255),
 	StartDate date,
 	EndDate date,
-    FOREIGN KEY (IndividualID) REFERENCES Individuals (IndividualID),
-    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID),
-    FOREIGN KEY (UserID) REFERENCES User (UserID),
+    FOREIGN KEY (IndividualID) REFERENCES Individuals (IndividualID) ON DELETE CASCADE,
+    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID) ON DELETE CASCADE,
+    FOREIGN KEY (UserID) REFERENCES User (UserID) ON DELETE CASCADE,
 	PRIMARY KEY (HistoryID)
 );
 
@@ -62,8 +62,8 @@ CREATE TABLE OriginalFundPosition (
     CompanyID int NOT NULL,
     PositionName varchar(255),
     PRIMARY KEY (OriginalPosID),
-    FOREIGN KEY (IndividualID) REFERENCES Individuals (IndividualID),
-    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID)
+    FOREIGN KEY (IndividualID) REFERENCES Individuals (IndividualID) ON DELETE CASCADE,
+    FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID) ON DELETE CASCADE
 );
 
 
