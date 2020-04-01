@@ -79,25 +79,34 @@ app.post("/logout", (req, res) => {
   }
 });
 
+//Returns all users except the current user
 app.get("/users", (req, res) => {
-  //Todo for Aaron: Get all users except the current user using the User object defined in LoginPage, and return the results in
-  //an array
-
-  //Temp
-  const users = [
-    { id: 0, username: "user2" },
-    { id: 1, username: "user3" },
-    { id: 2, username: "user4" }
-  ];
-  res.json({ users });
+  let userID = req.user.UserID;
+  let be = new BackendProcessing();
+  be.getOtherUsers(userID)
+    .then(users => {
+      res.json({ users });
+    })
+    .catch(error => {
+      console.error("An error occurred while retrieving users");
+      console.error(error);
+    });
 });
 
 app.post("/shareFund", (req, res) => {
-  //Todo for Aaron: Share the given fund using res.body.fundId with user using res.body.user
-
-  //Temp
-  console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
-  res.sendStatus(200);
+  let fundID = res.body.fundId;
+  let user = res.body.user;
+  let be = new BackendProcessing();
+  be.sharefund(fundID, user)
+    .then(boolean => {
+      if (boolean) {
+        console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
+        res.sendStatus(200);
+      } else res.sendStatus(500);
+    })
+    .catch(error => {
+      res.sendStatus(500);
+    });
 });
 
 app.post("/csv", (req, res) => {
@@ -106,7 +115,7 @@ app.post("/csv", (req, res) => {
     let fileName = req.body.fileName;
     let userID = req.user.UserID;
     let be = new BackendProcessing();
-    be.processRawCSV(data,fileName,userID).then(results => {
+    be.processRawCSV(data, fileName, userID).then(results => {
       res.sendStatus(200);
     });
   } catch (error) {
@@ -118,7 +127,7 @@ app.get("/people", (req, res) => {
   try {
     let userID = req.user.UserID;
     let be = new BackendProcessing();
-    let data = be.retrievePeopleFromDatabase().then(results => {
+    let data = be.retrievePeopleFromDatabase(userID).then(results => {
       if (!results) {
         res.sendStatus(500);
       } else {
@@ -130,35 +139,25 @@ app.get("/people", (req, res) => {
   }
 });
 
+//retrieve all individuals whose most recent employment was in the specified company
+//Sends a 200 result with null information if user cannot see the company
 app.get("/people/:companyId", (req, res) => {
-  //Todo for Aaron: implement this function to get all the people who work in a certain company to show them in the company details panel.
   try {
+    let userID = req.user.UserID;
+    let companyID = req.params.companyID;
     let be = new BackendProcessing();
-    //Temp until function is implemented
-    let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
-      if (!results) {
-        res.sendStatus(500);
-      } else {
-        res.json({ data: results });
-      }
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
-
-app.get("/people/original/:companyId", (req, res) => {
-  //Todo for Aaron: implement this function to get all the people who **originally** worked in a certain company to show them in the fund details panel.
-  try {
-    let be = new BackendProcessing();
-    //Temp until function is implemented
-    let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
-      if (!results) {
-        res.sendStatus(500);
-      } else {
-        res.json({ data: results });
-      }
-    });
+    if (!be.userSeesCompany(userID, companyID)) {
+      res.sendStatus(200);
+      return;
+    } else {
+      let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
+        if (!results) {
+          res.sendStatus(500);
+        } else {
+          res.json({ data: results });
+        }
+      });
+    }
   } catch (error) {
     res.sendStatus(500);
   }
@@ -167,15 +166,23 @@ app.get("/people/original/:companyId", (req, res) => {
 app.put("/people", (req, res) => {
   //update person
   let be = new BackendProcessing();
-  //console.log("body: "+JSON.stringify(req.body))
   let person = req.body;
-  let update = be.update_person(person);
-  update.then(boolean => {
-    if (boolean) res.sendStatus(200);
-    else res.sendStatus(500);
-  });
-  update.catch(() => {
-    res.sendStatus(500);
+  let userID = req.user.UserID;
+  let fundID = person.FundID;
+  be.userCanChangeFund(userID, fundID).then(authorized => {
+    if (!authorized) {
+      console.error("user cannot update in the specified fund");
+      res.sendStatus(500);
+      return;
+    }
+    let update = be.update_person(person);
+    update.then(boolean => {
+      if (boolean) res.sendStatus(200);
+      else res.sendStatus(500);
+    });
+    update.catch(() => {
+      res.sendStatus(500);
+    });
   });
 });
 
@@ -183,30 +190,53 @@ app.post("/people", (req, res) => {
   //add person
   let be = new BackendProcessing();
   let person = req.body.newData;
-  let i = be.insert_person(person);
-  i.then(boolean => {
-    if (boolean) res.sendStatus(200);
-    else res.sendStatus(500);
-  });
-  i.catch(res.sendStatus(500));
+  let userID = req.user.UserID;
+  let fundID = person.FundID;
+  be.userCanChangeFund(userID, fundID)
+    .then(authorized => {
+      if (!authorized) {
+        console.error("user cannot add an individual to that fund");
+        res.sendStatus(500);
+        return;
+      }
+      let i = be.insert_person(person);
+      i.then(boolean => {
+        if (boolean) res.sendStatus(200);
+        else res.sendStatus(500);
+      });
+      i.catch(res.sendStatus(500));
+    })
+    .catch(() => {
+      res.sendStatus(500);
+    });
 });
 
 app.delete("/people/:id", (req, res) => {
   //delete person
   let be = new BackendProcessing();
   let person = req.params.id;
-  let d = be.delete_person(person);
-  d.then(boolean => {
-    if (boolean) res.sendStatus(200);
-    else res.sendStatus(500);
+  let userID = req.user.UserID;
+  let fundID = person.FundID;
+  be.userCanChangeFund(userID, fundID).then(authorized => {
+    if (!authorized) {
+      console.error("User cannot delete the individual");
+      res.sendStatus(500);
+      return;
+    }
+    let d = be.delete_person(person);
+    d.then(boolean => {
+      if (boolean) res.sendStatus(200);
+      else res.sendStatus(500);
+    });
+    d.catch(res.sendStatus(500));
   });
-  d.catch(res.sendStatus(500));
 });
 
 app.get("/company", (req, res) => {
   try {
     let be = new BackendProcessing();
-    let data = be.retrieveCompaniesFromDatabase().then(results => {
+    let userID = req.user.UserID;
+    let data = be.retrieveCompaniesFromDatabase(userID).then(results => {
       if (!results) {
         res.sendStatus(500);
       } else {
@@ -221,17 +251,25 @@ app.get("/company", (req, res) => {
 app.put("/company", (req, res) => {
   //update company
   let be = new BackendProcessing();
-  //console.log("body: "+JSON.stringify(req.body))
   let company = req.body;
-  let update = be.update_company(company);
-  update.then(boolean => {
-    if (boolean) {
-      console.log("company updated");
-      res.sendStatus(200);
-    } else res.sendStatus(500);
-  });
-  update.catch(() => {
-    res.sendStatus(500);
+  let userID = req.user.UserID;
+  let fundID = company.FundID;
+  be.userCanChangeFund(userID, fundID).then(authorized => {
+    if (!authorized) {
+      console.error("user is not authorized to change companies in that fund");
+      res.sendStatus(500);
+      return;
+    }
+    let update = be.update_company(company);
+    update.then(boolean => {
+      if (boolean) {
+        console.log("company updated");
+        res.sendStatus(200);
+      } else res.sendStatus(500);
+    });
+    update.catch(() => {
+      res.sendStatus(500);
+    });
   });
 });
 
@@ -239,33 +277,52 @@ app.post("/company", (req, res) => {
   //add company
   let be = new BackendProcessing();
   let company = req.body.newData;
-  let i = be.insert_company(company);
-  i.then(boolean => {
-    if (boolean) {
-      console.log("person added");
-      res.sendStatus(200);
-    } else res.sendStatus(500);
+  let userID = req.user.UserID;
+  let fundID = company.FundID;
+  be.userCanChangeFund(userID, fundID).then(authorized => {
+    if (!authorized) {
+      console.error("user cannot add a company to that fund");
+      res.sendStatus(500);
+      return;
+    }
+    let i = be.insert_company(company);
+    i.then(boolean => {
+      if (boolean) {
+        console.log("person added");
+        res.sendStatus(200);
+      } else res.sendStatus(500);
+    });
+    i.catch(res.sendStatus(500));
   });
-  i.catch(res.sendStatus(500));
 });
 
 app.delete("/company/:id", (req, res) => {
   //delete company
   let be = new BackendProcessing();
   let company = req.params.id;
-  let d = be.delete_company(company);
-  d.then(boolean => {
-    if (boolean) res.sendStatus(200);
-    else res.sendStatus(500);
+  let userID = req.user.UserID;
+  let fundID = company.FundID;
+  be.userCanChangeFund(userID, fundID).then(authorized => {
+    if (!authorized) {
+      console.error("user cannot delete a company from that fund");
+      res.sendStatus(500);
+      return;
+    }
+    let d = be.delete_company(company);
+    d.then(boolean => {
+      if (boolean) res.sendStatus(200);
+      else res.sendStatus(500);
+    });
+    d.catch(res.sendStatus(500));
   });
-  d.catch(res.sendStatus(500));
 });
 
 app.get("/funds", (req, res) => {
   //return type should be an Array of SideMenuFund objects as defined in App.tsx.
   try {
     let be = new BackendProcessing();
-    let results = be.retrieveFundsFromDatabase();
+    let userID = req.user.UserID;
+    let results = be.retrieveFundsFromDatabase(userID);
     results.then(funds => {
       res.json({ data: funds });
     });
@@ -291,25 +348,41 @@ app.put("/funds", (req, res) => {
   //req.body.fund.name is probably gonna be the thing that always change
   //Temp until function is implemented
   let be = new BackendProcessing();
-  console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
-  let fund = req.body.fund;
-  be.update_fund(fund).then(result => {
-    if (result) res.sendStatus(200);
-    else res.sendStatus(500);
+  let userID = req.user.UserID;
+  be.userCanChangeFund(userID, req.body.fund.id).then(authorized => {
+    if (!authorized) {
+      console.error("User cannot update the fund");
+      res.sendStatus(500);
+      return;
+    }
+    console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
+    let fund = req.body.fund;
+    be.update_fund(fund).then(result => {
+      if (result) res.sendStatus(200);
+      else res.sendStatus(500);
+    });
   });
 });
 
 app.get("/funds/:id", (req, res) => {
   try {
     let be = new BackendProcessing();
+    let userID = req.user.UserID;
     let fundID = req.params.id;
-    console.log("params: " + JSON.stringify(req.params));
-    console.log("type: " + typeof fundID);
-    console.log("string: " + fundID);
-    let data = be.retrieveCompaniesFromFund(fundID).then(results => {
-      if (results != null) {
-        res.json({ data: results });
-      } else res.sendStatus(500);
+    be.userSeesFund(userID, fundID).then(authorized => {
+      if (!authorized) {
+        console.error("User " + userID + " cannot see Fund " + fundID);
+        res.sendStatus(500);
+        return;
+      }
+      //console.log("params: " + JSON.stringify(req.params));
+      //console.log("type: " + typeof fundID);
+      //console.log("string: " + fundID);
+      let data = be.retrieveCompaniesFromFund(fundID).then(results => {
+        if (results != null) {
+          res.json({ data: results });
+        } else res.sendStatus(500);
+      });
     });
   } catch (error) {
     res.sendStatus(500);
@@ -320,12 +393,20 @@ app.get("/people/original/:companyId", (req, res) => {
   try {
     let be = new BackendProcessing();
     let companyID = req.params.id;
-    let data = be.retrievePeopleFromOriginalCompany(companyID).then(results => {
-      if (!results) {
+    let userID = req.user.UserID;
+    be.userSeesCompany(userID, companyID).then(authorized => {
+      if (!authorized) {
+        console.error("User " + userID + " cannot view company " + companyID);
         res.sendStatus(500);
-      } else {
-        res.json({ data: results });
+        return;
       }
+      let data = be.retrievePeopleFromOriginalCompany(companyID).then(results => {
+        if (!results) {
+          res.sendStatus(500);
+        } else {
+          res.json({ data: results });
+        }
+      });
     });
   } catch (error) {
     res.sendStatus(500);
@@ -333,35 +414,73 @@ app.get("/people/original/:companyId", (req, res) => {
 });
 
 app.get("/history/:id", (req, res) => {
-  // Todo for Aaron, make this function return all employee history related to the recieved IndividualID.
-  // Look at client/EmploymentHistpryTable.tsx for more info
-  // Make sure to use .toLocaleDateString() to make Date types strings or just shove the date in there if
-  // you recieve it as a string from the DB.
-  try {
-    //Temp until function is implemented
-    const results = [
-      { id: 1, company: "Joojle", position: "CEO", start: new Date(2014, 9, 18).toLocaleDateString(), end: "Present" },
-      {
-        id: 0,
-        company: "HardCode",
-        position: "Developer",
-        start: new Date(2002, 11, 23).toLocaleDateString(),
-        end: new Date(2007, 7, 7).toLocaleDateString()
-      }
-    ];
-
-    res.json({ data: results });
-  } catch (error) {
-    res.sendStatus(500);
-  }
+  let be = new BackendProcessing();
+  let individualID = req.params.id;
+  let userID = req.user.UserID;
+  be.userCanSeeIndividual(userID, individualID).then(authorized => {
+    if (!authorized) {
+      console.error("User cannot see history of individual " + individualID);
+      res.sendStatus(500);
+      return;
+    }
+    let g = be.getHistoryOfIndividual(individualID);
+    g.then(results => {
+      res.json({ data: results });
+    });
+    g.catch(error => {
+      res.sendStatus(500);
+    });
+  });
 });
 
 app.put("/history", (req, res) => {
-  // Update history
+  let be = new BackendProcessing();
+  let history = req.body;
+  let userID = req.user.UserID;
+  let individual = req.employee;
+  be.userCanChangeIndividual(userID, individual.individualID).then(authorized => {
+    if (!authorized) {
+      console.error("User cannot add history to individual " + individual.IndividualID);
+      res.sendStatus(500);
+      return;
+    }
+    let ins = be.insertHistory(history, individual, userID);
+    ins.then(result => {
+      if (result) {
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(500);
+      }
+    });
+    ins.catch(error => {
+      res.sendStatus(500);
+    });
+  });
 });
 
 app.post("/history/:id", (req, res) => {
-  // Add history
+  let be = new BackendProcessing();
+  let history = req.body;
+  let individual = req.employee;
+  let userID = req.user.UserID;
+  be.userCanChangeIndividual(userID, individual.individualID).then(authorized => {
+    if (!authorized) {
+      console.error("User cannot edit history of individual " + individual.IndividualID);
+      res.sendStatus(500);
+      return;
+    }
+    let upd = be.updateHistory(history, individual, userID);
+    upd.then(result => {
+      if (result) {
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(500);
+      }
+    });
+    upd.catch(error => {
+      res.sendStatus(500);
+    });
+  });
 });
 
 app.delete("/history", (req, res) => {
