@@ -18,12 +18,72 @@ getAllIndividuals = () => {
     })
     .catch(err => console.error(err));
 };
+
+//This function returns an array of FundIDs representing funds the user can see.
+//It is important this returns an array of strings rather than Fund JSON objects.
+getFundsUserCanSee = userID => {
+  return new Promise((resolve, reject) => {
+    models.Funds.findAll({
+      where: { UserID: userID }
+    }).then(originalFundResults => {
+      models.SharedFunds.findAll({
+        where: { UserID: userID }
+      }).then(sharedFundResults => {
+        let originalFundNumbers = originalFundResults.map(x => {
+          //Converted to string to be more universal
+          return x.FundID.toString();
+        });
+        let sharedFundNumbers = sharedFundResults.map(x => {
+          //Converted to string to be more universal
+          return x.FundID.toString();
+        });
+        let fundNumbers = originalFundNumbers.concat(sharedFundNumbers);
+        resolve(fundNumbers);
+      });
+    });
+  });
+};
+
+getFundsUserCanChange = userID => {
+  return new Promise((resolve, reject) => {
+    models.Funds.findAll({ where: { UserID: userID } }).then(originalFundResults => {
+      resolve(
+        originalFundResults.map(x => {
+          return x.FundID.toString();
+        })
+      );
+    });
+  });
+};
+
+getAllIndividualsOfUser = userID => {
+  return new Promise((resolve, reject) => {
+    getFundsUserCanSee(userID).then(ids => {
+      models.Individuals.findAll({
+        where: { FundID: ids }
+      }).then(results => {
+        resolve(results);
+      });
+    });
+  });
+};
 getAllCompanies = () => {
-  return models.Companies.findAll()
+  return models.Companies.findAll({ where: {} })
     .then(companies => {
       return companies;
     })
     .catch(err => console.error(err));
+};
+getAllCompaniesOfUser = userID => {
+  return new Promise((resolve, reject) => {
+    getFundsUserCanSee(userID).then(fundids => {
+      models.Companies.findAll({
+        where: { FundID: fundids }
+      }).then(results => {
+        resolve(results);
+      });
+    });
+  });
 };
 getAllFunds = () => {
   return models.Funds.findAll()
@@ -152,6 +212,30 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
     .catch(err => console.error("Error in insertEmployeeHistory", err));
 };
 
+updateEmployeeHistory = (historyID, userID, individualID, companyID, positionName, startDate, endDate) => {
+  return new Promise((resolve, reject) => {
+    models.EmployeeHistory.findOne({
+      where: {
+        HistoryID: historyID
+      }
+    }).then(result => {
+      if (result == null) reject();
+      result
+        .update({
+          UserID: userID,
+          IndividualID: individualID,
+          CompanyID: companyID,
+          PositionName: positionName,
+          StartDate: startDate,
+          EndDate: endDate
+        })
+        .then(result => {
+          resolve();
+        });
+    });
+  });
+};
+
 insertFromCsvLine = (
   UserID,
   FundID,
@@ -233,6 +317,7 @@ getIndividualCurrentEmployement = IndividualID => {
 };
 
 //---------------Modify Existing Data Functions----------//
+//FundID should not be changeable.
 modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
   return models.Individuals.findOne({
     where: {
@@ -259,23 +344,17 @@ deleteIndividual = IndividualID => {
   //
   // Modfying this to avoid a race condition -- Aaron
   return new Promise((resolve, reject) => {
-    models.EmployeeHistory.destroy({
+    models.Individuals.destroy({
       where: {
         IndividualID: IndividualID
       }
     })
-      .then(deletedHistory => {
-        models.Individuals.destroy({
-          where: {
-            IndividualID: IndividualID
-          }
-        }).then(deletedIndividual => {
-          console.log("deletion resolved");
-          resolve(deletedIndividual);
-        });
+      .then(deletedIndividual => {
+        console.log("New deletion of an individual.");
+        resolve(deletedIndividual);
       })
       .catch(err => {
-        console.error(err);
+        console.err("\n\n-->Error in deleteIndividual: ", err);
         reject(err);
       });
   });
@@ -319,23 +398,17 @@ modifyFund = (FundID, alteredFundName) => {
 
 deleteCompany = CompanyID => {
   return new Promise((resolve, reject) => {
-    models.EmployeeHistory.destroy({
+    models.Companies.destroy({
       where: {
         CompanyID: CompanyID
       }
     })
-      .then(deletedHistory => {
-        models.Companies.destroy({
-          where: {
-            CompanyID: CompanyID
-          }
-        }).then(deletedCompany => {
-          console.log("deletion resolved");
-          resolve(deletedCompany);
-        });
+      .then(deletedCompany => {
+        console.log("deletion resolved");
+        resolve(deletedCompany);
       })
       .catch(err => {
-        console.error(err);
+        console.error("Error in Delete company: ", err);
         reject(err);
       });
   });
@@ -351,6 +424,42 @@ deleteFund = FundID => {
       .then(deletedFund => {
         console.log("deleted ONLY a fund.");
         resolve(deletedFund);
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      });
+  });
+};
+
+deleteSharedFunds = ShareID => {
+  return new Promise((resolve, reject) => {
+    models.SharedFunds.destroy({
+      where: {
+        SharingID: ShareID
+      }
+    })
+      .then(unsharedFund => {
+        console.log("Fund is no longer shared.");
+        resolve(unsharedFund);
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      });
+  });
+};
+
+deleteEmployeeHistory = HistoryID => {
+  return new Promise((resolve, reject) => {
+    models.EmployeeHistory.destroy({
+      where: {
+        HistoryID: HistoryID
+      }
+    })
+      .then(deletedHistory => {
+        console.log("Deleted an single employment record.");
+        resolve(deletedHistory);
       })
       .catch(err => {
         console.error(err);
@@ -403,6 +512,22 @@ retrieveCurrentEmployeesOfCompany = CompanyID => {
   });
 };
 
+retrieveIndividualsByOriginalCompany = companyID => {
+  return models.OriginalFundPosition.findAll({
+    where: { CompanyID: companyID },
+    include: [
+      {
+        model: models.Individuals
+      }
+    ]
+  });
+};
+retrieveIndividualByID = individualID => {
+  return models.Individuals.findAll({
+    where: { IndividualID: individualID }
+  });
+};
+
 retrieveFundName = fundID => {
   return new Promise((resolve, reject) => {
     models.Funds.findAll({
@@ -414,6 +539,91 @@ retrieveFundName = fundID => {
       else resolve(undefined);
     });
   });
+};
+
+sharefund = (fundID, userID) => {
+  return new Promise((resolve, reject) => {
+    models.SharedFunds.findOrCreate({
+      where: {
+        FundID: fundID,
+        UserID: userID
+      }
+    }).then(result => {
+      resolve(result);
+    });
+  });
+};
+
+//Assumes company names are unique in a fund, or companies in the same fund with the same name are substitutable
+retrieveCompanyByName = (companyName, fundID) => {
+  return new Promise((resolve, reject) => {
+    models.Companies.find({
+      where: {
+        FundID: fundID,
+        CompanyName: companyName
+      }
+    })
+      .then(result => {
+        resolve(result);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+retrieveCompanyByID = companyID => {
+  return new Promise((resolve, reject) => {
+    models.Companies.find({
+      where: {
+        CompanyID: companyID
+      }
+    })
+      .then(result => {
+        resolve(result);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+//returns the number of accounts with the specified username
+checkUsageofUsername = username => {
+  return new Promise((resolve, reject) => {
+    models.User.findAll({
+      where: {
+        Username: username
+      }
+    })
+      .then(results => {
+        resolve(results.length);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+//returns the number of accounts with the specified email
+checkUsageofEmail = email => {
+  return new Promise((resolve, reject) => {
+    models.User.findAll({
+      where: {
+        Email: email
+      }
+    })
+      .then(results => {
+        resolve(results.length);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+createAccount = (username, email, password) => {
+  return models.User.create({ Username: username, Password: password, Email: email });
 };
 
 getUserByUsername = username => {
@@ -472,6 +682,7 @@ module.exports = {
   getAllUsers,
   getAllIndividuals,
   getAllCompanies,
+  getAllCompaniesOfUser,
   getAllFunds,
   getAllEmployeeHistory,
   insertPerson,
@@ -480,6 +691,8 @@ module.exports = {
   insertFromCsvLine,
   getIndividualEmployeeHistory,
   getIndividualCurrentEmployement,
+  retrieveIndividualsByOriginalCompany,
+  retrieveIndividualByID,
   modifyIndividual,
   deleteIndividual,
   modifyCompany,
@@ -487,7 +700,14 @@ module.exports = {
   deleteFund,
   modifyFund,
   retrieveCompaniesByFunds,
+  retrieveCompanyByName,
+  retrieveCompanyByID,
   retrieveCurrentEmployeesOfCompany,
+  retrieveFundName,
+  insertFund,
+  checkUsageofUsername,
+  checkUsageofEmail,
+  createAccount,
   retrieveFundName,
   insertFund,
   getUserByUsername,
@@ -496,5 +716,14 @@ module.exports = {
   getUserById,
   getIndividualByLinkedIn,
   getCompanyById,
-  getAllUsersRelatedToFund
+  getAllUsersRelatedToFund,
+  updateEmployeeHistory,
+  sharefund,
+  getFundsUserCanSee,
+  getFundsUserCanChange,
+  getAllIndividualsOfUser,
+  deleteSharedFunds,
+  deleteEmployeeHistory,
+  insertSharedFunds,
+  getAllSharedFunds
 };

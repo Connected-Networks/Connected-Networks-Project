@@ -18,8 +18,8 @@ function delay(ms: number) {
 
 function test_new_function() {
   let be = new BackendProcessing();
-  be.getAllUsers().then(users => {
-    console.log(users);
+  be.userSeesFund(1, 1).then(result => {
+    console.log(result);
   });
 }
 
