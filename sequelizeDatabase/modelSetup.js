@@ -78,8 +78,8 @@ const Funds = sequelize.define(
 );
 
 // NOTE: "ClassThatTakesForeignKey.BELONGSTO(ClassWithForeignKey)"
-Funds.belongsTo(User, { foreignKey: "UserID" });
-User.hasMany(Funds, { foreignKey: "UserID" });
+Funds.belongsTo(User, { foreignKey: "UserID", onDelete: "CASCADE" });
+User.hasMany(Funds, { foreignKey: "UserID", onDelete: "CASCADE" });
 
 const Individuals = sequelize.define(
   "individuals",
@@ -115,10 +115,10 @@ const Individuals = sequelize.define(
 );
 
 Individuals.belongsTo(Funds, { foreignKey: "FundID" });
-Funds.hasMany(Individuals, { foreignKey: "IndividualID" });
+Funds.hasMany(Individuals, { foreignKey: "IndividualID", onDelete: "CASCADE" });
 
 const SharedFunds = sequelize.define(
-  "sharefunds",
+  "sharedfunds",
   {
     SharingID: {
       type: Sequelize.INTEGER,

@@ -1,4 +1,5 @@
 import { resolve } from "dns";
+import { start } from "repl";
 
 const denv = require("dotenv").config();
 const mysql = require("mysql");
@@ -7,6 +8,7 @@ const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface DisplayPerson {
   id: number;
+  fundID: number;
   name: string;
   company: string;
   position: string;
@@ -15,22 +17,31 @@ interface DisplayPerson {
 }
 interface DisplayCompany {
   id: number;
+  fundID: number;
   name: string;
 }
 interface DisplayFund {
   id: number;
   name: string;
 }
+interface DisplayHistory {
+  id: number;
+  company: string;
+  position: string;
+  start: string;
+  end: string;
+}
+interface SimpleUser {
+  id: number;
+  username: string;
+}
 
 export default class BackendProcessing {
-  processRawCSV(data: string) {
+  processRawCSV(data: string, fileName: string, userID) {
     //First line is commented and ignored
     //Second line is treated as header
 
-    //TODO: add logic
-    //currently this is hardcoded
-    let fundName = "First Fund";
-    let userID = 1;
+    let fundName = fileName;
 
     var results = papa.parse("#" + data, {
       //Adding a # causes the parser to skip the first row, treat the second row as header
@@ -100,9 +111,9 @@ export default class BackendProcessing {
     );
   }
 
-  retrievePeopleFromDatabase(): Promise<DisplayPerson[]> {
+  retrievePeopleFromDatabase(userID): Promise<DisplayPerson[]> {
     return new Promise<DisplayPerson[]>((resolve, reject) => {
-      database.getAllIndividuals().then(individuals => {
+      database.getAllIndividualsOfUser(userID).then(individuals => {
         resolve(
           Promise.all(
             individuals.map(
@@ -121,6 +132,7 @@ export default class BackendProcessing {
       database.getIndividualCurrentEmployement(individual.IndividualID).then(employment => {
         let dp = {
           id: individual.IndividualID,
+          fundID: individual.FundID,
           name: individual.Name,
           company: "",
           position: "",
@@ -192,7 +204,7 @@ export default class BackendProcessing {
   //returns a promise boolean representing if the operation was successful
   insert_person(person) {
     return new Promise<boolean>((resolve, reject) => {
-      let insert = database.insertPerson(person.name, person.position, person.hyperlink, person.comment);
+      let insert = database.insertPerson(person.name, person.fundID, person.position, person.hyperlink, person.comment);
       insert.then(person => {
         resolve(true);
       });
@@ -204,9 +216,10 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
+  //NOTE: FundID is specifically excluded as changeable
   update_person(person) {
     return new Promise<boolean>((resolve, reject) => {
-      let update = database.modifyIndividual(person.id, person.name, person.position, person.hyperlink, person.comment);
+      let update = database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
       update.then(person => {
         resolve(true);
       });
@@ -259,16 +272,19 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
-  retrieveCompaniesFromDatabase(): Promise<DisplayCompany[]> {
+  retrieveCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
     return new Promise<DisplayCompany[]>((resolve, reject) => {
-      database.getAllCompanies().then(results => {
+      database.getAllCompaniesOfUser(userID).then(results => {
+        console.log(JSON.stringify(results));
         let list: DisplayCompany[] = results.map(element => {
           let company: DisplayCompany = {
             id: element.CompanyID,
+            fundID: element.FundID,
             name: element.CompanyName
           };
           return company;
         });
+        console.log(JSON.stringify(list));
         resolve(list);
       });
     });
@@ -302,17 +318,19 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
-  retrieveFundsFromDatabase(): Promise<DisplayFund[]> {
+  retrieveFundsFromDatabase(userID): Promise<DisplayFund[]> {
     return new Promise<DisplayFund[]>((resolve, reject) => {
-      database.getAllFunds().then(results => {
-        let list: DisplayFund[] = results.map(element => {
-          let fund: DisplayFund = {
-            id: element.FundID,
-            name: element.FundName
-          };
-          return fund;
+      database.getFundsUserCanSee(userID).then(availableFunds => {
+        database.getAllFunds().then(results => {
+          let list: DisplayFund[] = results.map(element => {
+            let fund: DisplayFund = {
+              id: element.FundID,
+              name: element.FundName
+            };
+            return fund;
+          });
+          resolve(list.filter(x => availableFunds.indexOf(x.id.toString()) >= 0));
         });
-        resolve(list);
       });
     });
   }
@@ -323,6 +341,7 @@ export default class BackendProcessing {
         let list: DisplayCompany[] = results.map(element => {
           let company: DisplayCompany = {
             id: element.CompanyID,
+            fundID: element.FundID,
             name: element.CompanyName
           };
           return company;
@@ -335,6 +354,36 @@ export default class BackendProcessing {
     return database.retrieveCurrentEmployeesOfCompany(companyID);
   }
 
+  //Assumes that OriginalFundPosition table will not have duplicate combinations of IndividualID and CompanyID
+  //If this assumption is wrong, this function may return duplicate entries
+  retrievePeopleFromOriginalCompany(companyID): Promise<Object> {
+    return new Promise<DisplayPerson[]>((resolve, reject) => {
+      database
+        .retrieveIndividualsByOriginalCompany(companyID)
+        .then(results => {
+          resolve(
+            results.map(entry => {
+              let dp: DisplayPerson = {
+                id: entry.Individual.IndividualID,
+                fundID: entry.Individual.FundID,
+                name: entry.Individual.Name,
+                //should not be needed. If it ever is, the db function could easily be edited to include companies table, at the cost of running time.
+                company: null,
+                position: entry.PositionName,
+                comment: entry.Individual.Comments,
+                hyperlink: entry.Individual.LinkedInUrl
+              };
+              return dp;
+            })
+          );
+        })
+        .catch(error => {
+          console.error("Error in retrievePeopleViaOriginalCompany");
+          console.error(error);
+        });
+    });
+  }
+
   //returns undefined if fundID is not found
   retrieveFundName(fundID): Promise<String> {
     return new Promise<String>((resolve, reject) => {
@@ -344,10 +393,107 @@ export default class BackendProcessing {
     });
   }
 
-  retrievePeopleFromOriginalCompany(companyID): Promise<Object> {
-    //TODO: complete this function
-    //This function will be simpler after the schema changes
-    return null;
+  getHistoryOfIndividual(individualID): Promise<DisplayHistory[]> {
+    return new Promise<DisplayHistory[]>((resolve, reject) => {
+      database.getIndividualEmployeeHistory(individualID).then(results => {
+        resolve(
+          results.map(entry => {
+            let history: DisplayHistory = {
+              id: entry.id,
+              company: entry.Company.CompanyName,
+              position: entry.PositionName,
+              start: entry.StartDate,
+              end: entry.EndDate
+            };
+            return history;
+          })
+        );
+      });
+    });
+  }
+
+  insertHistory(history, individual, userID): Promise<Boolean> {
+    return new Promise<Boolean>((resolve, reject) => {
+      let fundID = individual.FundID;
+      database
+        .retrieveCompanyByName(history.company, fundID)
+        .then(resultCompany => {
+          database
+            .insertEmployeeHistory(userID, history.id, resultCompany.CompanyID, history.position, history.start, history.end)
+            .then(result => {
+              if (result != null) resolve(true);
+              else resolve(false);
+            })
+            .catch(error => {
+              console.error("An error occurred while inserting employee history");
+              console.error(error);
+              resolve(false);
+            });
+        })
+        .catch(error => {
+          console.error("An error occurred while retrieving company information");
+          console.error(error);
+          resolve(false);
+        });
+    });
+  }
+
+  //The information passed into this function pertains to individuals, employeeHistory (except company ID), and company name
+  //This function assumes that the individualID part of employeeHistory may change, but the details about the individual will not be changed here,
+  //there is a seperate function for that. Similarly, this function assumes that the companyID may change, but the name of the specified company is not changing.
+  updateHistory(history, individual, userID): Promise<Boolean> {
+    return new Promise<Boolean>((resolve, reject) => {
+      let fundID = individual.FundID;
+      database
+        .retrieveCompanyByName(history.company, fundID)
+        .then(resultCompany => {
+          database
+            .updateHistory(
+              history.HistoryID,
+              userID,
+              individual.IndividualID,
+              resultCompany.CompanyID,
+              history.position,
+              history.start,
+              history.end
+            )
+            .then(resolve(true));
+        })
+        .catch(error => {
+          console.error("An error occurred while retrieving company information");
+          console.error(error);
+          resolve(false);
+        });
+    });
+  }
+
+  sharefund(fundID, user) {
+    return new Promise<Boolean>((resolve, reject) => {
+      database
+        .sharefund(fundID, user.UserID)
+        .then(result => {
+          resolve(true);
+        })
+        .catch(error => {
+          resolve(false);
+        });
+    });
+  }
+
+  getOtherUsers(currentUserID) {
+    return new Promise<SimpleUser[]>((resolve, reject) => {
+      database
+        .getAllUsers()
+        .then(users => {
+          let filteredList = users.filter(user => {
+            return user.UserID == currentUserID;
+          });
+          resolve(filteredList);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
   }
 
   //For Testing purposes
@@ -358,6 +504,78 @@ export default class BackendProcessing {
         .getAllUsers()
         .then(users => resolve(users))
         .catch(() => reject());
+    });
+  }
+
+  //Returns false if user cannot see the company, or the company doesn't exist
+  userSeesCompany(userID, companyID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database
+        .getFundsUserCanSee(userID)
+        .then(fundList => {
+          database
+            .retrieveCompanyByID(companyID)
+            .then(company => {
+              if (company == null) resolve(false);
+              let fundID = company.FundID;
+              if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
+              else resolve(false);
+            })
+            .catch(error => {
+              console.error("an error occured while retrieving information on company " + companyID);
+            });
+        })
+        .catch(error => {
+          console.error("an error occured while finding funds related to user " + userID);
+        });
+    });
+  }
+
+  userSeesFund(userID, fundID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database
+        .getFundsUserCanSee(userID)
+        .then(fundList => {
+          if (fundList.indexOf(fundID.toString()) > -1) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        })
+        .catch(error => {
+          console.error("an error occured while finding funds related to user " + userID);
+        });
+    });
+  }
+
+  userCanChangeFund(userID, fundID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database
+        .getFundsUserCanChange(userID)
+        .then(fundList => {
+          if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
+          else resolve(false);
+        })
+        .catch(error => {
+          console.error("an error occured while finding funds changeable by user " + userID);
+        });
+    });
+  }
+
+  userCanSeeIndividual(userID, individualID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database.retrieveIndividualByID(individualID).then(individual => {
+        let fundID = individual.FundID;
+        return this.userSeesFund(userID, fundID);
+      });
+    });
+  }
+  userCanChangeIndividual(userID, individualID): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      database.retrieveIndividualByID(individualID).then(individual => {
+        let fundID = individual.FundID;
+        return this.userCanChangeFund(userID, fundID);
+      });
     });
   }
 }

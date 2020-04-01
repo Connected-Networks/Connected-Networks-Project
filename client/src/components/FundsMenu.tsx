@@ -44,17 +44,12 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
   }
 
   refresh = () => {
-    const funds = [{ id: 0, name: "Mock Fund" }];
-    this.setState({ funds, addMode: false, editMode: false, newFundName: "" });
-
-    // this.getFunds().then(funds => {
-    //   if (!Object.keys(funds).length) {
-    //     funds = [];
-    //   }
-    //   console.log(funds);
-    //   funds = [{ id: 0, name: "Mock Fund" }];
-    //   this.setState({ funds, addMode: false, editMode: false, newFundName: "" });
-    // });
+    this.getFunds().then(funds => {
+      if (!Object.keys(funds).length) {
+        funds = [];
+      }
+      this.setState({ funds, addMode: false, editMode: false, newFundName: "" });
+    });
   };
 
   getFunds = async () => {
