@@ -1,4 +1,5 @@
-jest.mock("../../../backend-processing");
+require("mysql2/node_modules/iconv-lite").encodingExists("foo"); //Required due to some bug in Jest
+
 jest.mock("../../../sequelizeDatabase/sequelFunctions");
 jest.mock("bcryptjs");
 import AuthController from "../../../AuthController";

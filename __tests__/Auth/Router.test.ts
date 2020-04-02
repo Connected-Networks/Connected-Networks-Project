@@ -1,4 +1,7 @@
 require("mysql2/node_modules/iconv-lite").encodingExists("foo"); //Required due to some bug in Jest
+
+jest.mock("../../sequelizeDatabase/sequelFunctions");
+jest.mock("../../backend-processing");
 jest.mock("../../config/passport");
 import Passport from "../../config/passport";
 jest.mock("express");
@@ -46,6 +49,10 @@ describe("Router", () => {
 
   function importIsolatedRouter() {
     jest.isolateModules(() => {
+      jest.mock("../../sequelizeDatabase/modelSetup");
+      jest.mock("../../sequelizeDatabase/sequelFunctions");
+      jest.mock("../../backend-processing");
+      jest.mock("../../config/passport");
       require("../../router");
     });
   }

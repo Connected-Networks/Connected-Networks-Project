@@ -1,3 +1,5 @@
+require("mysql2/node_modules/iconv-lite").encodingExists("foo"); //Required due to some bug in Jest
+
 jest.mock("../../../sequelizeDatabase/sequelFunctions");
 const database = require("../../../sequelizeDatabase/sequelFunctions");
 jest.mock("bcryptjs");
