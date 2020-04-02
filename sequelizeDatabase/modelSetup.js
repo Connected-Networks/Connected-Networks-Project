@@ -10,14 +10,18 @@ const sequelize = new Sequelize(process.env.DATABASE, process.env.USER, process.
   }
 });
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Connection has been established successfully.");
-  })
-  .catch(err => {
-    console.error("Unable to connect to the database:", err);
-  });
+//Temp until we find a better way
+//TODO: find a better way
+sequelize.connect = function() {
+  sequelize
+    .authenticate()
+    .then(() => {
+      console.log("Connection has been established successfully.");
+    })
+    .catch(err => {
+      console.error("Unable to connect to the database:", err);
+    });
+};
 
 const User = sequelize.define(
   "user",

@@ -632,9 +632,7 @@ getUserByUsername = username => {
       where: {
         Username: username
       }
-    }).then(user => {
-      user !== null ? resolve(user) : reject();
-    });
+    }).then(user => resolve(user));
   });
 };
 
@@ -644,9 +642,7 @@ getUserByEmail = email => {
       where: {
         Email: email
       }
-    }).then(user => {
-      user !== null ? resolve(user) : reject();
-    });
+    }).then(user => resolve(user));
   });
 };
 
