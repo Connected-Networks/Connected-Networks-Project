@@ -7,6 +7,7 @@ const app = express();
 const models = require("./sequelizeDatabase/modelSetup");
 const SessionStore = require("express-session-sequelize")(session.Store);
 import BackendProcessing from "./backend-processing";
+import NotificationController from "./NotificationController";
 
 const port = process.env.PORT || 5000;
 
