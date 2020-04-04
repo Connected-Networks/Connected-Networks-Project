@@ -1,4 +1,3 @@
-import BackendProcessing from "./backend-processing";
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface DisplayPerson {
@@ -196,7 +195,7 @@ export default class PeopleController {
         res.sendStatus(500);
         return;
       }
-      let d = this.delete_person(person);
+      let d = this.deletePersonFromDatabase(person);
       d.then(boolean => {
         if (boolean) res.sendStatus(200);
         else res.sendStatus(500);
@@ -206,7 +205,7 @@ export default class PeopleController {
   }
 
   //returns a promise boolean representing if the operation was successful
-  static delete_person(person) {
+  static deletePersonFromDatabase(person) {
     return new Promise<boolean>((resolve, reject) => {
       console.log("starting deletion");
       let del = database.deleteIndividual(person);
