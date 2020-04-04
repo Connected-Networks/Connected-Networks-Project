@@ -127,6 +127,7 @@ export default class PeopleController {
         })
         .catch(error => {
           console.error("an error occured while finding funds changeable by user " + userID);
+          throw error;
         });
     });
   }
@@ -135,37 +136,18 @@ export default class PeopleController {
     let person = req.body.newData;
     let userID = req.user.UserID;
     let fundID = person.FundID;
-    this.userCanChangeFund(userID, fundID)
-      .then(authorized => {
-        if (!authorized) {
-          console.error("user cannot add an individual to that fund");
-          res.sendStatus(500);
-          return;
-        }
-        let i = this.insetPersonToDatabase(person);
-        i.then(boolean => {
-          if (boolean) res.sendStatus(200);
-          else res.sendStatus(500);
-        });
-        i.catch(res.sendStatus(500));
-      })
-      .catch(() => {
-        res.sendStatus(500);
-      });
-  }
+    try {
+      if (!(await this.userCanChangeFund(userID, fundID))) {
+        console.error("user cannot add an individual to that fund");
+        res.sendStatus(401);
+        return;
+      }
 
-  //returns a promise boolean representing if the operation was successful
-  static insetPersonToDatabase(person) {
-    return new Promise<boolean>((resolve, reject) => {
-      let insert = database.insertPerson(person.name, person.fundID, person.position, person.hyperlink, person.comment);
-      insert.then(person => {
-        resolve(true);
-      });
-      insert.catch(error => {
-        console.error(error);
-        resolve(false);
-      });
-    });
+      await database.insertPerson(person.name, person.fundID, person.position, person.hyperlink, person.comment);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
   }
 
   static async deletePerson(req, res) {

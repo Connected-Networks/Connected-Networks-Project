@@ -168,7 +168,10 @@ insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
     .spread((user, createdBoolean) => {
       return user;
     })
-    .catch(err => console.error("Error in insertPerson", err));
+    .catch(err => {
+      console.error("Error in insertPerson", err);
+      throw err;
+    });
 };
 
 insertCompany = (CompanyName, FundID) => {
