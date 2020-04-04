@@ -1,6 +1,6 @@
 const database = require("./sequelizeDatabase/sequelFunctions");
 
-interface DisplayPerson {
+export interface DisplayPerson {
   id: number;
   fundID: number;
   name: string;
