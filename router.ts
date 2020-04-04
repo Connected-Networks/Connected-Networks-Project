@@ -1,6 +1,7 @@
 import BackendProcessing from "./backend-processing";
 import Passport from "./config/passport";
 import AuthController from "./AuthController";
+import PeopleController from "./PeopleController";
 const express = require("express");
 const router = express.Router();
 
@@ -63,31 +64,9 @@ router.post("/csv", (req, res) => {
   }
 });
 
-router.get("/people", );
+router.get("/people", PeopleController.getPeople);
 
-//retrieve all individuals whose most recent employment was in the specified company
-//Sends a 200 result with null information if user cannot see the company
-router.get("/people/:companyId", (req, res) => {
-  try {
-    let userID = req.user.UserID;
-    let companyID = req.params.companyID;
-    let be = new BackendProcessing();
-    if (!be.userSeesCompany(userID, companyID)) {
-      res.sendStatus(200);
-      return;
-    } else {
-      let data = be.retrievePeopleViaCompany(req.params.companyId).then(results => {
-        if (!results) {
-          res.sendStatus(500);
-        } else {
-          res.json({ data: results });
-        }
-      });
-    }
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
+router.get("/people/:companyId", PeopleController.getPeopleOfCompany);
 
 router.put("/people", (req, res) => {
   //update person

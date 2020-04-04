@@ -304,9 +304,6 @@ export default class BackendProcessing {
       });
     });
   }
-  retrievePeopleViaCompany(companyID): Promise<Object> {
-    return database.retrieveCurrentEmployeesOfCompany(companyID);
-  }
 
   //Assumes that OriginalFundPosition table will not have duplicate combinations of IndividualID and CompanyID
   //If this assumption is wrong, this function may return duplicate entries
@@ -458,30 +455,6 @@ export default class BackendProcessing {
         .getAllUsers()
         .then(users => resolve(users))
         .catch(() => reject());
-    });
-  }
-
-  //Returns false if user cannot see the company, or the company doesn't exist
-  userSeesCompany(userID, companyID): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      database
-        .getFundsUserCanSee(userID)
-        .then(fundList => {
-          database
-            .retrieveCompanyByID(companyID)
-            .then(company => {
-              if (company == null) resolve(false);
-              let fundID = company.FundID;
-              if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
-              else resolve(false);
-            })
-            .catch(error => {
-              console.error("an error occured while retrieving information on company " + companyID);
-            });
-        })
-        .catch(error => {
-          console.error("an error occured while finding funds related to user " + userID);
-        });
     });
   }
 
