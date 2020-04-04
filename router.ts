@@ -72,26 +72,7 @@ router.put("/people", PeopleController.updatePerson);
 
 router.post("/people", PeopleController.addPerson);
 
-router.delete("/people/:id", (req, res) => {
-  //delete person
-  let be = new BackendProcessing();
-  let person = req.params.id;
-  let userID = req.user.UserID;
-  let fundID = person.FundID;
-  PeopleController.userCanChangeFund(userID, fundID).then(authorized => {
-    if (!authorized) {
-      console.error("User cannot delete the individual");
-      res.sendStatus(500);
-      return;
-    }
-    let d = be.delete_person(person);
-    d.then(boolean => {
-      if (boolean) res.sendStatus(200);
-      else res.sendStatus(500);
-    });
-    d.catch(res.sendStatus(500));
-  });
-});
+router.delete("/people/:id", PeopleController.deletePerson);
 
 router.get("/company", (req, res) => {
   try {
