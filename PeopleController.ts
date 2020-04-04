@@ -109,7 +109,7 @@ export default class PeopleController {
         res.sendStatus(401);
         return;
       }
-      let update = this.UpdatePersonInDatabase(person);
+      let update = this.updatePersonInDatabase(person);
       update.then(boolean => {
         if (boolean) res.sendStatus(200);
         else res.sendStatus(500);
@@ -136,13 +136,50 @@ export default class PeopleController {
 
   //returns a promise boolean representing if the operation was successful
   //NOTE: FundID is specifically excluded as changeable
-  static UpdatePersonInDatabase(person) {
+  static updatePersonInDatabase(person) {
     return new Promise<boolean>((resolve, reject) => {
       let update = database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
       update.then(person => {
         resolve(true);
       });
       update.catch(error => {
+        console.error(error);
+        resolve(false);
+      });
+    });
+  }
+
+  static async addPerson(req, res) {
+    let person = req.body.newData;
+    let userID = req.user.UserID;
+    let fundID = person.FundID;
+    this.userCanChangeFund(userID, fundID)
+      .then(authorized => {
+        if (!authorized) {
+          console.error("user cannot add an individual to that fund");
+          res.sendStatus(500);
+          return;
+        }
+        let i = this.insetPersonToDatabase(person);
+        i.then(boolean => {
+          if (boolean) res.sendStatus(200);
+          else res.sendStatus(500);
+        });
+        i.catch(res.sendStatus(500));
+      })
+      .catch(() => {
+        res.sendStatus(500);
+      });
+  }
+
+  //returns a promise boolean representing if the operation was successful
+  static insetPersonToDatabase(person) {
+    return new Promise<boolean>((resolve, reject) => {
+      let insert = database.insertPerson(person.name, person.fundID, person.position, person.hyperlink, person.comment);
+      insert.then(person => {
+        resolve(true);
+      });
+      insert.catch(error => {
         console.error(error);
         resolve(false);
       });

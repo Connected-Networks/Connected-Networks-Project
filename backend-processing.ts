@@ -156,22 +156,6 @@ export default class BackendProcessing {
   }
 
   //returns a promise boolean representing if the operation was successful
-  insert_person(person) {
-    return new Promise<boolean>((resolve, reject) => {
-      let insert = database.insertPerson(person.name, person.fundID, person.position, person.hyperlink, person.comment);
-      insert.then(person => {
-        resolve(true);
-      });
-      insert.catch(error => {
-        console.error(error);
-        resolve(false);
-      });
-    });
-  }
-
-  
-
-  //returns a promise boolean representing if the operation was successful
   delete_person(person) {
     return new Promise<boolean>((resolve, reject) => {
       console.log("starting deletion");

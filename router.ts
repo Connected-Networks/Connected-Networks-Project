@@ -70,30 +70,7 @@ router.get("/people/:companyId", PeopleController.getPeopleOfCompany);
 
 router.put("/people", PeopleController.updatePerson);
 
-router.post("/people", (req, res) => {
-  //add person
-  let be = new BackendProcessing();
-  let person = req.body.newData;
-  let userID = req.user.UserID;
-  let fundID = person.FundID;
-  PeopleController.userCanChangeFund(userID, fundID)
-    .then(authorized => {
-      if (!authorized) {
-        console.error("user cannot add an individual to that fund");
-        res.sendStatus(500);
-        return;
-      }
-      let i = be.insert_person(person);
-      i.then(boolean => {
-        if (boolean) res.sendStatus(200);
-        else res.sendStatus(500);
-      });
-      i.catch(res.sendStatus(500));
-    })
-    .catch(() => {
-      res.sendStatus(500);
-    });
-});
+router.post("/people", PeopleController.addPerson);
 
 router.delete("/people/:id", (req, res) => {
   //delete person
@@ -101,7 +78,7 @@ router.delete("/people/:id", (req, res) => {
   let person = req.params.id;
   let userID = req.user.UserID;
   let fundID = person.FundID;
-  be.userCanChangeFund(userID, fundID).then(authorized => {
+  PeopleController.userCanChangeFund(userID, fundID).then(authorized => {
     if (!authorized) {
       console.error("User cannot delete the individual");
       res.sendStatus(500);
