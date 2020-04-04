@@ -333,7 +333,10 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
       });
       return individual;
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      console.error(err);
+      throw err;
+    });
 };
 
 deleteIndividual = IndividualID => {

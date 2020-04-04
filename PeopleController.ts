@@ -99,24 +99,22 @@ export default class PeopleController {
   }
 
   static async updatePerson(req, res) {
-    let person = req.body;
-    let userID = req.user.UserID;
-    let fundID = person.FundID;
-    this.userCanChangeFund(userID, fundID).then(authorized => {
-      if (!authorized) {
+    try {
+      const person = req.body;
+      const userID = req.user.UserID;
+      const fundID = person.FundID;
+
+      if (!(await this.userCanChangeFund(userID, fundID))) {
         console.error("user cannot update in the specified fund");
         res.sendStatus(401);
         return;
       }
-      let update = this.updatePersonInDatabase(person);
-      update.then(boolean => {
-        if (boolean) res.sendStatus(200);
-        else res.sendStatus(500);
-      });
-      update.catch(() => {
-        res.sendStatus(500);
-      });
-    });
+
+      await database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
   }
 
   static userCanChangeFund(userID, fundID): Promise<boolean> {
@@ -130,21 +128,6 @@ export default class PeopleController {
         .catch(error => {
           console.error("an error occured while finding funds changeable by user " + userID);
         });
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  //NOTE: FundID is specifically excluded as changeable
-  static updatePersonInDatabase(person) {
-    return new Promise<boolean>((resolve, reject) => {
-      let update = database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
-      update.then(person => {
-        resolve(true);
-      });
-      update.catch(error => {
-        console.error(error);
-        resolve(false);
-      });
     });
   }
 
