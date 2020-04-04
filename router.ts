@@ -68,28 +68,7 @@ router.get("/people", PeopleController.getPeople);
 
 router.get("/people/:companyId", PeopleController.getPeopleOfCompany);
 
-router.put("/people", (req, res) => {
-  //update person
-  let be = new BackendProcessing();
-  let person = req.body;
-  let userID = req.user.UserID;
-  let fundID = person.FundID;
-  be.userCanChangeFund(userID, fundID).then(authorized => {
-    if (!authorized) {
-      console.error("user cannot update in the specified fund");
-      res.sendStatus(500);
-      return;
-    }
-    let update = be.update_person(person);
-    update.then(boolean => {
-      if (boolean) res.sendStatus(200);
-      else res.sendStatus(500);
-    });
-    update.catch(() => {
-      res.sendStatus(500);
-    });
-  });
-});
+router.put("/people", PeopleController.updatePerson);
 
 router.post("/people", (req, res) => {
   //add person
@@ -97,7 +76,7 @@ router.post("/people", (req, res) => {
   let person = req.body.newData;
   let userID = req.user.UserID;
   let fundID = person.FundID;
-  be.userCanChangeFund(userID, fundID)
+  PeopleController.userCanChangeFund(userID, fundID)
     .then(authorized => {
       if (!authorized) {
         console.error("user cannot add an individual to that fund");

@@ -169,20 +169,7 @@ export default class BackendProcessing {
     });
   }
 
-  //returns a promise boolean representing if the operation was successful
-  //NOTE: FundID is specifically excluded as changeable
-  update_person(person) {
-    return new Promise<boolean>((resolve, reject) => {
-      let update = database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
-      update.then(person => {
-        resolve(true);
-      });
-      update.catch(error => {
-        console.error(error);
-        resolve(false);
-      });
-    });
-  }
+  
 
   //returns a promise boolean representing if the operation was successful
   delete_person(person) {
@@ -471,20 +458,6 @@ export default class BackendProcessing {
         })
         .catch(error => {
           console.error("an error occured while finding funds related to user " + userID);
-        });
-    });
-  }
-
-  userCanChangeFund(userID, fundID): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      database
-        .getFundsUserCanChange(userID)
-        .then(fundList => {
-          if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
-          else resolve(false);
-        })
-        .catch(error => {
-          console.error("an error occured while finding funds changeable by user " + userID);
         });
     });
   }
