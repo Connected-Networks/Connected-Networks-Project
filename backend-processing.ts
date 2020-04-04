@@ -6,15 +6,6 @@ const mysql = require("mysql");
 const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
 
-interface DisplayPerson {
-  id: number;
-  fundID: number;
-  name: string;
-  company: string;
-  position: string;
-  comment: string;
-  hyperlink: string;
-}
 interface DisplayCompany {
   id: number;
   fundID: number;
@@ -109,43 +100,6 @@ export default class BackendProcessing {
       url,
       comments
     );
-  }
-
-  retrievePeopleFromDatabase(userID): Promise<DisplayPerson[]> {
-    return new Promise<DisplayPerson[]>((resolve, reject) => {
-      database.getAllIndividualsOfUser(userID).then(individuals => {
-        resolve(
-          Promise.all(
-            individuals.map(
-              (individual): Promise<DisplayPerson> => {
-                return this.processIndividualForDisplay(individual);
-              }
-            )
-          )
-        );
-      });
-    });
-  }
-
-  processIndividualForDisplay(individual): Promise<DisplayPerson> {
-    return new Promise<DisplayPerson>((resolve, reject) => {
-      database.getIndividualCurrentEmployement(individual.IndividualID).then(employment => {
-        let dp = {
-          id: individual.IndividualID,
-          fundID: individual.FundID,
-          name: individual.Name,
-          company: "",
-          position: "",
-          hyperlink: individual.LinkedInUrl,
-          comment: individual.comments
-        };
-        if (employment != null) {
-          dp.company = employment.company.CompanyName;
-          dp.position = employment.PositionName;
-        }
-        resolve(dp);
-      });
-    });
   }
 
   convertDates(dates: String): string[] {

@@ -4,14 +4,14 @@ import AuthController from "./AuthController";
 const express = require("express");
 const router = express.Router();
 
-router.post("/signup", AuthController.signup);
-
 // router.get("/users", (req, res) => {
 //   const be = new BackendProcessing();
 //   be.getAllUsers().then(users => {
 //     res.json({ users });
 //   });
 // });
+
+router.post("/signup", AuthController.signup);
 
 router.post("/login", Passport.authenticate("local"), AuthController.handleLoginSuccess);
 
@@ -63,21 +63,7 @@ router.post("/csv", (req, res) => {
   }
 });
 
-router.get("/people", (req, res) => {
-  try {
-    let userID = req.user.UserID;
-    let be = new BackendProcessing();
-    let data = be.retrievePeopleFromDatabase(userID).then(results => {
-      if (!results) {
-        res.sendStatus(500);
-      } else {
-        res.json({ data: results });
-      }
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
+router.get("/people", );
 
 //retrieve all individuals whose most recent employment was in the specified company
 //Sends a 200 result with null information if user cannot see the company
