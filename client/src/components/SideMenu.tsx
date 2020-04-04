@@ -1,19 +1,31 @@
 import * as React from "react";
-import { Divider, List, ListItem, ListItemText } from "@material-ui/core";
+import { Divider, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, TextField } from "@material-ui/core";
 import styled from "styled-components";
+import FundsMenu from "./FundsMenu";
 
 export interface SideMenuProps {
   open: boolean;
   tableTypes: string[];
   handleSwitchTable: Function;
+  handleLogout: Function;
 }
 
-export interface SideMenuState {}
+export interface SideMenuState {
+  editMode: boolean;
+}
 
 export default class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
+  state = { editMode: false };
+
+  handleEditMode = (editMode: boolean) => this.setState({ editMode });
+
+  getSideMenuWidth = () => {
+    return this.state.editMode ? "250px" : "150px";
+  };
+
   render() {
     return (
-      <Container open={this.props.open}>
+      <Container open={this.props.open} width={this.getSideMenuWidth()}>
         <List>
           {this.props.tableTypes.map(type => (
             <ListItem button key={type} onClick={() => this.props.handleSwitchTable(type)}>
@@ -22,23 +34,21 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
           ))}
         </List>
         <Divider />
-        <List>
-          <ListItem key={"Funds"}>
-            <ListItemText primary={"Funds"} />
-          </ListItem>
-        </List>
+        <FundsMenu handleSwitchTable={this.props.handleSwitchTable} handleEditMode={this.handleEditMode} />
         <Divider />
+        <ListItem button key="logout" onClick={() => this.props.handleLogout()}>
+          <ListItemText primary="Logout" />
+        </ListItem>
       </Container>
     );
   }
 }
 
-const Container = styled.div<{ open: boolean }>`
-  /* max-height: 100%; */
-  min-width: 150px;
-  max-width: 150px;
-  transition: margin 0.5s;
-  margin-left: ${props => (props.open ? "0px" : "-150px")};
+const Container = styled.div<{ open: boolean; width: string }>`
+  min-width: ${props => props.width};
+  max-width: ${props => props.width};
+  transition: margin 0.5s, min-width 0.5s, max-width 0.5s;
+  margin-left: ${props => (props.open ? "0px" : "-" + props.width)};
   display: flex;
   flex-direction: column;
 `;

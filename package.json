@@ -5,7 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node server.ts",
-    "heroku-postbuild": "cd client && npm install && npm run build"
+    "heroku-postbuild": "cd client && npm install && npm run build",
+    "dev": "ts-node-dev server.ts",
+    "test": "jest",
+    "test:watch": "npm test -- --watch",
+    "test:coverage": "npm test -- --coverage"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "restoreMocks": true,
+    "clearMocks": true,
+    "resetMocks": true
   },
   "repository": {
     "type": "git",
@@ -19,26 +29,33 @@
   },
   "homepage": "https://github.com/Connected-Networks/Connected-Networks-Project#readme",
   "dependencies": {
-    "@material-ui/core": "^4.9.0",
     "@types/express": "^4.17.2",
     "@types/mysql": "^2.15.8",
     "@types/node": "^12.12.25",
     "@types/papaparse": "^5.0.2",
-    "@types/styled-components": "^4.4.2",
-    "axios": "^0.19.2",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "material-table": "^1.56.1",
+    "express-session": "^1.17.0",
+    "express-session-sequelize": "^2.2.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.1.0",
+    "nodemailer": "^6.4.6",
     "papaparse": "^5.1.1",
-    "react-script": "^2.0.5",
-    "react-scripts": "^3.3.0",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
     "sequelize": "^5.21.3",
-    "styled-components": "^4.4.1",
     "ts-node": "^8.6.2",
     "tsc": "^1.20150623.0",
     "typeface-roboto": "0.0.75",
     "typescript": "^3.7.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.9.1",
+    "@types/supertest": "^2.0.8",
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2",
+    "ts-jest": "^25.2.1",
+    "ts-node-dev": "^1.0.0-pre.44"
   }
 }
