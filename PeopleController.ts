@@ -21,7 +21,7 @@ export default class PeopleController {
     }
   }
 
-  static async getPeopleFromDatabase(userID) {
+  static async getPeopleFromDatabase(userID): Promise<DisplayPerson[]> {
     const individuals = await database.getAllIndividualsOfUser(userID);
 
     return Promise.all(
