@@ -108,13 +108,12 @@ export default class PeopleController {
         res.sendStatus(500);
         return;
       }
-      let data = this.getPeopleByOriginalCompanyFromDatabase(companyID).then((results) => {
-        if (!results) {
-          res.sendStatus(500);
-        } else {
-          res.json({ data: results });
-        }
-      });
+      const people = await this.getPeopleByOriginalCompanyFromDatabase(companyID);
+      if (!people) {
+        res.sendStatus(500);
+      } else {
+        res.json({ data: people });
+      }
     } catch (error) {
       res.sendStatus(500);
     }
