@@ -58,3 +58,48 @@ describe("UpdatePerson", () => {
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });
+
+describe("UserCanChangeFund", () => {
+  it("should return true if user owns the fund", async () => {
+    const mockUserID = 12345;
+    const mockFundID = 54321;
+    const mockOwnedFunds = ["5342", "3243", "54321", "", "12345"];
+
+    const mockGetFundsUserCanChange = jest.spyOn(database, "getFundsUserCanChange").mockResolvedValue(mockOwnedFunds);
+
+    const returnedValue = await PeopleController.userCanChangeFund(mockUserID, mockFundID);
+
+    expect(mockGetFundsUserCanChange).toBeCalledWith(mockUserID);
+    expect(returnedValue).toBe(true);
+  });
+
+  it("should return false if user does not own the fund", async () => {
+    const mockUserID = 12345;
+    const mockFundID = 54321;
+    const mockOwnedFunds = ["5342", "3243", "", "12345"];
+
+    const mockGetFundsUserCanChange = jest.spyOn(database, "getFundsUserCanChange").mockResolvedValue(mockOwnedFunds);
+
+    const returnedValue = await PeopleController.userCanChangeFund(mockUserID, mockFundID);
+
+    expect(mockGetFundsUserCanChange).toBeCalledWith(mockUserID);
+    expect(returnedValue).toBe(false);
+  });
+
+  it("should throw an error if database throws an error", async () => {
+    const mockUserID = 12345;
+    const mockFundID = 54321;
+
+    const mockError = new Error("Mock error");
+    const mockGetFundsUserCanChange = jest.spyOn(database, "getFundsUserCanChange").mockImplementation(() => {
+      throw mockError;
+    });
+    console.error = jest.fn();
+
+    try {
+      await PeopleController.userCanChangeFund(mockUserID, mockFundID);
+    } catch (error) {
+      expect(error).toBe(mockError);
+    }
+  });
+});
