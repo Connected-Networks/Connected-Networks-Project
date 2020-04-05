@@ -69,3 +69,38 @@ describe("getPeopleFromDatabase", () => {
     expect(returnedPeople[1]).toBe(mockDisplayPeople[1]);
   });
 });
+
+describe("processIndividualForDisplay", () => {
+  it("should convert the given individual object to DisplayPerson object", async () => {
+    const mockIndividualID = 12345;
+    const mockIndividual = {
+      IndividualID: mockIndividualID,
+      FundID: 1,
+      Name: "Mock",
+      company: "",
+      position: "",
+      LinkedInUrl: "Mock",
+      comments: "",
+    };
+
+    const mockCompanyName = "MockCompany";
+    const mockPositionName = "MockPosition";
+    const mockEmployment = { company: { CompanyName: mockCompanyName }, PositionName: mockPositionName };
+
+    const mockGetIndividualCurrentEmployement = jest
+      .spyOn(database, "getIndividualCurrentEmployement")
+      .mockResolvedValue(mockEmployment);
+
+    const returnedPerson = await PeopleController.processIndividualForDisplay(mockIndividual);
+
+    expect(mockGetIndividualCurrentEmployement).toBeCalledWith(mockIndividualID);
+
+    expect(returnedPerson.id).toBe(mockIndividual.IndividualID);
+    expect(returnedPerson.fundID).toBe(mockIndividual.FundID);
+    expect(returnedPerson.name).toBe(mockIndividual.Name);
+    expect(returnedPerson.company).toBe(mockCompanyName);
+    expect(returnedPerson.position).toBe(mockPositionName);
+    expect(returnedPerson.hyperlink).toBe(mockIndividual.LinkedInUrl);
+    expect(returnedPerson.comment).toBe(mockIndividual.comments);
+  });
+});
