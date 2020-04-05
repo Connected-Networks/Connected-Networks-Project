@@ -142,9 +142,9 @@ export default class PeopleController {
 
   static async updatePerson(req, res) {
     try {
-      const person = req.body;
+      const person = req.body.newData;
       const userID = req.user.UserID;
-      const fundID = person.FundID;
+      const fundID = person.fundID;
 
       if (!(await this.userCanChangeFund(userID, fundID))) {
         console.error("user cannot update in the specified fund");
@@ -175,10 +175,10 @@ export default class PeopleController {
   }
 
   static async addPerson(req, res) {
-    let person = req.body.newData;
-    let userID = req.user.UserID;
-    let fundID = person.FundID;
     try {
+      let person = req.body.newData;
+      let userID = req.user.UserID;
+      let fundID = person.FundID;
       if (!(await this.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add an individual to that fund");
         res.sendStatus(401);

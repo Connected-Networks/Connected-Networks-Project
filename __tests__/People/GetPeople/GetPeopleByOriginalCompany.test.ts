@@ -13,6 +13,7 @@ describe("GetPeopleByOriginalCompany", () => {
     const mockRes = { sendStatus: mockSendStatus };
 
     const mockUserSeesCompany = jest.spyOn(PeopleController, "userSeesCompany").mockResolvedValue(false);
+    console.error = jest.fn();
 
     await PeopleController.getPeopleByOriginalCompany(mockReq, mockRes);
 
