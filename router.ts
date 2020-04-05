@@ -25,10 +25,10 @@ router.get("/users", (req, res) => {
   let userID = req.user.UserID;
   let be = new BackendProcessing();
   be.getOtherUsers(userID)
-    .then(users => {
+    .then((users) => {
       res.json({ users });
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("An error occurred while retrieving users");
       console.error(error);
     });
@@ -39,13 +39,13 @@ router.post("/shareFund", (req, res) => {
   let user = res.body.user;
   let be = new BackendProcessing();
   be.sharefund(fundID, user)
-    .then(boolean => {
+    .then((boolean) => {
       if (boolean) {
         console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
         res.sendStatus(200);
       } else res.sendStatus(500);
     })
-    .catch(error => {
+    .catch((error) => {
       res.sendStatus(500);
     });
 });
@@ -56,7 +56,7 @@ router.post("/csv", (req, res) => {
     let fileName = req.body.fileName;
     let userID = req.user.UserID;
     let be = new BackendProcessing();
-    be.processRawCSV(data, fileName, userID).then(results => {
+    be.processRawCSV(data, fileName, userID).then((results) => {
       res.sendStatus(200);
     });
   } catch (error) {
@@ -78,7 +78,7 @@ router.get("/company", (req, res) => {
   try {
     let be = new BackendProcessing();
     let userID = req.user.UserID;
-    let data = be.retrieveCompaniesFromDatabase(userID).then(results => {
+    let data = be.retrieveCompaniesFromDatabase(userID).then((results) => {
       if (!results) {
         res.sendStatus(500);
       } else {
@@ -96,14 +96,14 @@ router.put("/company", (req, res) => {
   let company = req.body;
   let userID = req.user.UserID;
   let fundID = company.FundID;
-  be.userCanChangeFund(userID, fundID).then(authorized => {
+  PeopleController.userCanChangeFund(userID, fundID).then((authorized) => {
     if (!authorized) {
       console.error("user is not authorized to change companies in that fund");
       res.sendStatus(500);
       return;
     }
     let update = be.update_company(company);
-    update.then(boolean => {
+    update.then((boolean) => {
       if (boolean) {
         console.log("company updated");
         res.sendStatus(200);
@@ -121,14 +121,14 @@ router.post("/company", (req, res) => {
   let company = req.body.newData;
   let userID = req.user.UserID;
   let fundID = company.FundID;
-  be.userCanChangeFund(userID, fundID).then(authorized => {
+  PeopleController.userCanChangeFund(userID, fundID).then((authorized) => {
     if (!authorized) {
       console.error("user cannot add a company to that fund");
       res.sendStatus(500);
       return;
     }
     let i = be.insert_company(company);
-    i.then(boolean => {
+    i.then((boolean) => {
       if (boolean) {
         console.log("person added");
         res.sendStatus(200);
@@ -144,14 +144,14 @@ router.delete("/company/:id", (req, res) => {
   let company = req.params.id;
   let userID = req.user.UserID;
   let fundID = company.FundID;
-  be.userCanChangeFund(userID, fundID).then(authorized => {
+  PeopleController.userCanChangeFund(userID, fundID).then((authorized) => {
     if (!authorized) {
       console.error("user cannot delete a company from that fund");
       res.sendStatus(500);
       return;
     }
     let d = be.delete_company(company);
-    d.then(boolean => {
+    d.then((boolean) => {
       if (boolean) res.sendStatus(200);
       else res.sendStatus(500);
     });
@@ -165,7 +165,7 @@ router.get("/funds", (req, res) => {
     let be = new BackendProcessing();
     let userID = req.user.UserID;
     let results = be.retrieveFundsFromDatabase(userID);
-    results.then(funds => {
+    results.then((funds) => {
       res.json({ data: funds });
     });
     results.catch(() => {
@@ -179,7 +179,7 @@ router.post("/funds", (req, res) => {
   let be = new BackendProcessing();
   console.log("Adding fund: " + req.body.newFundName + " to the database");
   let fund = req.body.newFundName;
-  be.insert_fund(fund).then(result => {
+  be.insert_fund(fund).then((result) => {
     if (result) res.sendStatus(200);
     else res.sendStatus(500);
   });
@@ -191,7 +191,7 @@ router.put("/funds", (req, res) => {
   //Temp until function is implemented
   let be = new BackendProcessing();
   let userID = req.user.UserID;
-  be.userCanChangeFund(userID, req.body.fund.id).then(authorized => {
+  PeopleController.userCanChangeFund(userID, req.body.fund.id).then((authorized) => {
     if (!authorized) {
       console.error("User cannot update the fund");
       res.sendStatus(500);
@@ -199,7 +199,7 @@ router.put("/funds", (req, res) => {
     }
     console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
     let fund = req.body.fund;
-    be.update_fund(fund).then(result => {
+    be.update_fund(fund).then((result) => {
       if (result) res.sendStatus(200);
       else res.sendStatus(500);
     });
@@ -211,7 +211,7 @@ router.get("/funds/:id", (req, res) => {
     let be = new BackendProcessing();
     let userID = req.user.UserID;
     let fundID = req.params.id;
-    be.userSeesFund(userID, fundID).then(authorized => {
+    be.userSeesFund(userID, fundID).then((authorized) => {
       if (!authorized) {
         console.error("User " + userID + " cannot see Fund " + fundID);
         res.sendStatus(500);
@@ -220,7 +220,7 @@ router.get("/funds/:id", (req, res) => {
       //console.log("params: " + JSON.stringify(req.params));
       //console.log("type: " + typeof fundID);
       //console.log("string: " + fundID);
-      let data = be.retrieveCompaniesFromFund(fundID).then(results => {
+      let data = be.retrieveCompaniesFromFund(fundID).then((results) => {
         if (results != null) {
           res.json({ data: results });
         } else res.sendStatus(500);
@@ -236,13 +236,13 @@ router.get("/people/original/:companyId", (req, res) => {
     let be = new BackendProcessing();
     let companyID = req.params.id;
     let userID = req.user.UserID;
-    be.userSeesCompany(userID, companyID).then(authorized => {
+    PeopleController.userSeesCompany(userID, companyID).then((authorized) => {
       if (!authorized) {
         console.error("User " + userID + " cannot view company " + companyID);
         res.sendStatus(500);
         return;
       }
-      let data = be.retrievePeopleFromOriginalCompany(companyID).then(results => {
+      let data = be.retrievePeopleFromOriginalCompany(companyID).then((results) => {
         if (!results) {
           res.sendStatus(500);
         } else {
@@ -259,17 +259,17 @@ router.get("/history/:id", (req, res) => {
   let be = new BackendProcessing();
   let individualID = req.params.id;
   let userID = req.user.UserID;
-  be.userCanSeeIndividual(userID, individualID).then(authorized => {
+  be.userCanSeeIndividual(userID, individualID).then((authorized) => {
     if (!authorized) {
       console.error("User cannot see history of individual " + individualID);
       res.sendStatus(500);
       return;
     }
     let g = be.getHistoryOfIndividual(individualID);
-    g.then(results => {
+    g.then((results) => {
       res.json({ data: results });
     });
-    g.catch(error => {
+    g.catch((error) => {
       res.sendStatus(500);
     });
   });
@@ -280,21 +280,21 @@ router.put("/history", (req, res) => {
   let history = req.body;
   let userID = req.user.UserID;
   let individual = req.employee;
-  be.userCanChangeIndividual(userID, individual.individualID).then(authorized => {
+  be.userCanChangeIndividual(userID, individual.individualID).then((authorized) => {
     if (!authorized) {
       console.error("User cannot add history to individual " + individual.IndividualID);
       res.sendStatus(500);
       return;
     }
     let ins = be.insertHistory(history, individual, userID);
-    ins.then(result => {
+    ins.then((result) => {
       if (result) {
         res.sendStatus(200);
       } else {
         res.sendStatus(500);
       }
     });
-    ins.catch(error => {
+    ins.catch((error) => {
       res.sendStatus(500);
     });
   });
@@ -305,21 +305,21 @@ router.post("/history/:id", (req, res) => {
   let history = req.body;
   let individual = req.employee;
   let userID = req.user.UserID;
-  be.userCanChangeIndividual(userID, individual.individualID).then(authorized => {
+  be.userCanChangeIndividual(userID, individual.individualID).then((authorized) => {
     if (!authorized) {
       console.error("User cannot edit history of individual " + individual.IndividualID);
       res.sendStatus(500);
       return;
     }
     let upd = be.updateHistory(history, individual, userID);
-    upd.then(result => {
+    upd.then((result) => {
       if (result) {
         res.sendStatus(200);
       } else {
         res.sendStatus(500);
       }
     });
-    upd.catch(error => {
+    upd.catch((error) => {
       res.sendStatus(500);
     });
   });
