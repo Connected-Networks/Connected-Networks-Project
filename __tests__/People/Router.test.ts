@@ -8,8 +8,8 @@ describe("Router", () => {
     RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people", PeopleController.getPeople);
   });
 
-  it("should use PeopleController.getPeopleOfCompany for get /people/:companyId", () => {
-    RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people/:companyId", PeopleController.getPeopleOfCompany);
+  it("should use PeopleController.getPeopleByCompany for get /people/:companyId", () => {
+    RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people/:companyId", PeopleController.getPeopleByCompany);
   });
 
   it("should use PeopleController.updatePerson for put /people", () => {

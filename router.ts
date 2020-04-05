@@ -66,7 +66,9 @@ router.post("/csv", (req, res) => {
 
 router.get("/people", PeopleController.getPeople);
 
-router.get("/people/:companyId", PeopleController.getPeopleOfCompany);
+router.get("/people/:companyId", PeopleController.getPeopleByCompany);
+
+router.get("/people/original/:companyId", PeopleController.getPeopleByOriginalCompany);
 
 router.put("/people", PeopleController.updatePerson);
 
@@ -224,30 +226,6 @@ router.get("/funds/:id", (req, res) => {
         if (results != null) {
           res.json({ data: results });
         } else res.sendStatus(500);
-      });
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
-
-router.get("/people/original/:companyId", (req, res) => {
-  try {
-    let be = new BackendProcessing();
-    let companyID = req.params.id;
-    let userID = req.user.UserID;
-    PeopleController.userSeesCompany(userID, companyID).then((authorized) => {
-      if (!authorized) {
-        console.error("User " + userID + " cannot view company " + companyID);
-        res.sendStatus(500);
-        return;
-      }
-      let data = be.retrievePeopleFromOriginalCompany(companyID).then((results) => {
-        if (!results) {
-          res.sendStatus(500);
-        } else {
-          res.json({ data: results });
-        }
       });
     });
   } catch (error) {

@@ -25,7 +25,7 @@ export default class PeopleController {
     const individuals = await database.getAllIndividualsOfUser(userID);
 
     return Promise.all(
-      individuals.map(async individual => {
+      individuals.map(async (individual) => {
         return await this.processIndividualForDisplay(individual);
       })
     );
@@ -41,7 +41,7 @@ export default class PeopleController {
       company: "",
       position: "",
       hyperlink: individual.LinkedInUrl,
-      comment: individual.comments
+      comment: individual.comments,
     };
 
     if (employment != null) {
@@ -54,7 +54,7 @@ export default class PeopleController {
 
   //retrieve all individuals whose most recent employment was in the specified company
   //Sends a 401 result with null information if user cannot see the company
-  static async getPeopleOfCompany(req, res) {
+  static async getPeopleByCompany(req, res) {
     try {
       let userID = req.user.UserID;
       let companyID = req.params.companyID;
@@ -79,22 +79,64 @@ export default class PeopleController {
     return new Promise((resolve, reject) => {
       database
         .getFundsUserCanSee(userID)
-        .then(fundList => {
+        .then((fundList) => {
           database
             .retrieveCompanyByID(companyID)
-            .then(company => {
+            .then((company) => {
               if (company == null) resolve(false);
               let fundID = company.FundID;
               if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
               else resolve(false);
             })
-            .catch(error => {
+            .catch((error) => {
               console.error("an error occured while retrieving information on company " + companyID);
             });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("an error occured while finding funds related to user " + userID);
         });
+    });
+  }
+
+  static async getPeopleByOriginalCompany(req, res) {
+    try {
+      let companyID = req.params.id;
+      let userID = req.user.UserID;
+
+      if (!(await this.userSeesCompany(userID, companyID))) {
+        console.error("User " + userID + " cannot view company " + companyID);
+        res.sendStatus(500);
+        return;
+      }
+      let data = this.getPeopleByOriginalCompanyFromDatabase(companyID).then((results) => {
+        if (!results) {
+          res.sendStatus(500);
+        } else {
+          res.json({ data: results });
+        }
+      });
+    } catch (error) {
+      res.sendStatus(500);
+    }
+  }
+
+  //Assumes that OriginalFundPosition table will not have duplicate combinations of IndividualID and CompanyID
+  //If this assumption is wrong, this function may return duplicate entries
+  static async getPeopleByOriginalCompanyFromDatabase(companyID): Promise<Object> {
+    const people = await database.retrieveIndividualsByOriginalCompany(companyID);
+
+    return people.map((entry) => {
+      let displayPerson: DisplayPerson = {
+        id: entry.Individual.IndividualID,
+        fundID: entry.Individual.FundID,
+        name: entry.Individual.Name,
+        //should not be needed. If it ever is, the db function could easily be edited to include companies table, at the cost of running time.
+        company: null,
+        position: entry.PositionName,
+        comment: entry.Individual.Comments,
+        hyperlink: entry.Individual.LinkedInUrl,
+      };
+      return displayPerson;
     });
   }
 
@@ -121,11 +163,11 @@ export default class PeopleController {
     return new Promise((resolve, reject) => {
       database
         .getFundsUserCanChange(userID)
-        .then(fundList => {
+        .then((fundList) => {
           if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
           else resolve(false);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("an error occured while finding funds changeable by user " + userID);
           throw error;
         });

@@ -39,7 +39,7 @@ export default class BackendProcessing {
       //Adding a # causes the parser to skip the first row, treat the second row as header
       header: true,
       comments: "#",
-      beforeFirstChunk: function(chunk) {
+      beforeFirstChunk: function (chunk) {
         let fi = chunk.indexOf("\n");
         let si = chunk.indexOf("\n", fi + 1);
         let fs = chunk.substring(0, fi);
@@ -48,20 +48,20 @@ export default class BackendProcessing {
         chunk = fs + ms.toLowerCase() + ls;
         console.log("chunk: " + chunk);
         return chunk;
-      }
+      },
     });
     console.log(JSON.stringify(results));
     return new Promise((resolve, reject) => {
-      database.insertFund(fundName, userID).then(fund => {
+      database.insertFund(fundName, userID).then((fund) => {
         return Promise.all(
-          results.data.map(element => {
+          results.data.map((element) => {
             if (element["name"] != null) this.call_from_csv_line(element, fund.FundID, userID);
           })
         ).then(() => {
           resolve(true);
         });
       });
-    }).catch(error => {
+    }).catch((error) => {
       console.error("error in processRawCSV", error);
     });
   }
@@ -144,7 +144,7 @@ export default class BackendProcessing {
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ];
     let monthsAbbr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     let s = line.split(" ");
@@ -186,13 +186,13 @@ export default class BackendProcessing {
   //returns a promise boolean representing if the operation was successful
   retrieveCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
     return new Promise<DisplayCompany[]>((resolve, reject) => {
-      database.getAllCompaniesOfUser(userID).then(results => {
+      database.getAllCompaniesOfUser(userID).then((results) => {
         console.log(JSON.stringify(results));
-        let list: DisplayCompany[] = results.map(element => {
+        let list: DisplayCompany[] = results.map((element) => {
           let company: DisplayCompany = {
             id: element.CompanyID,
             fundID: element.FundID,
-            name: element.CompanyName
+            name: element.CompanyName,
           };
           return company;
         });
@@ -232,16 +232,16 @@ export default class BackendProcessing {
   //returns a promise boolean representing if the operation was successful
   retrieveFundsFromDatabase(userID): Promise<DisplayFund[]> {
     return new Promise<DisplayFund[]>((resolve, reject) => {
-      database.getFundsUserCanSee(userID).then(availableFunds => {
-        database.getAllFunds().then(results => {
-          let list: DisplayFund[] = results.map(element => {
+      database.getFundsUserCanSee(userID).then((availableFunds) => {
+        database.getAllFunds().then((results) => {
+          let list: DisplayFund[] = results.map((element) => {
             let fund: DisplayFund = {
               id: element.FundID,
-              name: element.FundName
+              name: element.FundName,
             };
             return fund;
           });
-          resolve(list.filter(x => availableFunds.indexOf(x.id.toString()) >= 0));
+          resolve(list.filter((x) => availableFunds.indexOf(x.id.toString()) >= 0));
         });
       });
     });
@@ -249,12 +249,12 @@ export default class BackendProcessing {
 
   retrieveCompaniesFromFund(fundID) {
     return new Promise<DisplayCompany[]>((resolve, reject) => {
-      database.retrieveCompaniesByFunds(fundID).then(results => {
-        let list: DisplayCompany[] = results.map(element => {
+      database.retrieveCompaniesByFunds(fundID).then((results) => {
+        let list: DisplayCompany[] = results.map((element) => {
           let company: DisplayCompany = {
             id: element.CompanyID,
             fundID: element.FundID,
-            name: element.CompanyName
+            name: element.CompanyName,
           };
           return company;
         });
@@ -263,40 +263,10 @@ export default class BackendProcessing {
     });
   }
 
-  //Assumes that OriginalFundPosition table will not have duplicate combinations of IndividualID and CompanyID
-  //If this assumption is wrong, this function may return duplicate entries
-  retrievePeopleFromOriginalCompany(companyID): Promise<Object> {
-    return new Promise<DisplayPerson[]>((resolve, reject) => {
-      database
-        .retrieveIndividualsByOriginalCompany(companyID)
-        .then(results => {
-          resolve(
-            results.map(entry => {
-              let dp: DisplayPerson = {
-                id: entry.Individual.IndividualID,
-                fundID: entry.Individual.FundID,
-                name: entry.Individual.Name,
-                //should not be needed. If it ever is, the db function could easily be edited to include companies table, at the cost of running time.
-                company: null,
-                position: entry.PositionName,
-                comment: entry.Individual.Comments,
-                hyperlink: entry.Individual.LinkedInUrl
-              };
-              return dp;
-            })
-          );
-        })
-        .catch(error => {
-          console.error("Error in retrievePeopleViaOriginalCompany");
-          console.error(error);
-        });
-    });
-  }
-
   //returns undefined if fundID is not found
   retrieveFundName(fundID): Promise<String> {
     return new Promise<String>((resolve, reject) => {
-      database.retrieveFundName(fundID).then(result => {
+      database.retrieveFundName(fundID).then((result) => {
         resolve(result);
       });
     });
@@ -304,15 +274,15 @@ export default class BackendProcessing {
 
   getHistoryOfIndividual(individualID): Promise<DisplayHistory[]> {
     return new Promise<DisplayHistory[]>((resolve, reject) => {
-      database.getIndividualEmployeeHistory(individualID).then(results => {
+      database.getIndividualEmployeeHistory(individualID).then((results) => {
         resolve(
-          results.map(entry => {
+          results.map((entry) => {
             let history: DisplayHistory = {
               id: entry.id,
               company: entry.Company.CompanyName,
               position: entry.PositionName,
               start: entry.StartDate,
-              end: entry.EndDate
+              end: entry.EndDate,
             };
             return history;
           })
@@ -326,20 +296,20 @@ export default class BackendProcessing {
       let fundID = individual.FundID;
       database
         .retrieveCompanyByName(history.company, fundID)
-        .then(resultCompany => {
+        .then((resultCompany) => {
           database
             .insertEmployeeHistory(userID, history.id, resultCompany.CompanyID, history.position, history.start, history.end)
-            .then(result => {
+            .then((result) => {
               if (result != null) resolve(true);
               else resolve(false);
             })
-            .catch(error => {
+            .catch((error) => {
               console.error("An error occurred while inserting employee history");
               console.error(error);
               resolve(false);
             });
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("An error occurred while retrieving company information");
           console.error(error);
           resolve(false);
@@ -355,7 +325,7 @@ export default class BackendProcessing {
       let fundID = individual.FundID;
       database
         .retrieveCompanyByName(history.company, fundID)
-        .then(resultCompany => {
+        .then((resultCompany) => {
           database
             .updateHistory(
               history.HistoryID,
@@ -368,7 +338,7 @@ export default class BackendProcessing {
             )
             .then(resolve(true));
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("An error occurred while retrieving company information");
           console.error(error);
           resolve(false);
@@ -380,10 +350,10 @@ export default class BackendProcessing {
     return new Promise<Boolean>((resolve, reject) => {
       database
         .sharefund(fundID, user.UserID)
-        .then(result => {
+        .then((result) => {
           resolve(true);
         })
-        .catch(error => {
+        .catch((error) => {
           resolve(false);
         });
     });
@@ -393,13 +363,13 @@ export default class BackendProcessing {
     return new Promise<SimpleUser[]>((resolve, reject) => {
       database
         .getAllUsers()
-        .then(users => {
-          let filteredList = users.filter(user => {
+        .then((users) => {
+          let filteredList = users.filter((user) => {
             return user.UserID == currentUserID;
           });
           resolve(filteredList);
         })
-        .catch(error => {
+        .catch((error) => {
           reject(error);
         });
     });
@@ -411,7 +381,7 @@ export default class BackendProcessing {
     return new Promise((resolve, reject) => {
       database
         .getAllUsers()
-        .then(users => resolve(users))
+        .then((users) => resolve(users))
         .catch(() => reject());
     });
   }
@@ -420,14 +390,14 @@ export default class BackendProcessing {
     return new Promise((resolve, reject) => {
       database
         .getFundsUserCanSee(userID)
-        .then(fundList => {
+        .then((fundList) => {
           if (fundList.indexOf(fundID.toString()) > -1) {
             resolve(true);
           } else {
             resolve(false);
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("an error occured while finding funds related to user " + userID);
         });
     });
@@ -435,7 +405,7 @@ export default class BackendProcessing {
 
   userCanSeeIndividual(userID, individualID): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      database.retrieveIndividualByID(individualID).then(individual => {
+      database.retrieveIndividualByID(individualID).then((individual) => {
         let fundID = individual.FundID;
         return this.userSeesFund(userID, fundID);
       });
@@ -443,7 +413,7 @@ export default class BackendProcessing {
   }
   userCanChangeIndividual(userID, individualID): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      database.retrieveIndividualByID(individualID).then(individual => {
+      database.retrieveIndividualByID(individualID).then((individual) => {
         let fundID = individual.FundID;
         return PeopleController.userCanChangeFund(userID, fundID);
       });
