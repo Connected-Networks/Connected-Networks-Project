@@ -19,4 +19,8 @@ describe("Router", () => {
   it("should use PeopleController.addPerson for post /people", async () => {
     RouterTestingUtils.testRouterAPI(CrudType.POST, "/people", PeopleController.addPerson);
   });
+
+  it("should use PeopleController.deletePerson for delete /people/:id", async () => {
+    RouterTestingUtils.testRouterAPI(CrudType.DELETE, "/people/:id", PeopleController.deletePerson);
+  });
 });
