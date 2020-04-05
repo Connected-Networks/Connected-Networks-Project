@@ -106,14 +106,14 @@ export default class PeopleController {
 
       if (!(await this.userSeesCompany(userID, companyID))) {
         console.error("User " + userID + " cannot view company " + companyID);
-        res.sendStatus(500);
+        res.sendStatus(401);
         return;
       }
       const people = await this.getPeopleByOriginalCompanyFromDatabase(companyID);
       if (!people) {
         res.sendStatus(500);
       } else {
-        res.json({ data: people });
+        res.send({ data: people });
       }
     } catch (error) {
       res.sendStatus(500);
