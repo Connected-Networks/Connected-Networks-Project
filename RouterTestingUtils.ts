@@ -20,7 +20,7 @@ export default class RouterTestingUtils {
     [CrudType.DELETE, RouterTestingUtils.mockExpressRouter.delete],
   ]);
 
-  static testRouterAPI(CrudType: CrudType, endPoint: string, functionUsed: Function) {
+  static testApiUsedFunction(CrudType: CrudType, endPoint: string, functionUsed: Function) {
     express.Router = jest.fn().mockReturnValue(this.mockExpressRouter);
 
     this.importIsolatedRouter();

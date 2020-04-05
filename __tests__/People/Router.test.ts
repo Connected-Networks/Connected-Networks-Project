@@ -4,23 +4,23 @@ import RouterTestingUtils, { CrudType } from "../../RouterTestingUtils";
 import PeopleController from "../../PeopleController";
 
 describe("Router", () => {
-  it("should use PeopleController.getPeople for get /people", async () => {
-    RouterTestingUtils.testRouterAPI(CrudType.GET, "/people", PeopleController.getPeople);
+  it("should use PeopleController.getPeople for get /people", () => {
+    RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people", PeopleController.getPeople);
   });
 
-  it("should use PeopleController.getPeopleOfCompany for get /people/:companyId", async () => {
-    RouterTestingUtils.testRouterAPI(CrudType.GET, "/people/:companyId", PeopleController.getPeopleOfCompany);
+  it("should use PeopleController.getPeopleOfCompany for get /people/:companyId", () => {
+    RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people/:companyId", PeopleController.getPeopleOfCompany);
   });
 
-  it("should use PeopleController.updatePerson for put /people", async () => {
-    RouterTestingUtils.testRouterAPI(CrudType.PUT, "/people", PeopleController.updatePerson);
+  it("should use PeopleController.updatePerson for put /people", () => {
+    RouterTestingUtils.testApiUsedFunction(CrudType.PUT, "/people", PeopleController.updatePerson);
   });
 
-  it("should use PeopleController.addPerson for post /people", async () => {
-    RouterTestingUtils.testRouterAPI(CrudType.POST, "/people", PeopleController.addPerson);
+  it("should use PeopleController.addPerson for post /people", () => {
+    RouterTestingUtils.testApiUsedFunction(CrudType.POST, "/people", PeopleController.addPerson);
   });
 
-  it("should use PeopleController.deletePerson for delete /people/:id", async () => {
-    RouterTestingUtils.testRouterAPI(CrudType.DELETE, "/people/:id", PeopleController.deletePerson);
+  it("should use PeopleController.deletePerson for delete /people/:id", () => {
+    RouterTestingUtils.testApiUsedFunction(CrudType.DELETE, "/people/:id", PeopleController.deletePerson);
   });
 });
