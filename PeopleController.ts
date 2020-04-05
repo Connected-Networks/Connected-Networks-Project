@@ -58,16 +58,17 @@ export default class PeopleController {
     try {
       let userID = req.user.UserID;
       let companyID = req.params.companyID;
+
       if (!(await this.userSeesCompany(userID, companyID))) {
         res.sendStatus(401);
         return;
+      }
+
+      const people = await database.retrieveCurrentEmployeesOfCompany(companyID);
+      if (!people) {
+        res.sendStatus(500);
       } else {
-        const people = await database.retrieveCurrentEmployeesOfCompany(companyID);
-        if (!people) {
-          res.sendStatus(500);
-        } else {
-          res.json({ data: people });
-        }
+        res.send({ data: people });
       }
     } catch (error) {
       res.sendStatus(500);
