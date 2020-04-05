@@ -151,35 +151,20 @@ export default class PeopleController {
   }
 
   static async deletePerson(req, res) {
-    let person = req.params.id;
-    let userID = req.user.UserID;
-    let fundID = person.FundID;
-    PeopleController.userCanChangeFund(userID, fundID).then(authorized => {
-      if (!authorized) {
+    try {
+      let person = req.params.id;
+      let userID = req.user.UserID;
+      let fundID = person.FundID;
+
+      if (!(await this.userCanChangeFund(userID, fundID))) {
         console.error("User cannot delete the individual");
         res.sendStatus(500);
         return;
       }
-      let d = this.deletePersonFromDatabase(person);
-      d.then(boolean => {
-        if (boolean) res.sendStatus(200);
-        else res.sendStatus(500);
-      });
-      d.catch(res.sendStatus(500));
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  static deletePersonFromDatabase(person) {
-    return new Promise<boolean>((resolve, reject) => {
-      console.log("starting deletion");
-      let del = database.deleteIndividual(person);
-      del.then(person => {
-        resolve(true);
-      });
-      del.catch(error => {
-        reject(false);
-      });
-    });
+      await database.deleteIndividual(person);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
   }
 }
