@@ -40,3 +40,32 @@ describe("getPeople", () => {
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });
+
+describe("getPeopleFromDatabase", () => {
+  it("should get people from database, map them to DisplayPerson and then return", async () => {
+    const mockUserID = 12345;
+    const mockPeople = [
+      { IndividualID: 123, FundID: 1, Name: "Mock", company: "", position: "", LinkedInUrl: "Mock", comments: "" },
+      { IndividualID: 321, FundID: 2, Name: "Mock2", company: "", position: "", LinkedInUrl: "Mock2", comments: "" },
+    ];
+    const mockDisplayPeople = [
+      { id: 123, fundID: 1, name: "Mock", company: "", position: "", hyperlink: "Mock", comment: "" },
+      { id: 321, fundID: 2, name: "Mock2", company: "", position: "", hyperlink: "Mock2", comment: "" },
+    ];
+
+    const mockGetAllIndividualsOfUser = jest.spyOn(database, "getAllIndividualsOfUser").mockResolvedValue(mockPeople);
+    const mockProcessIndividualForDisplay = jest
+      .spyOn(PeopleController, "processIndividualForDisplay")
+      .mockResolvedValueOnce(mockDisplayPeople[0])
+      .mockResolvedValueOnce(mockDisplayPeople[1]);
+
+    const returnedPeople = await PeopleController.getPeopleFromDatabase(mockUserID);
+
+    expect(mockGetAllIndividualsOfUser).toBeCalledWith(mockUserID);
+    expect(mockProcessIndividualForDisplay).toBeCalledWith(mockPeople[0]);
+    expect(mockProcessIndividualForDisplay).toBeCalledWith(mockPeople[1]);
+
+    expect(returnedPeople[0]).toBe(mockDisplayPeople[0]);
+    expect(returnedPeople[1]).toBe(mockDisplayPeople[1]);
+  });
+});
