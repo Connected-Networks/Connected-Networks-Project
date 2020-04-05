@@ -18,6 +18,14 @@ describe("Router", () => {
     expect(mockExpressRouter.get).toBeCalledWith("/people", PeopleController.getPeople);
   });
 
+  it("should use PeopleController.getPeopleOfCompany for get /people/:companyId", async () => {
+    express.Router = jest.fn().mockReturnValue(mockExpressRouter);
+
+    importIsolatedRouter();
+
+    expect(mockExpressRouter.get).toBeCalledWith("/people/:companyId", PeopleController.getPeopleOfCompany);
+  });
+
   function importIsolatedRouter() {
     jest.isolateModules(() => {
       require("../../router");
