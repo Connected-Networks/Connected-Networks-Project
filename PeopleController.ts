@@ -14,14 +14,14 @@ export default class PeopleController {
   static async getPeople(req, res) {
     try {
       const userID = req.user.UserID;
-      const people = await this.retrievePeopleFromDatabase(userID);
-      res.json({ data: people });
+      const people = await this.getPeopleFromDatabase(userID);
+      res.send({ data: people });
     } catch (error) {
       res.sendStatus(500);
     }
   }
 
-  static async retrievePeopleFromDatabase(userID) {
+  static async getPeopleFromDatabase(userID) {
     const individuals = await database.getAllIndividualsOfUser(userID);
 
     return Promise.all(
