@@ -19,7 +19,7 @@ export default class CompaniesController {
   }
 
   static async getCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
-    const companies = database.getAllCompaniesOfUser(userID);
+    const companies = await database.getAllCompaniesOfUser(userID);
 
     return companies.map((element) => {
       let company: DisplayCompany = {
