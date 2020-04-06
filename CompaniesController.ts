@@ -11,14 +11,14 @@ export default class CompaniesController {
   static async getCompanies(req, res) {
     try {
       let userID = req.user.UserID;
-      const companies = await this.retrieveCompaniesFromDatabase(userID);
-      res.json({ data: companies });
+      const companies = await this.getCompaniesFromDatabase(userID);
+      res.send({ data: companies });
     } catch (error) {
       res.sendStatus(500);
     }
   }
 
-  static async retrieveCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
+  static async getCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
     const companies = database.getAllCompaniesOfUser(userID);
 
     return companies.map((element) => {
