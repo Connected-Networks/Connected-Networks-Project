@@ -194,16 +194,16 @@ export default class PeopleController {
 
   static async deletePerson(req, res) {
     try {
-      let person = req.params.id;
+      let personID = req.params.id;
       let userID = req.user.UserID;
-      let fundID = person.FundID;
+      let fundID = (await database.retrieveIndividualByID(personID)).FundID;
 
       if (!(await this.userCanChangeFund(userID, fundID))) {
         console.error("User cannot delete the individual");
-        res.sendStatus(500);
+        res.sendStatus(401);
         return;
       }
-      await database.deleteIndividual(person);
+      await database.deleteIndividual(personID);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
