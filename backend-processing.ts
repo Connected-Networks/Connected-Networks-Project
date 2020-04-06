@@ -1,17 +1,13 @@
 import { resolve } from "dns";
 import { start } from "repl";
 import PeopleController, { DisplayPerson } from "./PeopleController";
+import { DisplayCompany } from "./CompaniesController";
 
 const denv = require("dotenv").config();
 const mysql = require("mysql");
 const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
 
-interface DisplayCompany {
-  id: number;
-  fundID: number;
-  name: string;
-}
 interface DisplayFund {
   id: number;
   name: string;
@@ -154,52 +150,6 @@ export default class BackendProcessing {
     let mis = String(mi);
     if (mis.length == 1) mis = "0" + mi;
     return `${s[s.length - 1]}-${mis}-01`;
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  insert_company(company): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let i = database.insertCompany(company.name);
-      i.then(resolve(true));
-      i.catch(resolve(false));
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  update_company(company): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let u = database.modifyCompany(company.id, company.name);
-      u.then(resolve(true));
-      u.catch(resolve(false));
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  delete_company(company): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let d = database.deleteCompany(company.id);
-      d.then(resolve(true));
-      d.catch(resolve(false));
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  retrieveCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
-    return new Promise<DisplayCompany[]>((resolve, reject) => {
-      database.getAllCompaniesOfUser(userID).then((results) => {
-        console.log(JSON.stringify(results));
-        let list: DisplayCompany[] = results.map((element) => {
-          let company: DisplayCompany = {
-            id: element.CompanyID,
-            fundID: element.FundID,
-            name: element.CompanyName,
-          };
-          return company;
-        });
-        console.log(JSON.stringify(list));
-        resolve(list);
-      });
-    });
   }
 
   //returns a promise boolean representing if the operation was successful
