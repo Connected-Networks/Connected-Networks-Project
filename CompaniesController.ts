@@ -70,16 +70,16 @@ export default class CompaniesController {
 
   static async deleteCompany(req, res) {
     try {
-      let company = req.params.id;
+      let companyID = req.params.id;
       let userID = req.user.UserID;
-      let fundID = company.FundID;
+      let fundID = (await database.retrieveCompanyByID(companyID)).FundID;
 
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot delete a company from that fund");
-        res.sendStatus(500);
+        res.sendStatus(401);
         return;
       }
-      await database.deleteCompany(company.id);
+      await database.deleteCompany(companyID);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
