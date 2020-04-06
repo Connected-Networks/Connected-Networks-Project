@@ -2,6 +2,7 @@ import BackendProcessing from "./backend-processing";
 import Passport from "./config/passport";
 import AuthController from "./AuthController";
 import PeopleController from "./PeopleController";
+import CompaniesController from "./CompaniesController";
 const express = require("express");
 const router = express.Router();
 
@@ -76,90 +77,13 @@ router.post("/people", PeopleController.addPerson);
 
 router.delete("/people/:id", PeopleController.deletePerson);
 
-router.get("/company", (req, res) => {
-  try {
-    let be = new BackendProcessing();
-    let userID = req.user.UserID;
-    let data = be.retrieveCompaniesFromDatabase(userID).then((results) => {
-      if (!results) {
-        res.sendStatus(500);
-      } else {
-        res.json({ data: results });
-      }
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
+router.get("/company", CompaniesController.getCompanies);
 
-router.put("/company", (req, res) => {
-  //update company
-  let be = new BackendProcessing();
-  let company = req.body;
-  let userID = req.user.UserID;
-  let fundID = company.FundID;
-  PeopleController.userCanChangeFund(userID, fundID).then((authorized) => {
-    if (!authorized) {
-      console.error("user is not authorized to change companies in that fund");
-      res.sendStatus(500);
-      return;
-    }
-    let update = be.update_company(company);
-    update.then((boolean) => {
-      if (boolean) {
-        console.log("company updated");
-        res.sendStatus(200);
-      } else res.sendStatus(500);
-    });
-    update.catch(() => {
-      res.sendStatus(500);
-    });
-  });
-});
+router.put("/company", CompaniesController.updateCompany);
 
-router.post("/company", (req, res) => {
-  //add company
-  let be = new BackendProcessing();
-  let company = req.body.newData;
-  let userID = req.user.UserID;
-  let fundID = company.FundID;
-  PeopleController.userCanChangeFund(userID, fundID).then((authorized) => {
-    if (!authorized) {
-      console.error("user cannot add a company to that fund");
-      res.sendStatus(500);
-      return;
-    }
-    let i = be.insert_company(company);
-    i.then((boolean) => {
-      if (boolean) {
-        console.log("person added");
-        res.sendStatus(200);
-      } else res.sendStatus(500);
-    });
-    i.catch(res.sendStatus(500));
-  });
-});
+router.post("/company", CompaniesController.addCompany);
 
-router.delete("/company/:id", (req, res) => {
-  //delete company
-  let be = new BackendProcessing();
-  let company = req.params.id;
-  let userID = req.user.UserID;
-  let fundID = company.FundID;
-  PeopleController.userCanChangeFund(userID, fundID).then((authorized) => {
-    if (!authorized) {
-      console.error("user cannot delete a company from that fund");
-      res.sendStatus(500);
-      return;
-    }
-    let d = be.delete_company(company);
-    d.then((boolean) => {
-      if (boolean) res.sendStatus(200);
-      else res.sendStatus(500);
-    });
-    d.catch(res.sendStatus(500));
-  });
-});
+router.delete("/company/:id", CompaniesController.deleteCompany);
 
 router.get("/funds", (req, res) => {
   //return type should be an Array of SideMenuFund objects as defined in App.tsx.
