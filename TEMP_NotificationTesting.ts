@@ -5,7 +5,11 @@
 import UpdatesController, { Change } from "./UpdatesController";
 import NotificationController from "./NotificationController";
 const database = require("./sequelizeDatabase/sequelFunctions");
+const models = require("./sequelizeDatabase/modelSetup");
 
-const main = async () => {};
+const main = async () => {
+  console.log(await database.getFundsUserCanChange(91));
+};
 
+models.sequelize.connect();
 main();

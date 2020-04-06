@@ -50,8 +50,6 @@ describe("UpdatePerson", () => {
 
     const mockModifyIndividual = jest.spyOn(database, "modifyIndividual").mockRejectedValue(new Error("Mock error"));
 
-    await PeopleController.getPeopleByCompany(mockReq, mockRes);
-
     await PeopleController.updatePerson(mockReq, mockRes);
 
     expect(mockModifyIndividual).toBeCalledWith(mockPerson.id, mockPerson.name, mockPerson.hyperlink, mockPerson.comment);
