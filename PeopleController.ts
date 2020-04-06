@@ -91,10 +91,12 @@ export default class PeopleController {
             })
             .catch((error) => {
               console.error("an error occured while retrieving information on company " + companyID);
+              throw error;
             });
         })
         .catch((error) => {
           console.error("an error occured while finding funds related to user " + userID);
+          throw error;
         });
     });
   }

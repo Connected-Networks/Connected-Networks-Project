@@ -57,3 +57,39 @@ describe("GetPeopleByCompany", () => {
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });
+
+describe("UserSeesCompany", () => {
+  it("should return true if user sees the fund of the company", async () => {
+    const mockUserID = 12345;
+    const mockCompanyID = 54321;
+    const mockFundID = 3243;
+    const mockCompany = { FundID: mockFundID };
+    const mockFunds = ["5342", "3243", "54321", "", "12345"];
+
+    const mockGetFundsUserCanSee = jest.spyOn(database, "getFundsUserCanSee").mockResolvedValue(mockFunds);
+    const mockRetrieveCompanyByID = jest.spyOn(database, "retrieveCompanyByID").mockResolvedValue(mockCompany);
+
+    const returnedValue = await PeopleController.userSeesCompany(mockUserID, mockCompanyID);
+
+    expect(mockGetFundsUserCanSee).toBeCalledWith(mockUserID);
+    expect(mockRetrieveCompanyByID).toBeCalledWith(mockCompanyID);
+    expect(returnedValue).toBe(true);
+  });
+
+  it("should return false if user does not see the fund of the company", async () => {
+    const mockUserID = 12345;
+    const mockCompanyID = 54321;
+    const mockFundID = 3243;
+    const mockCompany = { FundID: mockFundID };
+    const mockFunds = ["5342", "54321", "", "12345"];
+
+    const mockGetFundsUserCanSee = jest.spyOn(database, "getFundsUserCanSee").mockResolvedValue(mockFunds);
+    const mockRetrieveCompanyByID = jest.spyOn(database, "retrieveCompanyByID").mockResolvedValue(mockCompany);
+
+    const returnedValue = await PeopleController.userSeesCompany(mockUserID, mockCompanyID);
+
+    expect(mockGetFundsUserCanSee).toBeCalledWith(mockUserID);
+    expect(mockRetrieveCompanyByID).toBeCalledWith(mockCompanyID);
+    expect(returnedValue).toBe(false);
+  });
+});
