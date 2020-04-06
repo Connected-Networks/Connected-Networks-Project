@@ -54,11 +54,11 @@ export default class CompaniesController {
     try {
       let company = req.body.newData;
       let userID = req.user.UserID;
-      let fundID = company.FundID;
+      let fundID = company.fundID;
 
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add a company to that fund");
-        res.sendStatus(500);
+        res.sendStatus(401);
         return;
       }
       await database.insertCompany(company.name);
