@@ -18,7 +18,6 @@ export default class CompaniesController {
     }
   }
 
-  //returns a promise boolean representing if the operation was successful
   static async retrieveCompaniesFromDatabase(userID): Promise<DisplayCompany[]> {
     const companies = database.getAllCompaniesOfUser(userID);
 
