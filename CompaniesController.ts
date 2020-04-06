@@ -33,13 +33,13 @@ export default class CompaniesController {
 
   static async updateCompany(req, res) {
     try {
-      let company = req.body;
+      let company = req.body.newData;
       let userID = req.user.UserID;
-      let fundID = company.FundID;
+      let fundID = company.fundID;
 
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user is not authorized to change companies in that fund");
-        res.sendStatus(500);
+        res.sendStatus(401);
         return;
       }
 

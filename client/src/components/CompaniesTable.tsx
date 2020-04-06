@@ -15,12 +15,12 @@ export default class CompaniesTable extends ATable<DisplayCompany> {
 
   state: TableState<DisplayCompany> = {
     data: [],
-    columns: [{ title: "Name", field: "name" }]
+    columns: [{ title: "Name", field: "name" }],
   };
 
   get editableObject(): EditableObject<DisplayCompany> {
     return {
-      onRowUpdate: this.updateRow
+      onRowUpdate: this.updateRow,
     };
   }
 
@@ -41,7 +41,7 @@ export default class CompaniesTable extends ATable<DisplayCompany> {
   };
 
   updateRow = async (newData: DisplayCompany, oldData?: DisplayCompany | undefined) => {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       if (oldData) {
         console.log(newData);
         this.updateCompanyOnServer(newData).then(() => {
@@ -52,18 +52,18 @@ export default class CompaniesTable extends ATable<DisplayCompany> {
     });
   };
 
-  updateCompanyOnServer = async (company: DisplayCompany) => {
+  updateCompanyOnServer = async (newData: DisplayCompany) => {
     return new Promise((resolve, reject) => {
       axios
-        .put("/company", company)
-        .then(response => {
+        .put("/company", { newData })
+        .then((response) => {
           if (response.status === 200) {
             resolve();
           } else {
             reject();
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     });
