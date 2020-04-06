@@ -5,35 +5,35 @@ const models = require("./modelSetup");
 
 getAllUsers = () => {
   return models.User.findAll()
-    .then(users => {
+    .then((users) => {
       return users;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 
 getAllIndividuals = () => {
   return models.Individuals.findAll()
-    .then(individuals => {
+    .then((individuals) => {
       return individuals;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 
 //This function returns an array of FundIDs representing funds the user can see.
 //It is important this returns an array of strings rather than Fund JSON objects.
-getFundsUserCanSee = userID => {
+getFundsUserCanSee = (userID) => {
   return new Promise((resolve, reject) => {
     models.Funds.findAll({
-      where: { UserID: userID }
-    }).then(originalFundResults => {
+      where: { UserID: userID },
+    }).then((originalFundResults) => {
       models.SharedFunds.findAll({
-        where: { UserID: userID }
-      }).then(sharedFundResults => {
-        let originalFundNumbers = originalFundResults.map(x => {
+        where: { UserID: userID },
+      }).then((sharedFundResults) => {
+        let originalFundNumbers = originalFundResults.map((x) => {
           //Converted to string to be more universal
           return x.FundID.toString();
         });
-        let sharedFundNumbers = sharedFundResults.map(x => {
+        let sharedFundNumbers = sharedFundResults.map((x) => {
           //Converted to string to be more universal
           return x.FundID.toString();
         });
@@ -44,11 +44,11 @@ getFundsUserCanSee = userID => {
   });
 };
 
-getFundsUserCanChange = userID => {
+getFundsUserCanChange = (userID) => {
   return new Promise((resolve, reject) => {
-    models.Funds.findAll({ where: { UserID: userID } }).then(originalFundResults => {
+    models.Funds.findAll({ where: { UserID: userID } }).then((originalFundResults) => {
       resolve(
-        originalFundResults.map(x => {
+        originalFundResults.map((x) => {
           return x.FundID.toString();
         })
       );
@@ -56,12 +56,12 @@ getFundsUserCanChange = userID => {
   });
 };
 
-getAllIndividualsOfUser = userID => {
+getAllIndividualsOfUser = (userID) => {
   return new Promise((resolve, reject) => {
-    getFundsUserCanSee(userID).then(ids => {
+    getFundsUserCanSee(userID).then((ids) => {
       models.Individuals.findAll({
-        where: { FundID: ids }
-      }).then(results => {
+        where: { FundID: ids },
+      }).then((results) => {
         resolve(results);
       });
     });
@@ -69,17 +69,17 @@ getAllIndividualsOfUser = userID => {
 };
 getAllCompanies = () => {
   return models.Companies.findAll({ where: {} })
-    .then(companies => {
+    .then((companies) => {
       return companies;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
-getAllCompaniesOfUser = userID => {
+getAllCompaniesOfUser = (userID) => {
   return new Promise((resolve, reject) => {
-    getFundsUserCanSee(userID).then(fundids => {
+    getFundsUserCanSee(userID).then((fundids) => {
       models.Companies.findAll({
-        where: { FundID: fundids }
-      }).then(results => {
+        where: { FundID: fundids },
+      }).then((results) => {
         resolve(results);
       });
     });
@@ -87,33 +87,33 @@ getAllCompaniesOfUser = userID => {
 };
 getAllFunds = () => {
   return models.Funds.findAll()
-    .then(funds => {
+    .then((funds) => {
       return funds;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 getAllEmployeeHistory = () => {
   return models.EmployeeHistory.findAll()
-    .then(employeeHistory => {
+    .then((employeeHistory) => {
       return employeeHistory;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 
 getAllOriginalFundPositions = () => {
   return models.OriginalFundPosition.findAll()
-    .then(originalPositions => {
+    .then((originalPositions) => {
       return originalPositions;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 
 getAllSharedFunds = () => {
   return models.SharedFunds.findAll()
-    .then(sharedFunds => {
+    .then((sharedFunds) => {
       return sharedFunds;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 
 //--------------------Insert into Table Functions-----------//
@@ -123,25 +123,25 @@ insertUser = (Username, Password, Email) => {
     where: { Email: Email },
     defaults: {
       Username: Username,
-      Password: Password
-    }
+      Password: Password,
+    },
   })
     .spread((user, createdBoolean) => {
       return user;
     })
-    .catch(err => console.error('Error in "insertUser", ', err));
+    .catch((err) => console.error('Error in "insertUser", ', err));
 };
 
 insertFund = (FundName, UserID) => {
   return models.Funds.create({
     //TODO: Make this a findOrCreate to prevent duplicate names.
     FundName: FundName,
-    UserID: UserID
+    UserID: UserID,
   })
-    .then(createdFund => {
+    .then((createdFund) => {
       return createdFund;
     })
-    .catch(err => console.error('Error in "insertFund", ', err));
+    .catch((err) => console.error('Error in "insertFund", ', err));
 };
 
 insertSharedFunds = (FundID, UserID) => {
@@ -149,12 +149,12 @@ insertSharedFunds = (FundID, UserID) => {
   return models.SharedFunds.create({
     //TODO: May need a "findOrCreate" with both fields in 'where'.
     FundID: FundID,
-    UserID: UserID
+    UserID: UserID,
   })
-    .then(createdSharedFund => {
+    .then((createdSharedFund) => {
       return createdSharedFund;
     })
-    .catch(err => console.error('Error in "insertSharedFunds", ', err));
+    .catch((err) => console.error('Error in "insertSharedFunds", ', err));
 };
 
 insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
@@ -162,22 +162,23 @@ insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
     where: { LinkedInUrl: LinkedInUrl, FundID: FundID },
     defaults: {
       Name: Name,
-      Comments: Comments
-    }
+      Comments: Comments,
+    },
   })
     .spread((user, createdBoolean) => {
       return user;
     })
-    .catch(err => console.error("Error in insertPerson", err));
+    .catch((err) => console.error("Error in insertPerson", err));
 };
 
-insertCompany = (CompanyName, FundID) => {
-  return models.Companies.findOrCreate({ where: { CompanyName: CompanyName, FundID: FundID } })
+insertCompany = (companyName, fundID) => {
+  console.log("finding " + companyName + " " + fundID);
+  return models.Companies.findOrCreate({ where: { CompanyName: companyName, FundID: fundID } })
     .spread((company, createdBoolean) => {
       //console.log('Company Created: ', company);
       return company;
     })
-    .catch(err => console.error("Error in insertCompany", err));
+    .catch((err) => console.error("Error in insertCompany", err));
 };
 
 insertOriginalFundPosition = (IndividualID, CompanyID, PositionName) => {
@@ -187,12 +188,12 @@ insertOriginalFundPosition = (IndividualID, CompanyID, PositionName) => {
     //TODO: Maybe make this findOrCreate, check if Funds match.
     IndividualID: IndividualID,
     CompanyID: CompanyID,
-    PositionName: PositionName
+    PositionName: PositionName,
   })
-    .then(originalFundPosition => {
+    .then((originalFundPosition) => {
       return originalFundPosition;
     })
-    .catch(err => console.error('Error in "insertOriginalFundPosition", ', err));
+    .catch((err) => console.error('Error in "insertOriginalFundPosition", ', err));
 };
 
 insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDate, EndDate) => {
@@ -203,22 +204,22 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
     CompanyID: CompanyID,
     PositionName: PositionName,
     StartDate: StartDate,
-    EndDate: EndDate
+    EndDate: EndDate,
   })
-    .then(history => {
+    .then((history) => {
       //console.log('History Added: ', history);
       return history;
     })
-    .catch(err => console.error("Error in insertEmployeeHistory", err));
+    .catch((err) => console.error("Error in insertEmployeeHistory", err));
 };
 
 updateEmployeeHistory = (historyID, userID, individualID, companyID, positionName, startDate, endDate) => {
   return new Promise((resolve, reject) => {
     models.EmployeeHistory.findOne({
       where: {
-        HistoryID: historyID
-      }
-    }).then(result => {
+        HistoryID: historyID,
+      },
+    }).then((result) => {
       if (result == null) reject();
       result
         .update({
@@ -227,9 +228,9 @@ updateEmployeeHistory = (historyID, userID, individualID, companyID, positionNam
           CompanyID: companyID,
           PositionName: positionName,
           StartDate: startDate,
-          EndDate: endDate
+          EndDate: endDate,
         })
-        .then(result => {
+        .then((result) => {
           resolve();
         });
     });
@@ -264,54 +265,78 @@ insertFromCsvLine = (
     Comments,
     "\n"
   );
-  insertPerson(FundID, EmployeeName, LinkedInUrl, Comments)
-    .then(newPerson => {
-      insertCompany(PortfolioCompanyName, FundID).then(originalCompany => {
-        insertOriginalFundPosition(newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion)
-          .then(() => {
-            //NOTE: I'm hoping it doesn't freak out that I included no arguements here.
-            insertEmployeeHistory(
-              UserID,
-              newPerson.IndividualID,
-              originalCompany.CompanyID,
-              OriginalPostion,
-              OriginalStartDate,
-              OriginalEndDate
-            ).then(() => {
-              insertCompany(CurrentEmployer, FundID).then(newCompany => {
-                insertEmployeeHistory(
-                  UserID,
-                  newPerson.IndividualID,
-                  newCompany.CompanyID,
-                  CurrentPostion,
-                  OriginalStartDate,
-                  OriginalEndDate
-                );
+  //returns IndividualID for use in processing quarter updates
+  return new Promise((resolve, reject) => {
+    insertPerson(FundID, EmployeeName, LinkedInUrl, Comments)
+      .then((newPerson) => {
+        insertCompany(PortfolioCompanyName, FundID).then((originalCompany) => {
+          insertOriginalFundPosition(newPerson.IndividualID, originalCompany.CompanyID, OriginalPostion)
+            .then(() => {
+              //NOTE: I'm hoping it doesn't freak out that I included no arguements here.
+              insertEmployeeHistory(
+                UserID,
+                newPerson.IndividualID,
+                originalCompany.CompanyID,
+                OriginalPostion,
+                OriginalStartDate,
+                OriginalEndDate
+              ).then(() => {
+                insertCompany(CurrentEmployer, FundID).then((newCompany) => {
+                  insertEmployeeHistory(
+                    UserID,
+                    newPerson.IndividualID,
+                    newCompany.CompanyID,
+                    CurrentPostion,
+                    OriginalStartDate,
+                    OriginalEndDate
+                  ).then(() => {
+                    resolve(newPerson.IndividualID);
+                  });
+                });
               });
-            });
+            })
+            .catch((err) => console.error(">>ERROR ini insertFromCSVLine, in insertOriginal Position."));
+        });
+      })
+      .catch((err) => console.error('Error in "insertFromCsvLine", ', err));
+  });
+};
+insertQuarterEmployment = (userID, individualID, fundID, companyName, positionName, startDate) => {
+  return new Promise((resolve, reject) => {
+    insertCompany(companyName, fundID)
+      .then((company) => {
+        this.insertEmployeeHistory(userID, individualID, company.CompanyID, positionName, startDate, "")
+          .then(() => {
+            resolve();
           })
-          .catch(err => console.error(">>ERROR ini insertFromCSVLine, in insertOriginal Position."));
+          .catch((error) => {
+            console.error("An error occurred while adding employee history from quarter columns");
+            reject();
+          });
+      })
+      .catch((error) => {
+        console.error("An error occurred while finding the company " + companyName);
+        reject();
       });
-    })
-    .catch(err => console.error('Error in "insertFromCsvLine", ', err));
+  });
 };
 
-getIndividualEmployeeHistory = IndividualID => {
+getIndividualEmployeeHistory = (IndividualID) => {
   return models.EmployeeHistory.findAll({
     where: { IndividualID: IndividualID },
     order: [["EndDate", "DESC"]],
     include: [
       {
-        model: models.Companies
-      }
-    ]
-  }).then(wholeHistory => {
+        model: models.Companies,
+      },
+    ],
+  }).then((wholeHistory) => {
     return wholeHistory;
   });
 };
 
-getIndividualCurrentEmployement = IndividualID => {
-  return getIndividualEmployeeHistory(IndividualID).then(IndividualHistory => {
+getIndividualCurrentEmployement = (IndividualID) => {
+  return getIndividualEmployeeHistory(IndividualID).then((IndividualHistory) => {
     return IndividualHistory[0];
   });
 };
@@ -321,22 +346,22 @@ getIndividualCurrentEmployement = IndividualID => {
 modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
   return models.Individuals.findOne({
     where: {
-      IndividualID: IndividualID
-    }
+      IndividualID: IndividualID,
+    },
   })
-    .then(individual => {
+    .then((individual) => {
       individual.update({
         IndividualName: newName,
         OriginalPostion: newPosition, //TODO: Update this.
         LinkedInUrl: newUrl,
-        Comments: newComments
+        Comments: newComments,
       });
       return individual;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 
-deleteIndividual = IndividualID => {
+deleteIndividual = (IndividualID) => {
   // I can't get the delete for an individual to in turn
   //   delete rows from EmployeeHistory, so I'm doing
   //   this the long way until I can ask about Sequelize
@@ -346,14 +371,14 @@ deleteIndividual = IndividualID => {
   return new Promise((resolve, reject) => {
     models.Individuals.destroy({
       where: {
-        IndividualID: IndividualID
-      }
+        IndividualID: IndividualID,
+      },
     })
-      .then(deletedIndividual => {
+      .then((deletedIndividual) => {
         console.log("New deletion of an individual.");
         resolve(deletedIndividual);
       })
-      .catch(err => {
+      .catch((err) => {
         console.err("\n\n-->Error in deleteIndividual: ", err);
         reject(err);
       });
@@ -364,16 +389,16 @@ deleteIndividual = IndividualID => {
 modifyCompany = (CompanyID, alteredCompanyName) => {
   return models.Companies.findOne({
     where: {
-      CompanyID: CompanyID
-    }
+      CompanyID: CompanyID,
+    },
   })
-    .then(company => {
+    .then((company) => {
       company.update({
-        CompanyName: alteredCompanyName
+        CompanyName: alteredCompanyName,
       });
       return company;
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 };
 
 //---------------Modify Fund---------------//
@@ -381,13 +406,13 @@ modifyFund = (FundID, alteredFundName) => {
   return new Promise((resolve, reject) => {
     models.Funds.findOne({
       where: {
-        FundID: FundID
-      }
+        FundID: FundID,
+      },
     })
-      .then(fund => {
+      .then((fund) => {
         fund
           .update({
-            FundName: alteredFundName
+            FundName: alteredFundName,
           })
           .then(resolve(true))
           .catch(reject());
@@ -396,72 +421,72 @@ modifyFund = (FundID, alteredFundName) => {
   });
 };
 
-deleteCompany = CompanyID => {
+deleteCompany = (CompanyID) => {
   return new Promise((resolve, reject) => {
     models.Companies.destroy({
       where: {
-        CompanyID: CompanyID
-      }
+        CompanyID: CompanyID,
+      },
     })
-      .then(deletedCompany => {
+      .then((deletedCompany) => {
         console.log("deletion resolved");
         resolve(deletedCompany);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error in Delete company: ", err);
         reject(err);
       });
   });
 };
 
-deleteFund = FundID => {
+deleteFund = (FundID) => {
   return new Promise((resolve, reject) => {
     models.Funds.destroy({
       where: {
-        FundID: FundID
-      }
+        FundID: FundID,
+      },
     })
-      .then(deletedFund => {
+      .then((deletedFund) => {
         console.log("deleted ONLY a fund.");
         resolve(deletedFund);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         reject(err);
       });
   });
 };
 
-deleteSharedFunds = ShareID => {
+deleteSharedFunds = (ShareID) => {
   return new Promise((resolve, reject) => {
     models.SharedFunds.destroy({
       where: {
-        SharingID: ShareID
-      }
+        SharingID: ShareID,
+      },
     })
-      .then(unsharedFund => {
+      .then((unsharedFund) => {
         console.log("Fund is no longer shared.");
         resolve(unsharedFund);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         reject(err);
       });
   });
 };
 
-deleteEmployeeHistory = HistoryID => {
+deleteEmployeeHistory = (HistoryID) => {
   return new Promise((resolve, reject) => {
     models.EmployeeHistory.destroy({
       where: {
-        HistoryID: HistoryID
-      }
+        HistoryID: HistoryID,
+      },
     })
-      .then(deletedHistory => {
+      .then((deletedHistory) => {
         console.log("Deleted an single employment record.");
         resolve(deletedHistory);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         reject(err);
       });
@@ -470,20 +495,20 @@ deleteEmployeeHistory = HistoryID => {
 
 //returns a list of objects
 //TODO: Update
-retrieveCompaniesByFunds = fundID => {
+retrieveCompaniesByFunds = (fundID) => {
   return models.Companies.findAll({
     where: {
-      FundID: fundID
-    }
-  }).catch(err => console.error(">>>ERROR in retrieveCompaniesByFunds, ", err));
+      FundID: fundID,
+    },
+  }).catch((err) => console.error(">>>ERROR in retrieveCompaniesByFunds, ", err));
 };
-retrieveCurrentEmployeesOfCompany = CompanyID => {
+retrieveCurrentEmployeesOfCompany = (CompanyID) => {
   return new Promise((resolve, reject) => {
-    getAllIndividuals().then(people => {
+    getAllIndividuals().then((people) => {
       Promise.all(
-        people.map(person => {
+        people.map((person) => {
           return new Promise((resolve, reject) => {
-            getIndividualCurrentEmployement(person.IndividualID).then(result => {
+            getIndividualCurrentEmployement(person.IndividualID).then((result) => {
               if (result == null || result == undefined || result.company == null || result.company.CompanyID != CompanyID)
                 resolve(null);
               else {
@@ -495,46 +520,46 @@ retrieveCurrentEmployeesOfCompany = CompanyID => {
                   company: result.company.CompanyName,
                   StartDate: result.StartDate,
                   EndDate: result.EndDate,
-                  position: result.PositionName
+                  position: result.PositionName,
                 };
                 resolve(info);
               }
             });
           });
         })
-      ).then(results => {
-        resolve(results.filter(x => x != null));
+      ).then((results) => {
+        resolve(results.filter((x) => x != null));
       });
     });
-  }).catch(error => {
+  }).catch((error) => {
     console.err("Error in retrieveCurrentEmployeesOfCompany", error);
     reject();
   });
 };
 
-retrieveIndividualsByOriginalCompany = companyID => {
+retrieveIndividualsByOriginalCompany = (companyID) => {
   return models.OriginalFundPosition.findAll({
     where: { CompanyID: companyID },
     include: [
       {
-        model: models.Individuals
-      }
-    ]
+        model: models.Individuals,
+      },
+    ],
   });
 };
-retrieveIndividualByID = individualID => {
+retrieveIndividualByID = (individualID) => {
   return models.Individuals.findAll({
-    where: { IndividualID: individualID }
+    where: { IndividualID: individualID },
   });
 };
 
-retrieveFundName = fundID => {
+retrieveFundName = (fundID) => {
   return new Promise((resolve, reject) => {
     models.Funds.findAll({
       where: {
-        FundID: fundID
-      }
-    }).then(result => {
+        FundID: fundID,
+      },
+    }).then((result) => {
       if (result[0] != undefined) resolve(result[0].FundName);
       else resolve(undefined);
     });
@@ -546,9 +571,9 @@ sharefund = (fundID, userID) => {
     models.SharedFunds.findOrCreate({
       where: {
         FundID: fundID,
-        UserID: userID
-      }
-    }).then(result => {
+        UserID: userID,
+      },
+    }).then((result) => {
       resolve(result);
     });
   });
@@ -560,63 +585,63 @@ retrieveCompanyByName = (companyName, fundID) => {
     models.Companies.find({
       where: {
         FundID: fundID,
-        CompanyName: companyName
-      }
+        CompanyName: companyName,
+      },
     })
-      .then(result => {
+      .then((result) => {
         resolve(result);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
 };
 
-retrieveCompanyByID = companyID => {
+retrieveCompanyByID = (companyID) => {
   return new Promise((resolve, reject) => {
     models.Companies.find({
       where: {
-        CompanyID: companyID
-      }
+        CompanyID: companyID,
+      },
     })
-      .then(result => {
+      .then((result) => {
         resolve(result);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
 };
 
 //returns the number of accounts with the specified username
-checkUsageofUsername = username => {
+checkUsageofUsername = (username) => {
   return new Promise((resolve, reject) => {
     models.User.findAll({
       where: {
-        Username: username
-      }
+        Username: username,
+      },
     })
-      .then(results => {
+      .then((results) => {
         resolve(results.length);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
 };
 
 //returns the number of accounts with the specified email
-checkUsageofEmail = email => {
+checkUsageofEmail = (email) => {
   return new Promise((resolve, reject) => {
     models.User.findAll({
       where: {
-        Email: email
-      }
+        Email: email,
+      },
     })
-      .then(results => {
+      .then((results) => {
         resolve(results.length);
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error);
       });
   });
@@ -626,49 +651,49 @@ createAccount = (username, email, password) => {
   return models.User.create({ Username: username, Password: password, Email: email });
 };
 
-getUserByUsername = username => {
+getUserByUsername = (username) => {
   return new Promise((resolve, reject) => {
     models.User.findOne({
       where: {
-        Username: username
-      }
-    }).then(user => resolve(user));
+        Username: username,
+      },
+    }).then((user) => resolve(user));
   });
 };
 
-getUserByEmail = email => {
+getUserByEmail = (email) => {
   return new Promise((resolve, reject) => {
     models.User.findOne({
       where: {
-        Email: email
-      }
-    }).then(user => resolve(user));
+        Email: email,
+      },
+    }).then((user) => resolve(user));
   });
 };
 
-getUserById = id => {
+getUserById = (id) => {
   return new Promise((resolve, reject) => {
     models.User.findOne({
       where: {
-        UserID: id
-      }
-    }).then(user => {
+        UserID: id,
+      },
+    }).then((user) => {
       user !== null ? resolve(user) : reject();
     });
   });
 };
 
-getIndividualByLinkedIn = async LinkedInUrl => {
+getIndividualByLinkedIn = async (LinkedInUrl) => {
   return await models.Individuals.findOne({ where: { LinkedInUrl } });
 };
 
-getCompanyById = async CompanyID => {
+getCompanyById = async (CompanyID) => {
   return await models.Companies.findOne({ where: { CompanyID } });
 };
 
-getAllUsersRelatedToFund = async FundID => {
+getAllUsersRelatedToFund = async (FundID) => {
   const ownerId = (await models.Funds.findOne({ where: { FundID } })).UserID;
-  const sharedWithIds = (await models.SharedFunds.findAll({ where: { FundID } })).map(sharedFund => sharedFund.UserID);
+  const sharedWithIds = (await models.SharedFunds.findAll({ where: { FundID } })).map((sharedFund) => sharedFund.UserID);
 
   const allFundUsersIds = [ownerId, ...sharedWithIds];
   return await models.User.findAll({ where: { UserID: allFundUsersIds } });
@@ -721,5 +746,6 @@ module.exports = {
   deleteSharedFunds,
   deleteEmployeeHistory,
   insertSharedFunds,
-  getAllSharedFunds
+  getAllSharedFunds,
+  insertQuarterEmployment,
 };
