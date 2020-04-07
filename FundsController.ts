@@ -12,7 +12,7 @@ export default class FundsController {
     //return type should be an Array of SideMenuFund objects as defined in App.tsx.
     try {
       let userID = req.user.UserID;
-      let funds = await this.retrieveFundsFromDatabase(userID);
+      let funds = await this.getFundsFromDatabase(userID);
       res.send({ data: funds });
     } catch (error) {
       res.sendStatus(500);
@@ -20,7 +20,7 @@ export default class FundsController {
   }
 
   //returns a promise boolean representing if the operation was successful
-  static async retrieveFundsFromDatabase(userID): Promise<DisplayFund[]> {
+  static async getFundsFromDatabase(userID): Promise<DisplayFund[]> {
     const fundIdsUserCanSee = await database.getFundsUserCanSee(userID);
 
     const allFunds = await database.getAllFunds();
