@@ -32,7 +32,7 @@ export default class FundsController {
       return fund;
     });
 
-    return list.filter((x) => fundIdsUserCanSee.include(x.id.toString()));
+    return list.filter((x) => fundIdsUserCanSee.includes(x.id.toString()));
   }
 
   static async addFund(req, res) {
