@@ -94,6 +94,8 @@ router.put("/funds", FundsController.updateFund);
 
 router.get("/funds/:id", FundsController.getCompaniesOfFund);
 
+router.delete("/funds/:id", FundsController.deleteFund);
+
 router.get("/history/:id", (req, res) => {
   let be = new BackendProcessing();
   let individualID = req.params.id;

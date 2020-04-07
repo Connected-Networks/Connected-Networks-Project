@@ -102,12 +102,21 @@ export default class FundsController {
     }
   }
 
-  //returns a promise boolean representing if the operation was successful
-  static async delete_fund(fund): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let d = database.deleteFund(fund.id);
-      d.then(resolve(true));
-      d.catch(resolve(false));
-    });
+  static async deleteFund(req, res) {
+    try {
+      let fundID = req.params.id;
+      let userID = req.user.UserID;
+
+      if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
+        console.error("User cannot delete the fund");
+        res.sendStatus(401);
+        return;
+      }
+
+      await database.deleteFund(fundID);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
   }
 }
