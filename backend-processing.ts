@@ -8,10 +8,6 @@ const mysql = require("mysql");
 const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
 
-interface DisplayFund {
-  id: number;
-  name: string;
-}
 interface DisplayHistory {
   id: number;
   company: string;
@@ -150,51 +146,6 @@ export default class BackendProcessing {
     let mis = String(mi);
     if (mis.length == 1) mis = "0" + mi;
     return `${s[s.length - 1]}-${mis}-01`;
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  insert_fund(fundName): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let i = database.insertFund(fundName);
-      i.then(resolve(true));
-      i.catch(resolve(false));
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  update_fund(fund): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let u = database.modifyFund(fund.id, fund.name);
-      u.then(resolve(true));
-      u.catch(resolve(false));
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  delete_fund(fund): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let d = database.deleteFund(fund.id);
-      d.then(resolve(true));
-      d.catch(resolve(false));
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  retrieveFundsFromDatabase(userID): Promise<DisplayFund[]> {
-    return new Promise<DisplayFund[]>((resolve, reject) => {
-      database.getFundsUserCanSee(userID).then((availableFunds) => {
-        database.getAllFunds().then((results) => {
-          let list: DisplayFund[] = results.map((element) => {
-            let fund: DisplayFund = {
-              id: element.FundID,
-              name: element.FundName,
-            };
-            return fund;
-          });
-          resolve(list.filter((x) => availableFunds.indexOf(x.id.toString()) >= 0));
-        });
-      });
-    });
   }
 
   retrieveCompaniesFromFund(fundID) {

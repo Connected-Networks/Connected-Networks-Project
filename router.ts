@@ -3,6 +3,7 @@ import Passport from "./config/passport";
 import AuthController from "./AuthController";
 import PeopleController from "./PeopleController";
 import CompaniesController from "./CompaniesController";
+import FundsController from "./FundsController";
 const express = require("express");
 const router = express.Router();
 
@@ -85,77 +86,13 @@ router.post("/company", CompaniesController.addCompany);
 
 router.delete("/company/:id", CompaniesController.deleteCompany);
 
-router.get("/funds", (req, res) => {
-  //return type should be an Array of SideMenuFund objects as defined in App.tsx.
-  try {
-    let be = new BackendProcessing();
-    let userID = req.user.UserID;
-    let results = be.retrieveFundsFromDatabase(userID);
-    results.then((funds) => {
-      res.json({ data: funds });
-    });
-    results.catch(() => {
-      res.sendStatus(500);
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
-router.post("/funds", (req, res) => {
-  let be = new BackendProcessing();
-  console.log("Adding fund: " + req.body.newFundName + " to the database");
-  let fund = req.body.newFundName;
-  be.insert_fund(fund).then((result) => {
-    if (result) res.sendStatus(200);
-    else res.sendStatus(500);
-  });
-});
+router.get("/funds", FundsController.getFunds);
 
-router.put("/funds", (req, res) => {
-  //Todo for Aaron, implement this function so it updates an existing fund, the fund can be accessed by req.body.fund,
-  //req.body.fund.name is probably gonna be the thing that always change
-  //Temp until function is implemented
-  let be = new BackendProcessing();
-  let userID = req.user.UserID;
-  PeopleController.userCanChangeFund(userID, req.body.fund.id).then((authorized) => {
-    if (!authorized) {
-      console.error("User cannot update the fund");
-      res.sendStatus(500);
-      return;
-    }
-    console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
-    let fund = req.body.fund;
-    be.update_fund(fund).then((result) => {
-      if (result) res.sendStatus(200);
-      else res.sendStatus(500);
-    });
-  });
-});
+router.post("/funds", FundsController.updateFund);
 
-router.get("/funds/:id", (req, res) => {
-  try {
-    let be = new BackendProcessing();
-    let userID = req.user.UserID;
-    let fundID = req.params.id;
-    be.userSeesFund(userID, fundID).then((authorized) => {
-      if (!authorized) {
-        console.error("User " + userID + " cannot see Fund " + fundID);
-        res.sendStatus(500);
-        return;
-      }
-      //console.log("params: " + JSON.stringify(req.params));
-      //console.log("type: " + typeof fundID);
-      //console.log("string: " + fundID);
-      let data = be.retrieveCompaniesFromFund(fundID).then((results) => {
-        if (results != null) {
-          res.json({ data: results });
-        } else res.sendStatus(500);
-      });
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
+router.put("/funds", FundsController.addFund);
+
+router.get("/funds/:id", FundsController.getCompaniesOfFund);
 
 router.get("/history/:id", (req, res) => {
   let be = new BackendProcessing();
