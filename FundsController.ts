@@ -1,5 +1,4 @@
 import PeopleController from "./PeopleController";
-import { RSA_NO_PADDING } from "constants";
 import { DisplayCompany } from "./CompaniesController";
 const database = require("./sequelizeDatabase/sequelFunctions");
 

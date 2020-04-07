@@ -2,6 +2,7 @@ import { resolve } from "dns";
 import { start } from "repl";
 import PeopleController, { DisplayPerson } from "./PeopleController";
 import { DisplayCompany } from "./CompaniesController";
+import FundsController from "./FundsController";
 
 const denv = require("dotenv").config();
 const mysql = require("mysql");
@@ -275,7 +276,7 @@ export default class BackendProcessing {
     return new Promise((resolve, reject) => {
       database.retrieveIndividualByID(individualID).then((individual) => {
         let fundID = individual.FundID;
-        return this.userSeesFund(userID, fundID);
+        return FundsController.userSeesFund(userID, fundID);
       });
     });
   }
