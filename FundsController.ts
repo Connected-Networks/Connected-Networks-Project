@@ -35,26 +35,17 @@ export default class FundsController {
     return list.filter((x) => fundIdsUserCanSee.includes(x.id.toString()));
   }
 
-  static async addFund(req, res) {
-    try {
-      let fundName = req.body.newFundName;
-      await database.insertFund(fundName);
-      res.sendStatus(200);
-    } catch (error) {
-      res.sendStatus(500);
-    }
-  }
-
   static async updateFund(req, res) {
     try {
       let userID = req.user.UserID;
-      let fund = req.body.fund;
+      let fund = req.body.newData;
 
       if (!(await PeopleController.userCanChangeFund(userID, fund.id))) {
         console.error("User cannot update the fund");
         res.sendStatus(401);
         return;
       }
+
       await database.modifyFund(fund.id, fund.name);
       res.sendStatus(200);
     } catch (error) {
@@ -99,6 +90,16 @@ export default class FundsController {
     });
 
     return list;
+  }
+
+  static async addFund(req, res) {
+    try {
+      let fundName = req.body.newFundName;
+      await database.insertFund(fundName);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
   }
 
   //returns a promise boolean representing if the operation was successful

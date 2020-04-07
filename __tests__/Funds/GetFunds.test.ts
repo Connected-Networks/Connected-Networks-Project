@@ -37,7 +37,7 @@ describe("GetFunds", () => {
   });
 });
 
-describe("getFundsFromDatabase", () => {
+describe("GetFundsFromDatabase", () => {
   it("should only return funds user can see and should return as DisplayFunds", async () => {
     const mockUserID = 12345;
     const mockFundsUserCanSee = ["321"];
