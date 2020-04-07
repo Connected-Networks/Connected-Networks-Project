@@ -88,9 +88,9 @@ router.delete("/company/:id", CompaniesController.deleteCompany);
 
 router.get("/funds", FundsController.getFunds);
 
-router.post("/funds", FundsController.updateFund);
+router.post("/funds", FundsController.addFund);
 
-router.put("/funds", FundsController.addFund);
+router.put("/funds", FundsController.updateFund);
 
 router.get("/funds/:id", FundsController.getCompaniesOfFund);
 

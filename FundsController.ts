@@ -1,5 +1,6 @@
-import BackendProcessing from "./backend-processing";
 import PeopleController from "./PeopleController";
+import { RSA_NO_PADDING } from "constants";
+import { DisplayCompany } from "./CompaniesController";
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface DisplayFund {
@@ -35,77 +36,70 @@ export default class FundsController {
     return list.filter((x) => fundIdsUserCanSee.include(x.id.toString()));
   }
 
-  static async updateFund(req, res) {
-    let be = new BackendProcessing();
-    console.log("Adding fund: " + req.body.newFundName + " to the database");
-    let fund = req.body.newFundName;
-    this.insert_fund(fund).then((result) => {
-      if (result) res.sendStatus(200);
-      else res.sendStatus(500);
-    });
-  }
-
-  //returns a promise boolean representing if the operation was successful
-  static insert_fund(fundName): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let i = database.insertFund(fundName);
-      i.then(resolve(true));
-      i.catch(resolve(false));
-    });
-  }
-
   static async addFund(req, res) {
-    //Todo for Aaron, implement this function so it updates an existing fund, the fund can be accessed by req.body.fund,
-    //req.body.fund.name is probably gonna be the thing that always change
-    //Temp until function is implemented
-    let be = new BackendProcessing();
-    let userID = req.user.UserID;
-    PeopleController.userCanChangeFund(userID, req.body.fund.id).then((authorized) => {
-      if (!authorized) {
+    try {
+      let fundName = req.body.newFundName;
+      await database.insertFund(fundName);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
+  }
+
+  static async updateFund(req, res) {
+    try {
+      let userID = req.user.UserID;
+      let fund = req.body.fund;
+
+      if (!(await PeopleController.userCanChangeFund(userID, fund.id))) {
         console.error("User cannot update the fund");
-        res.sendStatus(500);
+        res.sendStatus(401);
         return;
       }
-      console.log("Updated fund with id: " + req.body.fund.id + " to be called: " + req.body.fund.name);
-      let fund = req.body.fund;
-      this.update_fund(fund).then((result) => {
-        if (result) res.sendStatus(200);
-        else res.sendStatus(500);
-      });
-    });
-  }
-
-  static update_fund(fund): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let u = database.modifyFund(fund.id, fund.name);
-      u.then(resolve(true));
-      u.catch(resolve(false));
-    });
+      await database.modifyFund(fund.id, fund.name);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
   }
 
   static async getCompaniesOfFund(req, res) {
     try {
-      let be = new BackendProcessing();
       let userID = req.user.UserID;
       let fundID = req.params.id;
-      be.userSeesFund(userID, fundID).then((authorized) => {
-        if (!authorized) {
-          console.error("User " + userID + " cannot see Fund " + fundID);
-          res.sendStatus(500);
-          return;
-        }
-        //console.log("params: " + JSON.stringify(req.params));
-        //console.log("type: " + typeof fundID);
-        //console.log("string: " + fundID);
-        let data = be.retrieveCompaniesFromFund(fundID).then((results) => {
-          if (results != null) {
-            res.json({ data: results });
-          } else res.sendStatus(500);
-        });
-      });
+
+      if (!(await this.userSeesFund(userID, fundID))) {
+        console.error("User " + userID + " cannot see Fund " + fundID);
+        res.sendStatus(401);
+        return;
+      }
+
+      const companies = await this.retrieveCompaniesFromFund(fundID);
+      res.send({ data: companies });
     } catch (error) {
       res.sendStatus(500);
     }
+  }
+
+  static async userSeesFund(userID, fundID): Promise<boolean> {
+    const fundsUserCanSee = await database.getFundsUserCanSee(userID);
+
+    return fundsUserCanSee.include(fundID.toString());
+  }
+
+  static async retrieveCompaniesFromFund(fundID) {
+    const companies = await database.retrieveCompaniesByFunds(fundID);
+
+    let list: DisplayCompany[] = companies.map((element) => {
+      let company: DisplayCompany = {
+        id: element.CompanyID,
+        fundID: element.FundID,
+        name: element.CompanyName,
+      };
+      return company;
+    });
+
+    return list;
   }
 
   //returns a promise boolean representing if the operation was successful

@@ -148,22 +148,6 @@ export default class BackendProcessing {
     return `${s[s.length - 1]}-${mis}-01`;
   }
 
-  retrieveCompaniesFromFund(fundID) {
-    return new Promise<DisplayCompany[]>((resolve, reject) => {
-      database.retrieveCompaniesByFunds(fundID).then((results) => {
-        let list: DisplayCompany[] = results.map((element) => {
-          let company: DisplayCompany = {
-            id: element.CompanyID,
-            fundID: element.FundID,
-            name: element.CompanyName,
-          };
-          return company;
-        });
-        resolve(list);
-      });
-    });
-  }
-
   //returns undefined if fundID is not found
   retrieveFundName(fundID): Promise<String> {
     return new Promise<String>((resolve, reject) => {
@@ -284,23 +268,6 @@ export default class BackendProcessing {
         .getAllUsers()
         .then((users) => resolve(users))
         .catch(() => reject());
-    });
-  }
-
-  userSeesFund(userID, fundID): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      database
-        .getFundsUserCanSee(userID)
-        .then((fundList) => {
-          if (fundList.indexOf(fundID.toString()) > -1) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        })
-        .catch((error) => {
-          console.error("an error occured while finding funds related to user " + userID);
-        });
     });
   }
 
