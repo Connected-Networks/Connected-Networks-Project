@@ -22,7 +22,7 @@ describe("UpdateFund", () => {
     expect(mockSendStatus).toBeCalledWith(401);
   });
 
-  it("should update the company in database and respond with 200", async () => {
+  it("should update the fund in database and respond with 200", async () => {
     const mockUserID = 12345;
     const mockFund = { id: 123, name: "Mock" };
     const mockReq = { user: { UserID: mockUserID }, body: { newData: mockFund } };

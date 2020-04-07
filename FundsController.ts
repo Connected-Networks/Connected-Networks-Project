@@ -94,8 +94,8 @@ export default class FundsController {
 
   static async addFund(req, res) {
     try {
-      let fundName = req.body.newFundName;
-      await database.insertFund(fundName);
+      let fund = req.body.newData;
+      await database.insertFund(fund.name);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
