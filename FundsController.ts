@@ -64,7 +64,7 @@ export default class FundsController {
         return;
       }
 
-      const companies = await this.retrieveCompaniesFromFund(fundID);
+      const companies = await this.getCompaniesFromFund(fundID);
       res.send({ data: companies });
     } catch (error) {
       res.sendStatus(500);
@@ -77,7 +77,7 @@ export default class FundsController {
     return fundsUserCanSee.includes(fundID.toString());
   }
 
-  static async retrieveCompaniesFromFund(fundID) {
+  static async getCompaniesFromFund(fundID) {
     const companies = await database.retrieveCompaniesByFunds(fundID);
 
     let list: DisplayCompany[] = companies.map((element) => {

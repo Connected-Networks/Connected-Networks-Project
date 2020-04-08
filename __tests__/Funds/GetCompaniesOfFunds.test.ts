@@ -34,13 +34,11 @@ describe("GetCompaniesOfFunds", () => {
     ];
 
     const mockUserSeesFund = jest.spyOn(FundsController, "userSeesFund").mockResolvedValue(true);
-    const mockRetrieveCompaniesFromFund = jest
-      .spyOn(FundsController, "retrieveCompaniesFromFund")
-      .mockResolvedValue(mockCompanies);
+    const mockGetCompaniesFromFund = jest.spyOn(FundsController, "getCompaniesFromFund").mockResolvedValue(mockCompanies);
 
     await FundsController.getCompaniesOfFund(mockReq, mockRes);
 
-    expect(mockRetrieveCompaniesFromFund).toBeCalledWith(mockFundID);
+    expect(mockGetCompaniesFromFund).toBeCalledWith(mockFundID);
     expect(mockSend).toBeCalledWith({ data: mockCompanies });
   });
 
@@ -52,13 +50,13 @@ describe("GetCompaniesOfFunds", () => {
     const mockRes = { sendStatus: mockSendStatus };
 
     const mockUserSeesFund = jest.spyOn(FundsController, "userSeesFund").mockResolvedValue(true);
-    const mockRetrieveCompaniesFromFund = jest
-      .spyOn(FundsController, "retrieveCompaniesFromFund")
+    const mockGetCompaniesFromFund = jest
+      .spyOn(FundsController, "getCompaniesFromFund")
       .mockRejectedValue(new Error("Mock error"));
 
     await FundsController.getCompaniesOfFund(mockReq, mockRes);
 
-    expect(mockRetrieveCompaniesFromFund).toBeCalledWith(mockFundID);
+    expect(mockGetCompaniesFromFund).toBeCalledWith(mockFundID);
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });
@@ -88,5 +86,35 @@ describe("userSeesFund", () => {
 
     expect(mockGetFundsUserCanSee).toBeCalledWith(mockUserID);
     expect(returnedValue).toBe(false);
+  });
+});
+
+describe("GetCompaniesFromFund", () => {
+  it("should get companies from database, map them to DisplayCompany and then return", async () => {
+    const mockFundID = 12345;
+    const mockCompanies = [
+      {
+        CompanyID: 123,
+        FundID: 1,
+        CompanyName: "Mock",
+      },
+      {
+        CompanyID: 321,
+        FundID: 4,
+        CompanyName: "Mock2",
+      },
+    ];
+
+    const mockRetrieveCompaniesByFunds = jest.spyOn(database, "retrieveCompaniesByFunds").mockResolvedValue(mockCompanies);
+
+    const returnedCompanies = await FundsController.getCompaniesFromFund(mockFundID);
+
+    expect(mockRetrieveCompaniesByFunds).toBeCalledWith(mockFundID);
+
+    const expectedCompanies = [
+      { id: 123, fundID: 1, name: "Mock" },
+      { id: 321, fundID: 4, name: "Mock2" },
+    ];
+    expect(returnedCompanies).toEqual(expectedCompanies);
   });
 });
