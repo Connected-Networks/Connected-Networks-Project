@@ -168,7 +168,10 @@ insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
     .spread((user, createdBoolean) => {
       return user;
     })
-    .catch((err) => console.error("Error in insertPerson", err));
+    .catch(err => {
+      console.error("Error in insertPerson", err);
+      throw err;
+    });
 };
 
 insertCompany = (companyName, fundID) => {
@@ -358,7 +361,10 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
       });
       return individual;
     })
-    .catch((err) => console.error(err));
+    .catch(err => {
+      console.error(err);
+      throw err;
+    });
 };
 
 deleteIndividual = (IndividualID) => {

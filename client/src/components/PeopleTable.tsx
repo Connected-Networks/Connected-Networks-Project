@@ -21,15 +21,15 @@ export default class PeopleTable extends ATable<DisplayPerson> {
     columns: [
       { title: "Name", field: "name" },
       { title: "Company", field: "company" },
-      { title: "Position", field: "position" }
-    ]
+      { title: "Position", field: "position" },
+    ],
   };
 
   get editableObject(): EditableObject<DisplayPerson> {
     return {
       onRowAdd: this.addRow,
       onRowUpdate: this.updateRow,
-      onRowDelete: this.deleteRow
+      onRowDelete: this.deleteRow,
     };
   }
 
@@ -48,7 +48,7 @@ export default class PeopleTable extends ATable<DisplayPerson> {
    * @param oldData
    */
   updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         if (oldData) {
           console.log(newData);
@@ -61,18 +61,18 @@ export default class PeopleTable extends ATable<DisplayPerson> {
     });
   };
 
-  updatePersonOnServer = async (person: DisplayPerson) => {
+  updatePersonOnServer = async (newData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       axios
-        .put("/people", person)
-        .then(response => {
+        .put("/people", { newData })
+        .then((response) => {
           if (response.status === 200) {
             resolve();
           } else {
             reject();
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     });
@@ -95,7 +95,7 @@ export default class PeopleTable extends ATable<DisplayPerson> {
     return new Promise((resolve, reject) => {
       axios
         .post(`/people`, { newData })
-        .then(response => {
+        .then((response) => {
           if (response.status === 200) {
             this.refreshTable();
             resolve();
@@ -104,7 +104,7 @@ export default class PeopleTable extends ATable<DisplayPerson> {
             reject();
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         });
     });
@@ -131,11 +131,11 @@ export default class PeopleTable extends ATable<DisplayPerson> {
       const personID = oldData.id; //Temp until we make ids for people
       axios
         .delete(`/people/${personID}`)
-        .then(response => {
+        .then((response) => {
           console.log("status: " + response.status);
           resolve();
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
           reject();
         });
