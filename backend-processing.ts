@@ -145,19 +145,6 @@ export default class BackendProcessing {
   //   });
   // }
 
-  sharefund(fundID, user) {
-    return new Promise<Boolean>((resolve, reject) => {
-      database
-        .sharefund(fundID, user.UserID)
-        .then((result) => {
-          resolve(true);
-        })
-        .catch((error) => {
-          resolve(false);
-        });
-    });
-  }
-
   getOtherUsers(currentUserID) {
     return new Promise<SimpleUser[]>((resolve, reject) => {
       database

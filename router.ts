@@ -30,22 +30,6 @@ router.get("/users", (req, res) => {
     });
 });
 
-router.post("/shareFund", (req, res) => {
-  let fundID = res.body.fundId;
-  let user = res.body.user;
-  let be = new BackendProcessing();
-  be.sharefund(fundID, user)
-    .then((boolean) => {
-      if (boolean) {
-        console.log(`Shared ${req.user.username}'s fund with id: ${req.body.fundId} with User: ${req.body.user.username}`);
-        res.sendStatus(200);
-      } else res.sendStatus(500);
-    })
-    .catch((error) => {
-      res.sendStatus(500);
-    });
-});
-
 router.post("/csv", (req, res) => {
   try {
     let data = req.body.data;
@@ -89,6 +73,8 @@ router.put("/funds", FundsController.updateFund);
 router.get("/funds/:id", FundsController.getCompaniesOfFund);
 
 router.delete("/funds/:id", FundsController.deleteFund);
+
+router.post("/shareFund", FundsController.shareFund);
 
 router.get("/history/:id", HistoryController.getHistory);
 

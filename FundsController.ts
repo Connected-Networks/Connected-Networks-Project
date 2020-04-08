@@ -119,4 +119,15 @@ export default class FundsController {
       res.sendStatus(500);
     }
   }
+
+  static async shareFund(req, res) {
+    try {
+      let fundID = req.body.fundId;
+      let user = req.body.user;
+      await database.sharefund(fundID, user.UserID);
+      res.sendStatus(200);
+    } catch (error) {
+      res.sendStatus(500);
+    }
+  }
 }
