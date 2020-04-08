@@ -13,18 +13,16 @@ export default class NotificationController {
     service: "Gmail",
     auth: {
       user: "ConnectedNetworksNodeMailer@gmail.com",
-      pass: "Yf%#RX]R7q4n[X{~"
-    }
+      pass: "Yf%#RX]R7q4n[X{~",
+    },
   });
 
   static async notify(changes: Change[]) {
     const usersToChanges = await this.mapUsersToChanges(changes);
-    for (const [user, changes] of usersToChanges) {
-      await this.notifyUser(user, changes);
+
+    for (const user of Array.from(usersToChanges.keys())) {
+      await this.notifyUser(user, usersToChanges.get(user));
     }
-    // usersToChanges.forEach(async (changes, user) => {
-    //   await this.notifyUser(user, changes);
-    // });
   }
 
   static async mapUsersToChanges(changes: Change[]): Promise<Map<User, Change[]>> {
@@ -41,7 +39,7 @@ export default class NotificationController {
   static async getUsersToNotify(change: Change): Promise<User[]> {
     const users = await database.getAllUsersRelatedToFund(change.employee.fundId);
 
-    return users.map(user => ({ username: user.Username, email: user.Email }));
+    return users.map((user) => ({ username: user.Username, email: user.Email }));
   }
 
   private static addUsersAndChanges(usersToChanges: Map<User, Change[]>, users: User[], change: Change) {
@@ -66,7 +64,7 @@ export default class NotificationController {
       from: "Connected Networks Notifications <ConnectedNetworksNodeMailer@gmail.com>",
       to: `${user.username} <${user.email}>`,
       subject: "New Changes Detected",
-      html: await this.getHtmlString(changes)
+      html: await this.getHtmlString(changes),
     };
   }
 

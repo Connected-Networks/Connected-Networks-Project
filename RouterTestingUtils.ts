@@ -1,13 +1,3 @@
-jest.mock("./AuthController");
-jest.mock("./PeopleController");
-jest.mock("./CompaniesController");
-jest.mock("./FundsController");
-jest.mock("./HistoryController");
-jest.mock("./backend-processing");
-jest.mock("./config/passport");
-jest.mock("express");
-const express = require("express");
-
 export enum CrudType {
   GET,
   POST,
@@ -25,16 +15,14 @@ export default class RouterTestingUtils {
   ]);
 
   static testApiUsedFunction(CrudType: CrudType, endPoint: string, functionUsed: Function) {
+    jest.mock("express");
+    const express = require("express");
     express.Router = jest.fn().mockReturnValue(this.mockExpressRouter);
 
-    this.importIsolatedRouter();
-
-    expect(this.typesToMethods.get(CrudType)).toBeCalledWith(endPoint, functionUsed);
-  }
-
-  private static importIsolatedRouter() {
     jest.isolateModules(() => {
       require("./router");
     });
+
+    expect(this.typesToMethods.get(CrudType)).toBeCalledWith(endPoint, functionUsed);
   }
 }
