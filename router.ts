@@ -68,7 +68,7 @@ router.post("/csv", (req, res) => {
 
 router.get("/people", PeopleController.getPeople);
 
-router.get("/people/:companyId", PeopleController.getPeopleByCompany);
+router.get("/people/:companyID", PeopleController.getPeopleByCompany);
 
 router.get("/people/original/:companyID", PeopleController.getPeopleByOriginalCompany);
 

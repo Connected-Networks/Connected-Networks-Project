@@ -8,14 +8,14 @@ describe("Router", () => {
     RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people", PeopleController.getPeople);
   });
 
-  it("should use PeopleController.getPeopleByCompany for get /people/:companyId", () => {
+  it("should use PeopleController.getPeopleByCompany for get /people/:companyID", () => {
     RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people/:companyId", PeopleController.getPeopleByCompany);
   });
 
-  it("should use PeopleController.getPeopleByOriginalCompany for get /people/original/:companyId", () => {
+  it("should use PeopleController.getPeopleByOriginalCompany for get /people/original/:companyID", () => {
     RouterTestingUtils.testApiUsedFunction(
       CrudType.GET,
-      "/people/original/:companyId",
+      "/people/original/:companyID",
       PeopleController.getPeopleByOriginalCompany
     );
   });
