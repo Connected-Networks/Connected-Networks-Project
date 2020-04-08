@@ -70,7 +70,7 @@ router.get("/people", PeopleController.getPeople);
 
 router.get("/people/:companyId", PeopleController.getPeopleByCompany);
 
-router.get("/people/original/:companyId", PeopleController.getPeopleByOriginalCompany);
+router.get("/people/original/:companyID", PeopleController.getPeopleByOriginalCompany);
 
 router.put("/people", PeopleController.updatePerson);
 
