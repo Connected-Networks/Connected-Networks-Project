@@ -4,6 +4,7 @@ import AuthController from "./AuthController";
 import PeopleController from "./PeopleController";
 import CompaniesController from "./CompaniesController";
 import FundsController from "./FundsController";
+import HistoryController from "./HistoryController";
 const express = require("express");
 const router = express.Router();
 
@@ -96,74 +97,10 @@ router.get("/funds/:id", FundsController.getCompaniesOfFund);
 
 router.delete("/funds/:id", FundsController.deleteFund);
 
-router.get("/history/:id", (req, res) => {
-  let be = new BackendProcessing();
-  let individualID = req.params.id;
-  let userID = req.user.UserID;
-  be.userCanSeeIndividual(userID, individualID).then((authorized) => {
-    if (!authorized) {
-      console.error("User cannot see history of individual " + individualID);
-      res.sendStatus(500);
-      return;
-    }
-    let g = be.getHistoryOfIndividual(individualID);
-    g.then((results) => {
-      res.json({ data: results });
-    });
-    g.catch((error) => {
-      res.sendStatus(500);
-    });
-  });
-});
+router.get("/history/:id", HistoryController.getHistory);
 
-router.put("/history", (req, res) => {
-  let be = new BackendProcessing();
-  let history = req.body;
-  let userID = req.user.UserID;
-  let individual = req.employee;
-  be.userCanChangeIndividual(userID, individual.individualID).then((authorized) => {
-    if (!authorized) {
-      console.error("User cannot add history to individual " + individual.IndividualID);
-      res.sendStatus(500);
-      return;
-    }
-    let ins = be.insertHistory(history, individual, userID);
-    ins.then((result) => {
-      if (result) {
-        res.sendStatus(200);
-      } else {
-        res.sendStatus(500);
-      }
-    });
-    ins.catch((error) => {
-      res.sendStatus(500);
-    });
-  });
-});
+router.put("/history", HistoryController.updateHistory);
 
-router.post("/history/:id", (req, res) => {
-  let be = new BackendProcessing();
-  let history = req.body;
-  let individual = req.employee;
-  let userID = req.user.UserID;
-  be.userCanChangeIndividual(userID, individual.individualID).then((authorized) => {
-    if (!authorized) {
-      console.error("User cannot edit history of individual " + individual.IndividualID);
-      res.sendStatus(500);
-      return;
-    }
-    let upd = be.updateHistory(history, individual, userID);
-    upd.then((result) => {
-      if (result) {
-        res.sendStatus(200);
-      } else {
-        res.sendStatus(500);
-      }
-    });
-    upd.catch((error) => {
-      res.sendStatus(500);
-    });
-  });
-});
+router.post("/history/:id", HistoryController.addHistory);
 
 module.exports = router;

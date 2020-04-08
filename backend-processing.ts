@@ -9,13 +9,6 @@ const mysql = require("mysql");
 const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
 
-interface DisplayHistory {
-  id: number;
-  company: string;
-  position: string;
-  start: string;
-  end: string;
-}
 interface SimpleUser {
   id: number;
   username: string;
@@ -158,80 +151,6 @@ export default class BackendProcessing {
     });
   }
 
-  getHistoryOfIndividual(individualID): Promise<DisplayHistory[]> {
-    return new Promise<DisplayHistory[]>((resolve, reject) => {
-      database.getIndividualEmployeeHistory(individualID).then((results) => {
-        resolve(
-          results.map((entry) => {
-            let history: DisplayHistory = {
-              id: entry.id,
-              company: entry.Company.CompanyName,
-              position: entry.PositionName,
-              start: entry.StartDate,
-              end: entry.EndDate,
-            };
-            return history;
-          })
-        );
-      });
-    });
-  }
-
-  insertHistory(history, individual, userID): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let fundID = individual.FundID;
-      database
-        .retrieveCompanyByName(history.company, fundID)
-        .then((resultCompany) => {
-          database
-            .insertEmployeeHistory(userID, history.id, resultCompany.CompanyID, history.position, history.start, history.end)
-            .then((result) => {
-              if (result != null) resolve(true);
-              else resolve(false);
-            })
-            .catch((error) => {
-              console.error("An error occurred while inserting employee history");
-              console.error(error);
-              resolve(false);
-            });
-        })
-        .catch((error) => {
-          console.error("An error occurred while retrieving company information");
-          console.error(error);
-          resolve(false);
-        });
-    });
-  }
-
-  //The information passed into this function pertains to individuals, employeeHistory (except company ID), and company name
-  //This function assumes that the individualID part of employeeHistory may change, but the details about the individual will not be changed here,
-  //there is a seperate function for that. Similarly, this function assumes that the companyID may change, but the name of the specified company is not changing.
-  updateHistory(history, individual, userID): Promise<Boolean> {
-    return new Promise<Boolean>((resolve, reject) => {
-      let fundID = individual.FundID;
-      database
-        .retrieveCompanyByName(history.company, fundID)
-        .then((resultCompany) => {
-          database
-            .updateHistory(
-              history.HistoryID,
-              userID,
-              individual.IndividualID,
-              resultCompany.CompanyID,
-              history.position,
-              history.start,
-              history.end
-            )
-            .then(resolve(true));
-        })
-        .catch((error) => {
-          console.error("An error occurred while retrieving company information");
-          console.error(error);
-          resolve(false);
-        });
-    });
-  }
-
   sharefund(fundID, user) {
     return new Promise<Boolean>((resolve, reject) => {
       database
@@ -269,23 +188,6 @@ export default class BackendProcessing {
         .getAllUsers()
         .then((users) => resolve(users))
         .catch(() => reject());
-    });
-  }
-
-  userCanSeeIndividual(userID, individualID): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      database.retrieveIndividualByID(individualID).then((individual) => {
-        let fundID = individual.FundID;
-        return FundsController.userSeesFund(userID, fundID);
-      });
-    });
-  }
-  userCanChangeIndividual(userID, individualID): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      database.retrieveIndividualByID(individualID).then((individual) => {
-        let fundID = individual.FundID;
-        return PeopleController.userCanChangeFund(userID, fundID);
-      });
     });
   }
 }
