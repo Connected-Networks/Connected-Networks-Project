@@ -1,11 +1,5 @@
-import { resolve } from "dns";
-import { start } from "repl";
-import PeopleController, { DisplayPerson } from "./PeopleController";
-import { DisplayCompany } from "./CompaniesController";
-import FundsController from "./FundsController";
-
-const denv = require("dotenv").config();
-const mysql = require("mysql");
+require("dotenv").config();
+require("mysql");
 const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
 
@@ -142,14 +136,14 @@ export default class BackendProcessing {
     return `${s[s.length - 1]}-${mis}-01`;
   }
 
-  //returns undefined if fundID is not found
-  retrieveFundName(fundID): Promise<String> {
-    return new Promise<String>((resolve, reject) => {
-      database.retrieveFundName(fundID).then((result) => {
-        resolve(result);
-      });
-    });
-  }
+  // //returns undefined if fundID is not found
+  // retrieveFundName(fundID): Promise<String> {
+  //   return new Promise<String>((resolve, reject) => {
+  //     database.retrieveFundName(fundID).then((result) => {
+  //       resolve(result);
+  //     });
+  //   });
+  // }
 
   sharefund(fundID, user) {
     return new Promise<Boolean>((resolve, reject) => {
@@ -177,17 +171,6 @@ export default class BackendProcessing {
         .catch((error) => {
           reject(error);
         });
-    });
-  }
-
-  //For Testing purposes
-  //TODO: Remove this once done.
-  getAllUsers() {
-    return new Promise((resolve, reject) => {
-      database
-        .getAllUsers()
-        .then((users) => resolve(users))
-        .catch(() => reject());
     });
   }
 }

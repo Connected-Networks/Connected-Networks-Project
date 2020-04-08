@@ -8,13 +8,6 @@ import HistoryController from "./HistoryController";
 const express = require("express");
 const router = express.Router();
 
-// router.get("/users", (req, res) => {
-//   const be = new BackendProcessing();
-//   be.getAllUsers().then(users => {
-//     res.json({ users });
-//   });
-// });
-
 router.post("/signup", AuthController.signup);
 
 router.post("/login", Passport.authenticate("local"), AuthController.handleLoginSuccess);
