@@ -78,26 +78,14 @@ export default class PeopleController {
   //Returns false if user cannot see the company, or the company doesn't exist
   static async userSeesCompany(userID, companyID): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      database
-        .getFundsUserCanSee(userID)
-        .then((fundList) => {
-          database
-            .retrieveCompanyByID(companyID)
-            .then((company) => {
-              if (company == null) resolve(false);
-              let fundID = company.FundID;
-              if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
-              else resolve(false);
-            })
-            .catch((error) => {
-              console.error("an error occured while retrieving information on company " + companyID);
-              throw error;
-            });
-        })
-        .catch((error) => {
-          console.error("an error occured while finding funds related to user " + userID);
-          throw error;
+      database.getFundsUserCanSee(userID).then((fundList) => {
+        database.retrieveCompanyByID(companyID).then((company) => {
+          if (company == null) resolve(false);
+          let fundID = company.FundID;
+          if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
+          else resolve(false);
         });
+      });
     });
   }
 
@@ -163,16 +151,10 @@ export default class PeopleController {
 
   static userCanChangeFund(userID, fundID): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      database
-        .getFundsUserCanChange(userID)
-        .then((fundList) => {
-          if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
-          else resolve(false);
-        })
-        .catch((error) => {
-          console.error("an error occured while finding funds changeable by user " + userID);
-          throw error;
-        });
+      database.getFundsUserCanChange(userID).then((fundList) => {
+        if (fundList.indexOf(fundID.toString()) > -1) resolve(true);
+        else resolve(false);
+      });
     });
   }
 
