@@ -21,7 +21,7 @@ export default class HistoryController {
         res.sendStatus(401);
         return;
       }
-      let history = await this.getHistoryOfIndividual(individualID);
+      let history = await this.getHistoryFromDatabase(individualID);
       res.send({ data: history });
     } catch (error) {
       res.sendStatus(500);
@@ -34,7 +34,7 @@ export default class HistoryController {
     return await FundsController.userSeesFund(userID, fundID);
   }
 
-  static async getHistoryOfIndividual(individualID): Promise<DisplayHistory[]> {
+  static async getHistoryFromDatabase(individualID): Promise<DisplayHistory[]> {
     const history = await database.getIndividualEmployeeHistory(individualID);
 
     return history.map((entry) => {
