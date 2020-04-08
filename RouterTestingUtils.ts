@@ -1,4 +1,8 @@
 jest.mock("./AuthController");
+jest.mock("./PeopleController");
+jest.mock("./CompaniesController");
+jest.mock("./FundsController");
+jest.mock("./HistoryController");
 jest.mock("./backend-processing");
 jest.mock("./config/passport");
 jest.mock("express");
