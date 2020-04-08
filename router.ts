@@ -5,6 +5,7 @@ import PeopleController from "./PeopleController";
 import CompaniesController from "./CompaniesController";
 import FundsController from "./FundsController";
 import HistoryController from "./HistoryController";
+import ParsingController from "./ParsingController";
 const express = require("express");
 const router = express.Router();
 
@@ -30,19 +31,7 @@ router.get("/users", (req, res) => {
     });
 });
 
-router.post("/csv", (req, res) => {
-  try {
-    let data = req.body.data;
-    let fileName = req.body.fileName;
-    let userID = req.user.UserID;
-    let be = new BackendProcessing();
-    be.processRawCSV(data, fileName, userID).then((results) => {
-      res.sendStatus(200);
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
+router.post("/csv", ParsingController.handleCsvRequest);
 
 router.get("/people", PeopleController.getPeople);
 
