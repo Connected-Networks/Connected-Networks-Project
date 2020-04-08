@@ -324,7 +324,7 @@ insertQuarterEmployment = (userID, individualID, fundID, companyName, positionNa
 getIndividualEmployeeHistory = (IndividualID) => {
   return models.EmployeeHistory.findAll({
     where: { IndividualID: IndividualID },
-    order: [["EndDate", "DESC"]],
+    order: [["StartDate", "DESC"]],
     include: [
       {
         model: models.Companies,
