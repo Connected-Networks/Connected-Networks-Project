@@ -6,6 +6,7 @@ import FundsController from "./FundsController";
 import HistoryController from "./HistoryController";
 import ParsingController from "./ParsingController";
 import UsersController from "./UsersController";
+import UpdatesController from "./UpdatesController";
 const express = require("express");
 const router = express.Router();
 
@@ -58,5 +59,7 @@ router.get("/history/:id", HistoryController.getHistory);
 router.put("/history", HistoryController.updateHistory);
 
 router.post("/history/:id", HistoryController.addHistory);
+
+router.post("/updates", UpdatesController.receiveUpdates);
 
 module.exports = router;
