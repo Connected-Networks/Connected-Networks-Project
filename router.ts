@@ -1,4 +1,3 @@
-import BackendProcessing from "./backend-processing";
 import Passport from "./config/passport";
 import AuthController from "./AuthController";
 import PeopleController from "./PeopleController";
@@ -6,6 +5,7 @@ import CompaniesController from "./CompaniesController";
 import FundsController from "./FundsController";
 import HistoryController from "./HistoryController";
 import ParsingController from "./ParsingController";
+import UsersController from "./UsersController";
 const express = require("express");
 const router = express.Router();
 
@@ -17,19 +17,7 @@ router.get("/user", AuthController.getCurrentUser);
 
 router.post("/logout", AuthController.logout);
 
-//Returns all users except the current user
-router.get("/users", (req, res) => {
-  let userID = req.user.UserID;
-  let be = new BackendProcessing();
-  be.getOtherUsers(userID)
-    .then((users) => {
-      res.json({ users });
-    })
-    .catch((error) => {
-      console.error("An error occurred while retrieving users");
-      console.error(error);
-    });
-});
+router.get("/users", UsersController.getOtherUsers);
 
 router.post("/csv", ParsingController.handleCsvRequest);
 
