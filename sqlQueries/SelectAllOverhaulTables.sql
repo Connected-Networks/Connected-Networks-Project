@@ -5,3 +5,4 @@ SELECT * FROM individuals;
 SELECT * FROM companies;
 SELECT * FROM originalfundposition;
 SELECT * FROM employeehistory;
+SELECT * FROM Session;
