@@ -40,7 +40,7 @@ describe("GetCompanies", () => {
 });
 
 describe("getCompaniesFromDatabase", () => {
-  it("should get people from database, map them to DisplayPerson and then return", async () => {
+  it("should get companies from database, map them to DisplayCompany and then return", async () => {
     const mockUserID = 12345;
     const mockCompanies = [
       {
