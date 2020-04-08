@@ -9,7 +9,7 @@ describe("Router", () => {
   });
 
   it("should use PeopleController.getPeopleByCompany for get /people/:companyID", () => {
-    RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people/:companyId", PeopleController.getPeopleByCompany);
+    RouterTestingUtils.testApiUsedFunction(CrudType.GET, "/people/:companyID", PeopleController.getPeopleByCompany);
   });
 
   it("should use PeopleController.getPeopleByOriginalCompany for get /people/original/:companyID", () => {

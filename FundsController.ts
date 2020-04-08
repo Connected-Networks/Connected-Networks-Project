@@ -74,7 +74,7 @@ export default class FundsController {
   static async userSeesFund(userID, fundID): Promise<boolean> {
     const fundsUserCanSee = await database.getFundsUserCanSee(userID);
 
-    return fundsUserCanSee.include(fundID.toString());
+    return fundsUserCanSee.includes(fundID.toString());
   }
 
   static async retrieveCompaniesFromFund(fundID) {

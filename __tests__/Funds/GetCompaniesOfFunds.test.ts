@@ -12,6 +12,8 @@ describe("GetCompaniesOfFunds", () => {
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
+    console.error = jest.fn();
+
     const mockUserSeesFund = jest.spyOn(FundsController, "userSeesFund").mockResolvedValue(false);
 
     await FundsController.getCompaniesOfFund(mockReq, mockRes);
@@ -58,5 +60,33 @@ describe("GetCompaniesOfFunds", () => {
 
     expect(mockRetrieveCompaniesFromFund).toBeCalledWith(mockFundID);
     expect(mockSendStatus).toBeCalledWith(500);
+  });
+});
+
+describe("userSeesFund", () => {
+  it("should return true if the given fundID is in the funds user can see", async () => {
+    const mockUserID = 12345;
+    const mockFundID = 3243;
+    const mockFunds = ["5342", "3243", "54321", "", "12345"];
+
+    const mockGetFundsUserCanSee = jest.spyOn(database, "getFundsUserCanSee").mockResolvedValue(mockFunds);
+
+    const returnedValue = await FundsController.userSeesFund(mockUserID, mockFundID);
+
+    expect(mockGetFundsUserCanSee).toBeCalledWith(mockUserID);
+    expect(returnedValue).toBe(true);
+  });
+
+  it("should return false if the given fundID is not in the funds user can see", async () => {
+    const mockUserID = 12345;
+    const mockFundID = 3243;
+    const mockFunds = ["5342", "54321", "", "12345"];
+
+    const mockGetFundsUserCanSee = jest.spyOn(database, "getFundsUserCanSee").mockResolvedValue(mockFunds);
+
+    const returnedValue = await FundsController.userSeesFund(mockUserID, mockFundID);
+
+    expect(mockGetFundsUserCanSee).toBeCalledWith(mockUserID);
+    expect(returnedValue).toBe(false);
   });
 });
