@@ -12,9 +12,10 @@ export default class FundsController {
     //return type should be an Array of SideMenuFund objects as defined in App.tsx.
     try {
       let userID = req.user.UserID;
-      let funds = await this.getFundsFromDatabase(userID);
+      let funds = await FundsController.getFundsFromDatabase(userID);
       res.send({ data: funds });
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -32,7 +33,9 @@ export default class FundsController {
       return fund;
     });
 
-    return list.filter((x) => fundIdsUserCanSee.includes(x.id.toString()));
+    return list.filter((fund) =>
+      fundIdsUserCanSee.includes(fund.id.toString())
+    );
   }
 
   static async updateFund(req, res) {
@@ -58,13 +61,13 @@ export default class FundsController {
       let userID = req.user.UserID;
       let fundID = req.params.id;
 
-      if (!(await this.userSeesFund(userID, fundID))) {
+      if (!(await FundsController.userSeesFund(userID, fundID))) {
         console.error("User " + userID + " cannot see Fund " + fundID);
         res.sendStatus(401);
         return;
       }
 
-      const companies = await this.getCompaniesFromFund(fundID);
+      const companies = await FundsController.getCompaniesFromFund(fundID);
       res.send({ data: companies });
     } catch (error) {
       res.sendStatus(500);
@@ -94,8 +97,10 @@ export default class FundsController {
 
   static async addFund(req, res) {
     try {
-      let fund = req.body.newData;
-      await database.insertFund(fund.name);
+      let newFundName = req.body.newData;
+      let userID = req.user.UserID;
+      console.log(req.body.newData);
+      await database.insertFund(newFundName, userID);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);

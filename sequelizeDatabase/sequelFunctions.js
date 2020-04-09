@@ -346,7 +346,7 @@ getIndividualCurrentEmployement = (IndividualID) => {
 
 //---------------Modify Existing Data Functions----------//
 //FundID should not be changeable.
-modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
+modifyIndividual = (IndividualID, newFundID, newName, newPosition, newUrl, newComments) => {
   return models.Individuals.findOne({
     where: {
       IndividualID: IndividualID,
@@ -358,6 +358,7 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
         OriginalPostion: newPosition, //TODO: Update this.
         LinkedInUrl: newUrl,
         Comments: newComments,
+        FundID: newFundID
       });
       return individual;
     })

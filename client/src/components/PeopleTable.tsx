@@ -1,10 +1,28 @@
 import axios from "axios";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
-import React from "react";
+import React, { ReactNode } from "react";
+import FundsDropdown from "./FundsDropdown";
+import MaterialTable, { Column, DetailPanel } from "material-table";
+import styled from "styled-components";
+
+interface PeopleTableState {
+  data: DisplayPerson[];
+  columns: Array<Column<DisplayPerson>>;
+  funds: DisplayFund[];
+  dialog?: JSX.Element;
+}
+
+interface PeopleTableProps {}
+
+export interface DisplayFund {
+  id: number;
+  name: string;
+}
 
 export interface DisplayPerson {
   id: number;
+  fundID: number;
   name: string;
   company: string;
   position: string;
@@ -12,17 +30,28 @@ export interface DisplayPerson {
   hyperlink: string;
 }
 
-export default class PeopleTable extends ATable<DisplayPerson> {
+export default class PeopleTable extends React.Component<
+  PeopleTableProps,
+  PeopleTableState
+> {
   readonly TABLE_NAME = "People";
   readonly DATA_END_POINT = "/people";
 
-  state: TableState<DisplayPerson> = {
+  state: PeopleTableState = {
     data: [],
     columns: [
+      {
+        title: "Fund",
+        field: "fundID",
+        render: (rowData) => (
+          <FundsDropdown fundsList={this.state.funds} person={rowData} />
+        ),
+      },
       { title: "Name", field: "name" },
       { title: "Company", field: "company" },
       { title: "Position", field: "position" },
     ],
+    funds: [],
   };
 
   get editableObject(): EditableObject<DisplayPerson> {
@@ -41,13 +70,44 @@ export default class PeopleTable extends ATable<DisplayPerson> {
     return this.DATA_END_POINT;
   }
 
+  getDetailPanel:
+    | ((rowData: DisplayPerson) => ReactNode)
+    | Array<
+        | DetailPanel<DisplayPerson>
+        | ((rowData: DisplayPerson) => DetailPanel<DisplayPerson>)
+      >
+    | undefined = () => {
+    return undefined;
+  };
+
+  parseFunds = () => {
+    return new Promise((resolve, reject) => {
+      axios
+        .get("/funds")
+        .then((response) => {
+          if (response.status === 200) {
+            this.setState({ funds: response.data.data });
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
+  };
+
   /**
    * This method takes two rows and updates the old row on the table with the new one
    *
    * @param newData
    * @param oldData
    */
-  updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
+  updateRow = async (
+    newData: DisplayPerson,
+    oldData?: DisplayPerson | undefined
+  ): Promise<void> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         if (oldData) {
@@ -64,7 +124,7 @@ export default class PeopleTable extends ATable<DisplayPerson> {
   updatePersonOnServer = async (newData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       axios
-        .put("/people", { newData })
+        .put("/people", { newData: { ...newData, hyperlink: "" } })
         .then((response) => {
           if (response.status === 200) {
             resolve();
@@ -94,7 +154,7 @@ export default class PeopleTable extends ATable<DisplayPerson> {
   addPersonOnServer = async (newData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       axios
-        .post(`/people`, { newData })
+        .post(`/people`, { newData: { ...newData, hyperlink: "hi" } })
         .then((response) => {
           if (response.status === 200) {
             this.refreshTable();
@@ -141,4 +201,61 @@ export default class PeopleTable extends ATable<DisplayPerson> {
         });
     });
   };
+
+  componentDidMount() {
+    this.parseFunds();
+    this.refreshTable();
+  }
+
+  refreshTable = () => {
+    this.getData()
+      .then((data) => {
+        this.setState({ data });
+      })
+      .catch(() => {});
+  };
+
+  getData = async () => {
+    return new Promise<DisplayPerson[]>((resolve) => {
+      axios
+        .get(this.dataEndPoint)
+        .then((response) => resolve(response.data.data))
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
+  };
+
+  handleCloseDialog = () => {
+    this.setState({ dialog: undefined });
+  };
+
+  render() {
+    return (
+      <>
+        <Container>
+          <MaterialTable
+            columns={this.state.columns}
+            data={this.state.data}
+            editable={this.editableObject}
+            title={this.name}
+            detailPanel={this.getDetailPanel}
+            onRowClick={
+              this.getDetailPanel
+                ? (event, rowData, togglePanel) => togglePanel!()
+                : undefined
+            }
+            options={{
+              actionsColumnIndex: -1,
+            }}
+          />
+        </Container>
+        {this.state.dialog}
+      </>
+    );
+  }
 }
+
+const Container = styled.div`
+  flex: 1;
+`;

@@ -14,7 +14,7 @@ import {
   Divider,
   Button,
   Menu,
-  MenuItem
+  MenuItem,
 } from "@material-ui/core";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
@@ -36,28 +36,45 @@ export interface FundsMenuState {
   newFundName: string;
 }
 
-export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenuState> {
-  state: FundsMenuState = { funds: [], addMode: false, editMode: false, newFundName: "" };
+export default class FundsMenu extends React.Component<
+  FundsMenuProps,
+  FundsMenuState
+> {
+  state: FundsMenuState = {
+    funds: [],
+    addMode: false,
+    editMode: false,
+    newFundName: "",
+  };
 
   componentDidMount() {
     this.refresh();
   }
 
   refresh = () => {
-    this.getFunds().then(funds => {
+    this.getFunds().then((funds) => {
+      // console.log(funds)
       if (!Object.keys(funds).length) {
         funds = [];
       }
-      this.setState({ funds, addMode: false, editMode: false, newFundName: "" });
+      this.setState({
+        funds,
+        addMode: false,
+        editMode: false,
+        newFundName: "",
+      });
     });
   };
 
   getFunds = async () => {
-    return new Promise<SideMenuFund[]>(resolve => {
+    return new Promise<SideMenuFund[]>((resolve) => {
       axios
         .get("/funds")
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
+        .then((response) => {
+          console.log(response);
+          resolve(response.data.data);
+        })
+        .catch(function (error) {
           console.log(error);
         });
     });
@@ -69,17 +86,27 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
       if (isAddMode === undefined) {
         this.setState({ editMode: isEditMode, newFundName: "" });
       } else {
-        this.setState({ editMode: isEditMode, addMode: isAddMode, newFundName: "" });
+        this.setState({
+          editMode: isEditMode,
+          addMode: isAddMode,
+          newFundName: "",
+        });
       }
     }
   };
 
   getFundListItem = (fund: SideMenuFund) => (
-    <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString(), fund.name)}>
+    <ListItem
+      button
+      key={fund.id}
+      onClick={() =>
+        this.props.handleSwitchTable(fund.id.toString(), fund.name)
+      }
+    >
       <ListItemText primary={fund.name} />
       <ListItemSecondaryAction>
         <PopupState variant="popover">
-          {popupState => (
+          {(popupState) => (
             <>
               <IconButton edge="end" {...bindTrigger(popupState)}>
                 <OptionIcon />
@@ -110,16 +137,18 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
             onBlur: () => {
               fund.isEditable = false;
               this.setModes(false, false);
-            }
+            },
           }}
           label="Fund Name"
           placeholder={fund.name}
           autoFocus
-          onChange={event => this.setState({ newFundName: event.target.value })}
+          onChange={(event) =>
+            this.setState({ newFundName: event.target.value })
+          }
         />
         <IconButton
           edge="end"
-          onMouseDown={event => event.preventDefault()}
+          onMouseDown={(event) => event.preventDefault()}
           onClick={() => {
             this.applyNewName(this.state.newFundName, fund);
           }}
@@ -141,13 +170,13 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     }
   };
 
-  addFund = (newFundName: string) => {
+  addFund = (newData: string) => {
     axios
-      .post("/funds", { newFundName })
-      .then(response => {
+      .post("/funds", { newData })
+      .then((response) => {
         this.refresh();
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
       });
   };
@@ -156,10 +185,10 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     const newFund = { ...fund, name: newFundName };
     axios
       .put("/funds", { fund: newFund })
-      .then(response => {
+      .then((response) => {
         this.refresh();
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
       });
   };
@@ -183,8 +212,14 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
         </List>
         <Divider />
         <List>
-          {this.state.funds.map(fund => (fund.isEditable ? this.getFundEditableItem(fund) : this.getFundListItem(fund)))}
-          {this.state.addMode ? this.getFundEditableItem(this.getNewEditableFund()) : null}
+          {this.state.funds.map((fund) =>
+            fund.isEditable
+              ? this.getFundEditableItem(fund)
+              : this.getFundListItem(fund)
+          )}
+          {this.state.addMode
+            ? this.getFundEditableItem(this.getNewEditableFund())
+            : null}
         </List>
       </>
     );
