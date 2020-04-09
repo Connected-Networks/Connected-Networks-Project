@@ -4,14 +4,14 @@ const papa = require("papaparse");
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 export default class ParsingController {
-  static handleCsvRequest(req, res) {
+  static async handleCsvRequest(req, res) {
     try {
       let data = req.body.data;
       let fileName = req.body.fileName;
       let userID = req.user.UserID;
-      this.processRawCSV(data, fileName, userID).then((results) => {
-        res.sendStatus(200);
-      });
+      const results = await ParsingController.processRawCSV(data, fileName, userID);
+
+      res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
     }
@@ -43,7 +43,7 @@ export default class ParsingController {
       database.insertFund(fundName, userID).then((fund) => {
         return Promise.all(
           results.data.map((element) => {
-            if (element["name"] != null) this.call_from_csv_line(element, fund.FundID, userID);
+            if (element["name"] != null) ParsingController.call_from_csv_line(element, fund.FundID, userID);
           })
         ).then(() => {
           resolve(true);
