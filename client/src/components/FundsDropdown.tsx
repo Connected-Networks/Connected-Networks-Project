@@ -8,7 +8,8 @@ import { resolve } from "dns";
 
 interface FundsDropdownProps {
   fundsList: DisplayFund[];
-  person: DisplayPerson;
+  onSelect: (newFundID: number) => void;
+  initialFundID: number;
 }
 
 export default function FundsDropdown(props: FundsDropdownProps) {
@@ -18,12 +19,12 @@ export default function FundsDropdown(props: FundsDropdownProps) {
       return fund.id == fundID;
     });
     console.log(found);
-    return found ? found.name : "test";
+    return found ? found.name : " ";
   };
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedFundID, setSelectedFundID] = React.useState<number>(
-    props.person.fundID
+    props.initialFundID
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -32,25 +33,6 @@ export default function FundsDropdown(props: FundsDropdownProps) {
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleSelect = () => {
-    return new Promise((resolve, reject) => {
-      axios
-        .put("/people", {
-          newData: { ...props.person, fundID: selectedFundID },
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            resolve();
-          } else {
-            reject();
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    });
   };
 
   return (
@@ -74,7 +56,7 @@ export default function FundsDropdown(props: FundsDropdownProps) {
             key={fund.id}
             onClick={() => {
               setSelectedFundID(fund.id);
-              handleSelect();
+              props.onSelect(fund.id);
               handleClose();
             }}
           >

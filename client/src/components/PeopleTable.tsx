@@ -2,9 +2,9 @@ import axios from "axios";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import React, { ReactNode } from "react";
-import FundsDropdown from "./FundsDropdown";
 import MaterialTable, { Column, DetailPanel } from "material-table";
 import styled from "styled-components";
+import FundsDropdown from "./FundsDropdown";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -43,9 +43,26 @@ export default class PeopleTable extends React.Component<
       {
         title: "Fund",
         field: "fundID",
-        render: (rowData) => (
-          <FundsDropdown fundsList={this.state.funds} person={rowData} />
-        ),
+        editComponent: (tableData) => {
+          if (tableData.rowData.fundID) {
+            return <> {this.findFund(tableData.rowData.fundID)} </>;
+          }
+
+          return (
+            <FundsDropdown
+              fundsList={this.state.funds}
+              onSelect={(newFundID: number) => {
+                tableData.rowData.fundID = newFundID;
+              }}
+              initialFundID={
+                this.state.funds.length > 0 ? this.state.funds[0].id : -1
+              }
+            />
+          );
+        },
+        render: (rowData) => {
+          return rowData ? this.findFund(rowData.fundID) : " ";
+        },
       },
       { title: "Name", field: "name" },
       { title: "Company", field: "company" },
@@ -53,6 +70,16 @@ export default class PeopleTable extends React.Component<
     ],
     funds: [],
   };
+
+  findFund = (fundID: number): string => {
+    let found = this.state.funds.find((fund: DisplayFund) => {
+      return fund.id == fundID;
+    });
+
+    return found ? found.name : " ";
+  };
+
+  createLookupTable = () => {};
 
   get editableObject(): EditableObject<DisplayPerson> {
     return {
