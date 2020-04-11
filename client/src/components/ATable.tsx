@@ -29,18 +29,18 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
 
   refreshTable = () => {
     this.getData()
-      .then(data => {
+      .then((data) => {
         this.setState({ data });
       })
       .catch(() => {});
   };
 
   getData = async () => {
-    return new Promise<T[]>(resolve => {
+    return new Promise<T[]>((resolve) => {
       axios
         .get(this.dataEndPoint)
-        .then(response => resolve(response.data.data))
-        .catch(function(error) {
+        .then((response) => resolve(response.data.data))
+        .catch(function (error) {
           console.log(error);
         });
     });
@@ -64,7 +64,7 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
             detailPanel={this.getDetailPanel}
             onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
             options={{
-              actionsColumnIndex: -1
+              actionsColumnIndex: -1,
             }}
           />
         </Container>

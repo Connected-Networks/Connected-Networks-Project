@@ -33,9 +33,7 @@ export default class FundsController {
       return fund;
     });
 
-    return list.filter((fund) =>
-      fundIdsUserCanSee.includes(fund.id.toString())
-    );
+    return list.filter((fund) => fundIdsUserCanSee.includes(fund.id.toString()));
   }
 
   static async updateFund(req, res) {

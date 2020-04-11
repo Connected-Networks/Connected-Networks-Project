@@ -17,8 +17,6 @@ interface DisplayFundCompany {
 }
 
 export default class FundTable extends ATable<DisplayFundCompany, FundTableProps> {
-  readonly DATA_END_POINT = "/funds/" + this.props.fundID;
-
   state: TableState<DisplayFundCompany> = {
     data: [],
     columns: [{ title: "Company", field: "name" }],
@@ -29,7 +27,7 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
   }
 
   get dataEndPoint(): string {
-    return this.DATA_END_POINT;
+    return "/funds/" + this.props.fundID;
   }
 
   actions = [
@@ -40,6 +38,13 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
       onClick: () => this.showShareDialog(),
     },
   ];
+
+  componentDidUpdate(prevProps: FundTableProps) {
+    if (this.props.fundID !== prevProps.fundID) {
+      this.setState({ data: [] });
+      this.refreshTable();
+    }
+  }
 
   showShareDialog = () => {
     this.setState({
