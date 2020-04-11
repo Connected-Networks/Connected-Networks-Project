@@ -40,7 +40,7 @@ export default class HistoryController {
 
     return history.map((entry) => {
       let history: DisplayHistory = {
-        id: entry.id,
+        id: entry.HistoryID,
         company: entry.company.CompanyName,
         position: entry.PositionName,
         start: entry.StartDate,
@@ -57,7 +57,7 @@ export default class HistoryController {
       let individual = req.body.employee;
 
       if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
-        console.error("User cannot add history to individual " + individual.IndividualID);
+        console.error("User cannot add history to individual " + individual.id);
         res.sendStatus(401);
         return;
       }
@@ -88,18 +88,19 @@ export default class HistoryController {
 
   static async updateHistory(req, res) {
     try {
-      let history = req.body;
-      let individual = req.employee;
+      let history = req.body.newData;
+      let individual = req.body.employee;
       let userID = req.user.UserID;
 
-      if (!(await HistoryController.userCanChangeIndividual(userID, individual.individualID))) {
-        console.error("User cannot edit history of individual " + individual.IndividualID);
+      if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
+        console.error("User cannot edit history of individual " + individual.id);
         res.sendStatus(401);
         return;
       }
       await HistoryController.updateHistoryInDatabase(history, individual, userID);
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -108,13 +109,13 @@ export default class HistoryController {
   //This function assumes that the individualID part of employeeHistory may change, but the details about the individual will not be changed here,
   //there is a seperate function for that. Similarly, this function assumes that the companyID may change, but the name of the specified company is not changing.
   static async updateHistoryInDatabase(history, individual, userID) {
-    let fundID = individual.FundID;
+    let fundID = individual.fundID;
     const company = await database.retrieveCompanyByName(history.company, fundID);
 
-    await database.updateHistory(
-      history.HistoryID,
+    await database.updateEmployeeHistory(
+      history.id,
       userID,
-      individual.IndividualID,
+      individual.id,
       company.CompanyID,
       history.position,
       history.start,

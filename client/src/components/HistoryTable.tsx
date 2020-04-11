@@ -45,7 +45,7 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
   updateRow = async (newData: DisplayHistory, oldData?: DisplayHistory | undefined): Promise<void> => {
     if (oldData) {
       try {
-        await axios.put("/history", { newData });
+        await axios.put("/history", { newData, employee: this.props.person });
       } catch (error) {
         console.log(error);
       }
@@ -65,36 +65,12 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
   };
 
   deleteRow = async (oldData: DisplayHistory): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        this.deletePersonOnServer(oldData)
-          .then(() => {
-            this.refreshTable();
-            resolve();
-          })
-          .catch(() => {
-            this.refreshTable();
-            resolve();
-          });
-      }, 1000);
-    });
-  };
-
-  deletePersonOnServer = async (oldData: DisplayHistory) => {
-    return new Promise((resolve, reject) => {
+    try {
       const historyID = oldData.id;
-      axios
-        .delete(`/history/${historyID}`)
-        .then((response) => {
-          console.log("status: " + response.status);
-          resolve();
-        })
-        .catch(function (error) {
-          console.log(error);
-          reject();
-        });
-    });
+      await axios.delete(`/history/${historyID}`);
+    } catch (error) {
+      console.log(error);
+    }
+    this.refreshTable();
   };
-
-  // state = { :  }
 }
