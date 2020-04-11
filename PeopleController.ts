@@ -32,9 +32,7 @@ export default class PeopleController {
   }
 
   static async processIndividualForDisplay(individual) {
-    const employment = await database.getIndividualCurrentEmployement(
-      individual.IndividualID
-    );
+    const employment = await database.getIndividualCurrentEmployement(individual.IndividualID);
 
     let displayPerson: DisplayPerson = {
       id: individual.IndividualID,
@@ -43,7 +41,7 @@ export default class PeopleController {
       company: "",
       position: "",
       hyperlink: individual.LinkedInUrl,
-      comment: individual.comments,
+      comment: individual.Comments,
     };
 
     if (employment != null) {
@@ -66,9 +64,7 @@ export default class PeopleController {
         return;
       }
 
-      const people = await database.retrieveCurrentEmployeesOfCompany(
-        companyID
-      );
+      const people = await database.retrieveCurrentEmployeesOfCompany(companyID);
       if (!people) {
         res.sendStatus(500);
       } else {
@@ -103,9 +99,7 @@ export default class PeopleController {
         res.sendStatus(401);
         return;
       }
-      const people = await PeopleController.getPeopleByOriginalCompanyFromDatabase(
-        companyID
-      );
+      const people = await PeopleController.getPeopleByOriginalCompanyFromDatabase(companyID);
       if (!people) {
         res.sendStatus(500);
       } else {
@@ -118,12 +112,8 @@ export default class PeopleController {
 
   //Assumes that OriginalFundPosition table will not have duplicate combinations of IndividualID and CompanyID
   //If this assumption is wrong, this function may return duplicate entries
-  static async getPeopleByOriginalCompanyFromDatabase(
-    companyID
-  ): Promise<Object> {
-    const people = await database.retrieveIndividualsByOriginalCompany(
-      companyID
-    );
+  static async getPeopleByOriginalCompanyFromDatabase(companyID): Promise<Object> {
+    const people = await database.retrieveIndividualsByOriginalCompany(companyID);
 
     return people.map((entry) => {
       let displayPerson: DisplayPerson = {
@@ -152,13 +142,7 @@ export default class PeopleController {
         return;
       }
 
-      await database.modifyIndividual(
-        person.id,
-        person.name,
-        person.position,
-        person.hyperlink,
-        person.comment
-      );
+      await database.modifyIndividual(person.id, person.name, person.position, person.hyperlink, person.comment);
       res.sendStatus(200);
     } catch (error) {
       console.error(error);
@@ -180,6 +164,9 @@ export default class PeopleController {
       let person = req.body.newData;
       let userID = req.user.UserID;
       let fundID = person.fundID;
+
+      console.log(person);
+
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add an individual to that fund");
         res.sendStatus(401);
@@ -187,12 +174,7 @@ export default class PeopleController {
       }
 
       console.log("\n\n" + JSON.stringify(person) + "\n\n");
-      await database.insertPerson(
-        person.fundID,
-        person.name,
-        person.hyperlink,
-        person.comment
-      );
+      await database.insertPerson(person.fundID, person.name, person.hyperlink, person.comment);
 
       res.sendStatus(200);
     } catch (error) {
