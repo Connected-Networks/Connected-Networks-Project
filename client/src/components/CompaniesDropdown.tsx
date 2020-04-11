@@ -4,17 +4,33 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import axios from "axios";
 import { DisplayCompany } from "./CompaniesTable";
+import { ReactComponent } from "*.svg";
 
 interface CompaniesDropdownProps {
   fundID: number;
-  onSelect: (newCompanyID: number) => void;
+  companyID: number;
+  onSelect: (newCompany: DisplayCompany) => void;
 }
 
-export default function CompaniesDropdown(props: CompaniesDropdownProps) {
-  const getFundCompanies = (fundID: number) => {
+interface CompaniesDropdownState {
+  anchorEl: null | HTMLElement;
+  selectedCompanyID: number;
+  companiesList: DisplayCompany[];
+  fundID: number;
+}
+
+export default class CompaniesDropdown extends React.Component<CompaniesDropdownProps, CompaniesDropdownState> {
+  state: CompaniesDropdownState = {
+    anchorEl: null,
+    selectedCompanyID: this.props.companyID,
+    companiesList: [],
+    fundID: this.props.fundID,
+  };
+
+  getFundCompanies = (fundID: number) => {
     return new Promise<DisplayCompany[]>((resolve) => {
       axios
-        .get("/funds/" + props.fundID)
+        .get("/funds/" + fundID)
         .then((response) => resolve(response.data.data))
         .catch(function (error) {
           console.log(error);
@@ -22,53 +38,77 @@ export default function CompaniesDropdown(props: CompaniesDropdownProps) {
     });
   };
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedCompanyID, setSelectedCompanyID] = React.useState<number>(-1);
-  const [companiesList, setCompaniesList] = React.useState<DisplayCompany[]>([]);
+  componentDidMount() {
+    this.getFundCompaniesList();
+  }
 
-  const getFundCompaniesList = () => {
-    getFundCompanies(props.fundID)
+  getFundCompaniesList = () => {
+    this.getFundCompanies(this.state.fundID)
       .then((data) => {
-        setCompaniesList(data);
+        this.setState({ companiesList: data });
       })
       .catch((error) => {
         console.error(error);
       });
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    this.setState({ anchorEl: event.currentTarget });
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  handleClose = () => {
+    this.setState({ anchorEl: null });
   };
 
-  const getFirstCompany = (): string => {
-    getFundCompaniesList();
+  getCompany = (): string => {
+    if (this.state.selectedCompanyID) {
+      let found = this.state.companiesList.find((company) => {
+        return company.id == this.state.selectedCompanyID;
+      });
 
-    return companiesList[0] ? companiesList[0].name : "No company available";
+      if (found) {
+        return found.name;
+      }
+
+      console.error("Company fund mismatch. This company ID does not exist in the selected fund.");
+      return " Company fund mismatch ";
+    }
+
+    if (this.state.companiesList[0]) {
+      this.setState({ selectedCompanyID: this.state.companiesList[0].id });
+      return this.state.companiesList[0].name;
+    }
+
+    return "No company available";
   };
 
-  return (
-    <div>
-      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
-        {getFirstCompany()}
-      </Button>
-      <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-        {companiesList.map((company) => (
-          <MenuItem
-            key={company.id}
-            onClick={() => {
-              setSelectedCompanyID(company.id);
-              props.onSelect(company.id);
-              handleClose();
-            }}
-          >
-            {company.name}
-          </MenuItem>
-        ))}
-      </Menu>
-    </div>
-  );
+  render() {
+    return (
+      <>
+        <Button aria-controls="simple-menu" aria-haspopup="true" onClick={this.handleClick}>
+          {this.getCompany()}
+        </Button>
+        <Menu
+          id="simple-menu"
+          anchorEl={this.state.anchorEl}
+          keepMounted
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handleClose}
+        >
+          {this.state.companiesList.map((company) => (
+            <MenuItem
+              key={company.id}
+              onClick={() => {
+                this.setState({ selectedCompanyID: company.id });
+                this.props.onSelect(company);
+                this.handleClose();
+              }}
+            >
+              {company.name}
+            </MenuItem>
+          ))}
+        </Menu>
+      </>
+    );
+  }
 }
