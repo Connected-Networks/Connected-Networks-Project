@@ -6,11 +6,13 @@ import MaterialTable, { Column, DetailPanel } from "material-table";
 import styled from "styled-components";
 import FundsDropdown from "./FundsDropdown";
 import CompaniesDropdown from "./CompaniesDropdown";
+import { DisplayCompany } from "./CompaniesTable";
 
 interface PeopleTableState {
   data: DisplayPerson[];
   columns: Array<Column<DisplayPerson>>;
   funds: DisplayFund[];
+  selectedFundID: number;
   dialog?: JSX.Element;
 }
 
@@ -26,6 +28,7 @@ export interface DisplayPerson {
   fundID: number;
   name: string;
   company: string;
+  companyID: number;
   position: string;
   comment: string;
   hyperlink: string;
@@ -34,8 +37,6 @@ export interface DisplayPerson {
 export default class PeopleTable extends React.Component<PeopleTableProps, PeopleTableState> {
   readonly TABLE_NAME = "People";
   readonly DATA_END_POINT = "/people";
-
-  selectedFundID = -1;
 
   state: PeopleTableState = {
     data: [],
@@ -48,15 +49,20 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
             return <> {this.findFund(tableData.rowData.fundID)} </>;
           }
 
-          this.selectedFundID = this.state.funds.length > 0 ? this.state.funds[0].id : -1;
+          if (tableData.rowData.fundID) {
+            this.state.selectedFundID = tableData.rowData.fundID;
+          } else {
+            this.state.selectedFundID = this.state.funds.length > 0 ? this.state.funds[0].id : -1;
+            // this.setState({ selectedFundID: this.state.funds.length > 0 ? this.state.funds[0].id : -1 });
+          }
 
           return (
             <FundsDropdown
               fundsList={this.state.funds}
               onSelect={(newFundID: number) => {
-                this.selectedFundID = newFundID;
+                this.setState({ selectedFundID: newFundID });
               }}
-              initialFundID={this.selectedFundID}
+              initialFundID={this.state.selectedFundID}
             />
           );
         },
@@ -69,18 +75,28 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
         title: "Company",
         field: "company",
         editComponent: (tableData) => {
-          let fundID = tableData.rowData.fundID;
+          let fundID = this.state.selectedFundID;
 
           if (fundID) {
-            return <CompaniesDropdown fundID={fundID} onSelect={(newCompanyID) => {}} />;
+            return (
+              <CompaniesDropdown
+                fundID={fundID}
+                companyID={tableData.rowData.companyID}
+                onSelect={(newCompany: DisplayCompany) => {
+                  tableData.rowData.companyID = newCompany.id;
+                  tableData.rowData.company = newCompany.name;
+                }}
+              />
+            );
           }
 
-          return <> No companies available </>;
+          return <> No fund available </>;
         },
       },
       { title: "Position", field: "position" },
     ],
     funds: [],
+    selectedFundID: -1,
   };
 
   findFund = (fundID: number): string => {
@@ -172,7 +188,7 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   };
 
   addRow = async (newData: DisplayPerson): Promise<void> => {
-    newData.fundID = this.selectedFundID;
+    newData.fundID = this.state.selectedFundID;
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
