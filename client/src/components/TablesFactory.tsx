@@ -8,7 +8,7 @@ class TablesFactory {
     ["Recent", undefined],
     ["Starred", undefined],
     ["People", <PeopleTable />],
-    ["Companies", <CompaniesTable />]
+    ["Companies", <CompaniesTable />],
   ]);
 
   getAvailableTables = () => {
@@ -23,7 +23,7 @@ class TablesFactory {
   };
 
   getFundTableWithId = (fundId: string, fundName: string = "Name not found") => {
-    return <FundTable fundId={fundId} fundName={fundName} />;
+    return <FundTable fundID={fundId} fundName={fundName} />;
   };
 
   getDefaultTableType() {

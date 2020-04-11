@@ -5,6 +5,7 @@ import React, { ReactNode } from "react";
 import MaterialTable, { Column, DetailPanel } from "material-table";
 import styled from "styled-components";
 import FundsDropdown from "./FundsDropdown";
+import CompaniesDropdown from "./CompaniesDropdown";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -30,12 +31,11 @@ export interface DisplayPerson {
   hyperlink: string;
 }
 
-export default class PeopleTable extends React.Component<
-  PeopleTableProps,
-  PeopleTableState
-> {
+export default class PeopleTable extends React.Component<PeopleTableProps, PeopleTableState> {
   readonly TABLE_NAME = "People";
   readonly DATA_END_POINT = "/people";
+
+  selectedFundID = -1;
 
   state: PeopleTableState = {
     data: [],
@@ -44,19 +44,19 @@ export default class PeopleTable extends React.Component<
         title: "Fund",
         field: "fundID",
         editComponent: (tableData) => {
-          if (tableData.rowData.fundID) {
+          if (tableData.rowData.fundID && tableData.rowData.company) {
             return <> {this.findFund(tableData.rowData.fundID)} </>;
           }
+
+          this.selectedFundID = this.state.funds.length > 0 ? this.state.funds[0].id : -1;
 
           return (
             <FundsDropdown
               fundsList={this.state.funds}
               onSelect={(newFundID: number) => {
-                tableData.rowData.fundID = newFundID;
+                this.selectedFundID = newFundID;
               }}
-              initialFundID={
-                this.state.funds.length > 0 ? this.state.funds[0].id : -1
-              }
+              initialFundID={this.selectedFundID}
             />
           );
         },
@@ -65,7 +65,19 @@ export default class PeopleTable extends React.Component<
         },
       },
       { title: "Name", field: "name" },
-      { title: "Company", field: "company" },
+      {
+        title: "Company",
+        field: "company",
+        editComponent: (tableData) => {
+          let fundID = tableData.rowData.fundID;
+
+          if (fundID) {
+            return <CompaniesDropdown fundID={fundID} onSelect={(newCompanyID) => {}} />;
+          }
+
+          return <> No companies available </>;
+        },
+      },
       { title: "Position", field: "position" },
     ],
     funds: [],
@@ -99,10 +111,7 @@ export default class PeopleTable extends React.Component<
 
   getDetailPanel:
     | ((rowData: DisplayPerson) => ReactNode)
-    | Array<
-        | DetailPanel<DisplayPerson>
-        | ((rowData: DisplayPerson) => DetailPanel<DisplayPerson>)
-      >
+    | Array<DetailPanel<DisplayPerson> | ((rowData: DisplayPerson) => DetailPanel<DisplayPerson>)>
     | undefined = () => {
     return undefined;
   };
@@ -131,10 +140,7 @@ export default class PeopleTable extends React.Component<
    * @param newData
    * @param oldData
    */
-  updateRow = async (
-    newData: DisplayPerson,
-    oldData?: DisplayPerson | undefined
-  ): Promise<void> => {
+  updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         if (oldData) {
@@ -166,6 +172,8 @@ export default class PeopleTable extends React.Component<
   };
 
   addRow = async (newData: DisplayPerson): Promise<void> => {
+    newData.fundID = this.selectedFundID;
+
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         if (newData) {
@@ -267,11 +275,7 @@ export default class PeopleTable extends React.Component<
             editable={this.editableObject}
             title={this.name}
             detailPanel={this.getDetailPanel}
-            onRowClick={
-              this.getDetailPanel
-                ? (event, rowData, togglePanel) => togglePanel!()
-                : undefined
-            }
+            onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
             options={{
               actionsColumnIndex: -1,
             }}

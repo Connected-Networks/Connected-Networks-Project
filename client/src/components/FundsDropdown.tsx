@@ -2,9 +2,7 @@ import * as React from "react";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import axios from "axios";
 import { DisplayFund, DisplayPerson } from "./PeopleTable";
-import { resolve } from "dns";
 
 interface FundsDropdownProps {
   fundsList: DisplayFund[];
@@ -23,9 +21,7 @@ export default function FundsDropdown(props: FundsDropdownProps) {
   };
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedFundID, setSelectedFundID] = React.useState<number>(
-    props.initialFundID
-  );
+  const [selectedFundID, setSelectedFundID] = React.useState<number>(props.initialFundID);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -37,20 +33,10 @@ export default function FundsDropdown(props: FundsDropdownProps) {
 
   return (
     <div>
-      <Button
-        aria-controls="simple-menu"
-        aria-haspopup="true"
-        onClick={handleClick}
-      >
+      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
         {findFund(selectedFundID)}
       </Button>
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+      <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
         {props.fundsList.map((fund) => (
           <MenuItem
             key={fund.id}

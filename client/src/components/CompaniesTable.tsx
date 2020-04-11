@@ -6,6 +6,7 @@ import axios from "axios";
 
 export interface DisplayCompany {
   id: number;
+  fundID: number;
   name: string;
 }
 
