@@ -60,6 +60,8 @@ router.put("/history", HistoryController.updateHistory);
 
 router.post("/history", HistoryController.addHistory);
 
+router.delete("/history/:id", HistoryController.deleteHistory);
+
 router.post("/updates", UpdatesController.receiveUpdates);
 
 module.exports = router;

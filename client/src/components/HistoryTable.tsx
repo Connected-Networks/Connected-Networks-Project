@@ -67,7 +67,7 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
   deleteRow = async (oldData: DisplayHistory): Promise<void> => {
     try {
       const historyID = oldData.id;
-      await axios.delete(`/history/${historyID}`);
+      await axios.delete(`/history/${historyID}`, { data: { employee: this.props.person } });
     } catch (error) {
       console.log(error);
     }

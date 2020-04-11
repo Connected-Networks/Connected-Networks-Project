@@ -122,4 +122,23 @@ export default class HistoryController {
       history.end
     );
   }
+
+  static async deleteHistory(req, res) {
+    try {
+      let historyID = req.params.id;
+      let individual = req.body.employee;
+      let userID = req.user.UserID;
+
+      if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
+        console.error("User cannot edit history of individual " + individual.id);
+        res.sendStatus(401);
+        return;
+      }
+      await database.deleteEmployeeHistory(historyID);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
 }
