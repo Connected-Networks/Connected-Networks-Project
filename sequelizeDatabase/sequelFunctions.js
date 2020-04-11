@@ -168,7 +168,7 @@ insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
     .spread((user, createdBoolean) => {
       return user;
     })
-    .catch(err => {
+    .catch((err) => {
       console.error("Error in insertPerson", err);
       throw err;
     });
@@ -213,7 +213,10 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
       //console.log('History Added: ', history);
       return history;
     })
-    .catch((err) => console.error("Error in insertEmployeeHistory", err));
+    .catch((err) => {
+      console.error("Error in insertEmployeeHistory", err);
+      throw err;
+    });
 };
 
 updateEmployeeHistory = (historyID, userID, individualID, companyID, positionName, startDate, endDate) => {
@@ -358,11 +361,11 @@ modifyIndividual = (IndividualID, newFundID, newName, newPosition, newUrl, newCo
         OriginalPostion: newPosition, //TODO: Update this.
         LinkedInUrl: newUrl,
         Comments: newComments,
-        FundID: newFundID
+        FundID: newFundID,
       });
       return individual;
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       throw err;
     });
@@ -554,8 +557,8 @@ retrieveIndividualsByOriginalCompany = (companyID) => {
     ],
   });
 };
-retrieveIndividualByID = (individualID) => {
-  return models.Individuals.findAll({
+retrieveIndividualByID = async (individualID) => {
+  return await models.Individuals.findOne({
     where: { IndividualID: individualID },
   });
 };
@@ -587,20 +590,12 @@ sharefund = (fundID, userID) => {
 };
 
 //Assumes company names are unique in a fund, or companies in the same fund with the same name are substitutable
-retrieveCompanyByName = (companyName, fundID) => {
-  return new Promise((resolve, reject) => {
-    models.Companies.find({
-      where: {
-        FundID: fundID,
-        CompanyName: companyName,
-      },
-    })
-      .then((result) => {
-        resolve(result);
-      })
-      .catch((error) => {
-        reject(error);
-      });
+retrieveCompanyByName = async (companyName, fundID) => {
+  return await models.Companies.findOne({
+    where: {
+      FundID: fundID,
+      CompanyName: companyName,
+    },
   });
 };
 

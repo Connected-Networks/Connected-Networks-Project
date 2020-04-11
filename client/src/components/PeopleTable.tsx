@@ -6,6 +6,7 @@ import MaterialTable, { Column, DetailPanel } from "material-table";
 import styled from "styled-components";
 import FundsDropdown from "./FundsDropdown";
 import CompaniesDropdown from "./CompaniesDropdown";
+import HistoryTable from "./HistoryTable";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -112,8 +113,12 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   getDetailPanel:
     | ((rowData: DisplayPerson) => ReactNode)
     | Array<DetailPanel<DisplayPerson> | ((rowData: DisplayPerson) => DetailPanel<DisplayPerson>)>
-    | undefined = () => {
-    return undefined;
+    | undefined = (rowData: DisplayPerson) => {
+    return (
+      <div style={{ marginLeft: "60px" }}>
+        <HistoryTable person={rowData} />
+      </div>
+    );
   };
 
   parseFunds = () => {

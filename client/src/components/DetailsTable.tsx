@@ -7,8 +7,8 @@ export interface TableProps {
 
 export default abstract class DetailsTable<RowData extends Object> extends ATable<RowData, TableProps> {
   components: Components = {
-    Toolbar: props => null,
-    Pagination: props => null
+    Toolbar: (props) => null,
+    Pagination: (props) => null,
   };
 
   dataEndPoint = this.props.dataEndPoint;

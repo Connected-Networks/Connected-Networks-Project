@@ -58,7 +58,7 @@ router.get("/history/:id", HistoryController.getHistory);
 
 router.put("/history", HistoryController.updateHistory);
 
-router.post("/history/:id", HistoryController.addHistory);
+router.post("/history", HistoryController.addHistory);
 
 router.post("/updates", UpdatesController.receiveUpdates);
 
