@@ -41,7 +41,7 @@ export default class PeopleController {
       company: "",
       position: "",
       hyperlink: individual.LinkedInUrl,
-      comment: individual.comments,
+      comment: individual.Comments,
     };
 
     if (employment != null) {

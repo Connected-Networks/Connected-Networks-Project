@@ -7,6 +7,7 @@ import styled from "styled-components";
 import FundsDropdown from "./FundsDropdown";
 import CompaniesDropdown from "./CompaniesDropdown";
 import HistoryTable from "./HistoryTable";
+import Comment from "./Comment";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -116,6 +117,7 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
     | undefined = (rowData: DisplayPerson) => {
     return (
       <div style={{ marginLeft: "60px" }}>
+        <Comment person={rowData} />
         <HistoryTable person={rowData} />
       </div>
     );
