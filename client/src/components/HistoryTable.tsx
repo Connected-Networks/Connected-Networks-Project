@@ -31,7 +31,7 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
   }
 
   get dataEndPoint(): string {
-    return "/history";
+    return `/history/${this.props.person.id}`;
   }
 
   get editableObject(): EditableObject<DisplayHistory> {
@@ -43,73 +43,25 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
   }
 
   updateRow = async (newData: DisplayHistory, oldData?: DisplayHistory | undefined): Promise<void> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (oldData) {
-          console.log(newData);
-          this.updatePersonOnServer(newData).then(() => {
-            this.refreshTable();
-            resolve();
-          });
-        }
-      }, 600);
-    });
-  };
-
-  updatePersonOnServer = async (newData: DisplayHistory) => {
-    return new Promise((resolve, reject) => {
-      axios
-        .put("/history", { newData })
-        .then((response) => {
-          if (response.status === 200) {
-            resolve();
-          } else {
-            reject();
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    });
+    if (oldData) {
+      try {
+        await axios.put("/history", { newData });
+      } catch (error) {
+        console.log(error);
+      }
+      this.refreshTable();
+    }
   };
 
   addRow = async (newData: DisplayHistory): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      if (newData) {
-        console.log(newData);
-        this.addPersonOnServer(newData)
-          .then(() => {
-            resolve();
-          })
-          .catch((err) => {
-            resolve();
-          });
+    if (newData) {
+      try {
+        await axios.post(`/history`, { newData, employee: this.props.person });
+      } catch (error) {
+        console.log(error);
       }
-    });
-  };
-
-  addPersonOnServer = async (newData: DisplayHistory) => {
-    return new Promise((resolve, reject) => {
-      axios
-        .post(`/history`, { newData, employee: this.props.person })
-        .then((response) => {
-          console.log("YUUUUUUUUp");
-
-          if (response.status === 200) {
-            this.refreshTable();
-            resolve();
-          } else {
-            this.refreshTable();
-            reject();
-          }
-        })
-        .catch((error) => {
-          console.log("NOOOOOOOOOOpe");
-          console.log(error);
-          this.refreshTable();
-          reject();
-        });
-    });
+      this.refreshTable();
+    }
   };
 
   deleteRow = async (oldData: DisplayHistory): Promise<void> => {

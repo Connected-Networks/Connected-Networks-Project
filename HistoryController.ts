@@ -24,6 +24,7 @@ export default class HistoryController {
       let history = await HistoryController.getHistoryFromDatabase(individualID);
       res.send({ data: history });
     } catch (error) {
+      console.log(error);
       res.sendStatus(500);
     }
   }
@@ -40,7 +41,7 @@ export default class HistoryController {
     return history.map((entry) => {
       let history: DisplayHistory = {
         id: entry.id,
-        company: entry.Company.CompanyName,
+        company: entry.company.CompanyName,
         position: entry.PositionName,
         start: entry.StartDate,
         end: entry.EndDate,
@@ -55,46 +56,33 @@ export default class HistoryController {
       let userID = req.user.UserID;
       let individual = req.body.employee;
 
-      console.log(history);
-
-      console.log(individual);
       if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
-        console.log("11111111111111111");
         console.error("User cannot add history to individual " + individual.IndividualID);
         res.sendStatus(401);
         return;
       }
-      console.log("2222222222222222");
+
       await HistoryController.addHistoryToDatabase(history, individual, userID);
       res.sendStatus(200);
-      return;
     } catch (error) {
-      console.log("4444444444444444444444444444");
       res.sendStatus(500);
-      console.log("77777777777777777777777777");
     }
   }
 
   static async addHistoryToDatabase(history, individual, userID) {
     let fundID = individual.fundID;
-    console.log("11111111111111111");
     const company = await database.retrieveCompanyByName(history.company, fundID);
-    console.log("2222222222222222222222");
-    if (!company) {
-      console.log("555555555555555555555555555555555555");
 
+    if (!company) {
       throw new Error();
     }
-    console.log("3333333333333");
+
     await database.insertEmployeeHistory(userID, individual.id, company.CompanyID, history.position, history.start, history.end);
-    console.log("444444444444444444444444444");
   }
 
   static async userCanChangeIndividual(userID, individualID): Promise<boolean> {
-    console.log("8888888888888888888888888");
     const individual = await database.retrieveIndividualByID(individualID);
     let fundID = individual.FundID;
-    console.log("99999999999999999999");
     return await PeopleController.userCanChangeFund(userID, fundID);
   }
 
