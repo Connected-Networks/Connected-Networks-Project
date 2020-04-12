@@ -2,11 +2,11 @@ import * as React from "react";
 import PeopleTable from "./PeopleTable";
 import CompaniesTable from "./CompaniesTable";
 import FundTable from "./FundTable";
+import RecentTable from "./RecentTable";
 
 class TablesFactory {
   tableTypes = new Map([
-    ["Recent", undefined],
-    ["Starred", undefined],
+    ["Recent", <RecentTable />],
     ["People", <PeopleTable />],
     ["Companies", <CompaniesTable />],
   ]);

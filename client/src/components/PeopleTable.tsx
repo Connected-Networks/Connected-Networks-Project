@@ -99,12 +99,16 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
         field: "lastChanged",
         editable: "never",
         render: (rowData) => {
-          const today = new Date();
-          const dayOfLastChange = new Date(rowData.lastChanged);
-          if (Math.abs(today.getDate() - dayOfLastChange.getDate()) <= 8) {
-            return <b style={{ color: "orange" }}> {rowData.lastChanged}</b>;
+          if (rowData && rowData.lastChanged) {
+            const today = new Date();
+            const dayOfLastChange = new Date(rowData.lastChanged);
+            const lastWeek = new Date();
+            lastWeek.setDate(today.getDate() - 8);
+            if (today.getDate() >= dayOfLastChange.getDate() && dayOfLastChange.getDate() >= lastWeek.getDate()) {
+              return <b style={{ color: "orange" }}> {rowData.lastChanged}</b>;
+            }
+            return rowData.lastChanged;
           }
-          return rowData.lastChanged;
         },
       },
     ],
