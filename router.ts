@@ -56,6 +56,8 @@ router.delete("/funds/:id", FundsController.deleteFund);
 
 router.post("/shareFund", FundsController.shareFund);
 
+router.get("/shareFund/:id", FundsController.getUsersSharedWith);
+
 router.get("/history/:id", HistoryController.getHistory);
 
 router.put("/history", HistoryController.updateHistory);

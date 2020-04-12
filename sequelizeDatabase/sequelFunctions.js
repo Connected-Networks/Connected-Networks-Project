@@ -687,6 +687,11 @@ getAllUsersRelatedToFund = async (FundID) => {
   return await models.User.findAll({ where: { UserID: allFundUsersIds } });
 };
 
+getSharedWithUsers = async (FundID) => {
+  const sharedWithIds = (await models.SharedFunds.findAll({ where: { FundID } })).map((sharedFund) => sharedFund.UserID);
+  return await models.User.findAll({ where: { UserID: sharedWithIds } });
+};
+
 module.exports = {
   getAllUsers,
   getAllIndividuals,
@@ -737,4 +742,5 @@ module.exports = {
   getAllSharedFunds,
   insertQuarterEmployment,
   insertOriginalFundPosition,
+  getSharedWithUsers,
 };

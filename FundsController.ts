@@ -1,5 +1,6 @@
 import PeopleController from "./PeopleController";
 import { DisplayCompany } from "./CompaniesController";
+import { RSA_NO_PADDING } from "constants";
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface DisplayFund {
@@ -130,6 +131,27 @@ export default class FundsController {
       await database.sharefund(fundID, user.id);
       res.sendStatus(200);
     } catch (error) {
+      res.sendStatus(500);
+    }
+  }
+
+  static async getUsersSharedWith(req, res) {
+    try {
+      const fundID = req.params.id;
+      const userID = req.user.UserID;
+
+      if (!(await FundsController.userSeesFund(userID, fundID))) {
+        console.error("User " + userID + " cannot see Fund " + fundID);
+        res.sendStatus(401);
+        return;
+      }
+
+      const usersSharedWith = await database.getSharedWithUsers(fundID);
+      const mappedUsers = usersSharedWith.map((user) => ({ username: user.Username }));
+
+      res.send({ users: mappedUsers });
+    } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
