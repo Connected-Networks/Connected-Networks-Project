@@ -169,9 +169,8 @@ export default class ParsingController {
     return `${s[s.length - 1]}-${mis}-01`;
   }
 
-  static async processQuarter(quarterString, quarterNumber, individualID, userID, fundID, year) {
-    console.log("***");
-    if (quarterString == null || quarterString == "") return;
+  static async processQuarter(quarterString, quarterNumber, individualID, userID, fundID, year): Promise<boolean> {
+    if (quarterString == null || quarterString == "") return false;
     let quarterDates = [year + "/01/01", year + "/04/01", year + "/07/01", year + "/10/01"];
     let positionName = "";
     let companyName = "";
@@ -186,7 +185,7 @@ export default class ParsingController {
       companyName = quarterString.substring(p + 1);
     }
     companyName = companyName.trim();
-    if (positionName == "" || companyName == "") return;
+    if (positionName == "" || companyName == "") return false;
     await database.insertQuarterEmployment(
       userID,
       individualID,
@@ -195,7 +194,7 @@ export default class ParsingController {
       positionName,
       quarterDates[quarterNumber - 1]
     );
-    return;
+    return true;
   }
 
   static estimateYear(line: string): number {
@@ -205,7 +204,7 @@ export default class ParsingController {
     let k = Number.parseInt(j);
     if (k >= 2000) return k;
     i = line.indexOf("20");
-    j = line.substring(i + 3, i + 8);
+    j = line.substring(i, i + 5);
     k = Number.parseInt(j);
     if (k >= 2000) return k;
     i = line.indexOf("Q1 19");
@@ -213,7 +212,7 @@ export default class ParsingController {
     k = Number.parseInt(j);
     if (k >= 1900 && k < 2000) return k;
     i = line.indexOf("19");
-    j = line.substring(i + 3, i + 8);
+    j = line.substring(i, i + 5);
     k = Number.parseInt(j);
     if (k >= 1900 && k < 2000) return k;
     console.log("Could not find year for quarter updates, defaulting to current year.");

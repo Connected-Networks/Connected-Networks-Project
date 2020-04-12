@@ -157,7 +157,7 @@ describe("call_from_csv_line", () => {
     };
 
     const mock_insert_from_csv = jest.spyOn(database, "insertFromCsvLine").mockResolvedValue(mockIndividualID);
-    const mock_process_quarter = jest.spyOn(ParsingController, "processQuarter").mockResolvedValue();
+    const mock_process_quarter = jest.spyOn(ParsingController, "processQuarter").mockResolvedValue(true);
 
     let result = await ParsingController.call_from_csv_line(mockEntry, mockFundID, mockUserID, mockYear);
     expect(mock_insert_from_csv).toBeCalledTimes(1);
@@ -200,11 +200,146 @@ describe("call_from_csv_line", () => {
     };
 
     const mock_insert_from_csv = jest.spyOn(database, "insertFromCsvLine").mockRejectedValue(null);
-    const mock_process_quarter = jest.spyOn(ParsingController, "processQuarter").mockResolvedValue();
+    const mock_process_quarter = jest.spyOn(ParsingController, "processQuarter").mockResolvedValue(true);
 
     let result = await ParsingController.call_from_csv_line(mockEntry, mockFundID, mockUserID, mockYear);
 
     expect(mock_insert_from_csv).toBeCalledTimes(1);
     expect(result).toEqual(false);
+  });
+});
+
+describe("processQuarter", () => {
+  it("should return false if quarterString is empty", async () => {
+    const mockQuarterString = "";
+    const mockQuarterNumber = 1;
+    const mockIndividualID = 12345;
+    const mockUserID = 12345;
+    const mockFundID = 12345;
+    const mockYear = 2020;
+
+    const mockInsertQuarterEmployment = jest.spyOn(database, "insertQuarterEmployment");
+
+    let result = await ParsingController.processQuarter(
+      mockQuarterString,
+      mockQuarterNumber,
+      mockIndividualID,
+      mockUserID,
+      mockFundID,
+      mockYear
+    );
+
+    expect(mockInsertQuarterEmployment).toBeCalledTimes(0);
+    expect(result).toEqual(false);
+  });
+
+  it("should return false if quarterString is invalid", async () => {
+    //This string is not valid
+    const mockQuarterString = "job place";
+    const mockQuarterNumber = 1;
+    const mockIndividualID = 12345;
+    const mockUserID = 12345;
+    const mockFundID = 12345;
+    const mockYear = 2020;
+
+    const mockInsertQuarterEmployment = jest.spyOn(database, "insertQuarterEmployment");
+
+    let result = await ParsingController.processQuarter(
+      mockQuarterString,
+      mockQuarterNumber,
+      mockIndividualID,
+      mockUserID,
+      mockFundID,
+      mockYear
+    );
+
+    expect(mockInsertQuarterEmployment).toBeCalledTimes(0);
+    expect(result).toEqual(false);
+  });
+
+  it("should return true if quarterString is proper and insertQuarterEmployment doesn't throw errors", async () => {
+    const mockQuarterString = "job, place";
+    const mockQuarterNumber = 1;
+    const mockIndividualID = 12345;
+    const mockUserID = 12345;
+    const mockFundID = 12345;
+    const mockYear = 2020;
+
+    const mockInsertQuarterEmployment = jest.spyOn(database, "insertQuarterEmployment");
+
+    let result = await ParsingController.processQuarter(
+      mockQuarterString,
+      mockQuarterNumber,
+      mockIndividualID,
+      mockUserID,
+      mockFundID,
+      mockYear
+    );
+
+    expect(mockInsertQuarterEmployment).toBeCalledTimes(1);
+    expect(result).toEqual(true);
+  });
+
+  it("should return true if quarterString is proper and insertQuarterEmployment doesn't throw errors", async () => {
+    const mockQuarterString = "job at place";
+    const mockQuarterNumber = 1;
+    const mockIndividualID = 12345;
+    const mockUserID = 12345;
+    const mockFundID = 12345;
+    const mockYear = 2020;
+
+    const mockInsertQuarterEmployment = jest.spyOn(database, "insertQuarterEmployment");
+
+    let result = await ParsingController.processQuarter(
+      mockQuarterString,
+      mockQuarterNumber,
+      mockIndividualID,
+      mockUserID,
+      mockFundID,
+      mockYear
+    );
+
+    expect(mockInsertQuarterEmployment).toBeCalledTimes(1);
+    expect(result).toEqual(true);
+  });
+});
+
+describe("Convert Dates", () => {
+  it("should correctly parse a date in month-month year format", () => {
+    let dateString = "April-May 2020";
+    let result = ParsingController.convertDates(dateString);
+    expect(result).toEqual(["2020-04-01", "2020-05-01"]);
+
+    dateString = "Jan-Feb 2019";
+    result = ParsingController.convertDates(dateString);
+    expect(result).toEqual(["2019-01-01", "2019-02-01"]);
+  });
+
+  it("should correctly parse a date in month year-month year format", () => {
+    let dateString = "April 2017-May 2018";
+    let result = ParsingController.convertDates(dateString);
+    expect(result).toEqual(["2017-04-01", "2018-05-01"]);
+
+    dateString = "Jan 2019-Feb 2020";
+    result = ParsingController.convertDates(dateString);
+    expect(result).toEqual(["2019-01-01", "2020-02-01"]);
+  });
+
+  describe("Estimate Year", () => {
+    it("Should detect a year string between 1900 and 2000", () => {
+      let data = "something something something 1984";
+      let result = ParsingController.estimateYear(data);
+      expect(result).toEqual(1984);
+    });
+    it("Should detect a year string between 2000 and 2100", () => {
+      let data = "something something something 2084";
+      let result = ParsingController.estimateYear(data);
+      expect(result).toEqual(2084);
+    });
+    it("Should should prioritize years in the 21st century", () => {
+      let data = "something something something 1984 something something something 2001";
+      let result = ParsingController.estimateYear(data);
+      expect(result).toEqual(2001);
+    });
   });
 });
