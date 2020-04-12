@@ -9,6 +9,7 @@ import CompaniesDropdown from "./CompaniesDropdown";
 import { DisplayCompany } from "./CompaniesTable";
 import HistoryTable from "./HistoryTable";
 import Comment from "./Comment";
+import FundsAutoComplete from "./FundsAutoComplete";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -51,21 +52,23 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
             return <> {this.findFund(tableData.rowData.fundID)} </>;
           }
 
-          if (tableData.rowData.fundID) {
-            this.state.selectedFundID = tableData.rowData.fundID;
-          } else {
-            this.state.selectedFundID = this.state.funds.length > 0 ? this.state.funds[0].id : -1;
-            // this.setState({ selectedFundID: this.state.funds.length > 0 ? this.state.funds[0].id : -1 });
-          }
+          // if (tableData.rowData.fundID) {
+          //   this.state.selectedFundID = tableData.rowData.fundID;
+          // }
+          // else {
+          this.state.selectedFundID = this.state.funds.length > 0 ? this.state.funds[0].id : -1;
+          // this.setState({ selectedFundID: this.state.funds.length > 0 ? this.state.funds[0].id : -1 });
+          // }
 
           return (
-            <FundsDropdown
-              fundsList={this.state.funds}
-              onSelect={(newFundID: number) => {
-                this.setState({ selectedFundID: newFundID });
-              }}
-              initialFundID={this.state.selectedFundID}
-            />
+            // <FundsDropdown
+            //   fundsList={this.state.funds}
+            //   onSelect={(newFundID: number) => {
+            //     this.setState({ selectedFundID: newFundID });
+            //   }}
+            //   initialFundID={this.state.selectedFundID}
+            // />
+            <FundsAutoComplete />
           );
         },
         render: (rowData) => {
