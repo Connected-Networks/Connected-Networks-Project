@@ -12,6 +12,7 @@ import Comment from "./Comment";
 import FundsAutoComplete from "./FundsAutoComplete";
 import CompaniesAutoComplete from "./CompaniesAutoComplete";
 import HyperlinkArea from "./HyperlinkArea";
+import { TablePagination } from "@material-ui/core";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -64,7 +65,11 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
         field: "name",
         render: (rowData) => {
           if (rowData.hyperlink) {
-            return <a href={rowData.hyperlink}>{rowData.name}</a>;
+            return (
+              <a href={rowData.hyperlink} target="_blank">
+                {rowData.name}
+              </a>
+            );
           }
           return rowData.name;
         },
@@ -300,6 +305,16 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
             onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
             options={{
               actionsColumnIndex: -1,
+            }}
+            components={{
+              Pagination: (props) => {
+                console.log(props);
+                let propsToPass = {
+                  ...props,
+                  rowsPerPageOptions: [5, 10, 25, 50, { label: "All", value: this.state.data.length }],
+                };
+                return <TablePagination {...propsToPass} />;
+              },
             }}
           />
         </Container>

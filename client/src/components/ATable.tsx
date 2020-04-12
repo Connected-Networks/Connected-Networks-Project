@@ -3,6 +3,7 @@ import MaterialTable, { Column, Action, DetailPanel, Components } from "material
 import styled from "styled-components";
 import EditableObject from "./EditableObject";
 import axios from "axios";
+import { TablePagination } from "@material-ui/core";
 
 export interface TableState<T extends Object> {
   data: T[];
@@ -60,7 +61,19 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
             editable={this.editableObject}
             title={this.name}
             actions={this.actions}
-            components={this.components}
+            components={
+              (this.components,
+              {
+                Pagination: (props) => {
+                  console.log(props);
+                  let propsToPass = {
+                    ...props,
+                    rowsPerPageOptions: [5, 10, 25, 50, { label: "All", value: this.state.data.length }],
+                  };
+                  return <TablePagination {...propsToPass} />;
+                },
+              })
+            }
             detailPanel={this.getDetailPanel}
             onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
             options={{
