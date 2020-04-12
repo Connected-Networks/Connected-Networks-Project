@@ -69,7 +69,7 @@ export default class ParsingController {
     try {
       let name: String = entry["name"];
       if (name.length < 1) {
-        return;
+        return false;
       }
       let firstCompany = entry["portfolio company"];
       let firstPosition = entry["portfolio company position"];

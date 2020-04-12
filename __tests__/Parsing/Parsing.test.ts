@@ -159,9 +159,52 @@ describe("call_from_csv_line", () => {
     const mock_insert_from_csv = jest.spyOn(database, "insertFromCsvLine").mockResolvedValue(mockIndividualID);
     const mock_process_quarter = jest.spyOn(ParsingController, "processQuarter").mockResolvedValue();
 
-    let result = ParsingController.call_from_csv_line(mockEntry, mockFundID, mockUserID, mockYear);
+    let result = await ParsingController.call_from_csv_line(mockEntry, mockFundID, mockUserID, mockYear);
     expect(mock_insert_from_csv).toBeCalledTimes(1);
     expect(mock_process_quarter).toBeCalledTimes(4);
     expect(result).toEqual(true);
+  });
+
+  it("should return false immediately if name is empty", async () => {
+    const mockUserID = "123";
+    const mockFundID = "1234";
+    const mockIndividualID = "12345";
+    const mockYear = 2020;
+
+    const mockEntry = { name: "" };
+    const mock_insert_from_csv = jest.spyOn(database, "insertFromCsvLine").mockResolvedValue(mockIndividualID);
+    let result = await ParsingController.call_from_csv_line(mockEntry, mockFundID, mockUserID, mockYear);
+    expect(mock_insert_from_csv).toBeCalledTimes(0);
+    expect(result).toEqual(false);
+  });
+
+  it("should return false immediately if insertFromCSV throws an error", async () => {
+    const mockUserID = "123";
+    const mockFundID = "1234";
+    const mockIndividualID = "12345";
+    const mockYear = 2020;
+
+    const mockEntry = {
+      "portfolio company": "Mock Company",
+      name: "John Smith",
+      "portfolio company position": "worker",
+      "employment term": "June-Aug 2019",
+      "new employer": "Mock New Employer",
+      "new position": "Mock New Position",
+      "hyperlink url": "www.com",
+      "q1 2019": "job at place",
+      "q2 2019": "job, place",
+      "q3 2019": "",
+      "q4 2019": "",
+      comments: "",
+    };
+
+    const mock_insert_from_csv = jest.spyOn(database, "insertFromCsvLine").mockRejectedValue(null);
+    const mock_process_quarter = jest.spyOn(ParsingController, "processQuarter").mockResolvedValue();
+
+    let result = await ParsingController.call_from_csv_line(mockEntry, mockFundID, mockUserID, mockYear);
+
+    expect(mock_insert_from_csv).toBeCalledTimes(1);
+    expect(result).toEqual(false);
   });
 });
