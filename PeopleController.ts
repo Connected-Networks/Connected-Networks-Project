@@ -10,6 +10,7 @@ export interface DisplayPerson {
   position: string;
   comment: string;
   hyperlink: string;
+  lastChanged?: string;
 }
 
 export default class PeopleController {
@@ -44,6 +45,7 @@ export default class PeopleController {
       position: "",
       hyperlink: individual.LinkedInUrl,
       comment: individual.Comments,
+      lastChanged: employment.StartDate,
     };
 
     if (employment != null) {

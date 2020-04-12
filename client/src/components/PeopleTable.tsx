@@ -40,6 +40,7 @@ export interface DisplayPerson {
   position: string;
   comment: string;
   hyperlink: string;
+  lastChanged: string;
 }
 
 export default class PeopleTable extends React.Component<PeopleTableProps, PeopleTableState> {
@@ -97,6 +98,19 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
         },
       },
       { title: "Position", field: "position" },
+      {
+        title: "Last Changed",
+        field: "lastChanged",
+        editable: "never",
+        render: (rowData) => {
+          const today = new Date();
+          const dayOfLastChange = new Date(rowData.lastChanged);
+          if (Math.abs(today.getDate() - dayOfLastChange.getDate()) <= 8) {
+            return <b style={{ color: "orange" }}> {rowData.lastChanged}</b>;
+          }
+          return rowData.lastChanged;
+        },
+      },
     ],
     funds: [],
     selectedFundID: undefined,
