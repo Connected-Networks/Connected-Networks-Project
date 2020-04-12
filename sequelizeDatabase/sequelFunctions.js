@@ -600,7 +600,7 @@ retrieveCompanyByName = async (companyName, fundID) => {
 
 retrieveCompanyByID = (companyID) => {
   return new Promise((resolve, reject) => {
-    models.Companies.find({
+    models.Companies.findOne({
       where: {
         CompanyID: companyID,
       },

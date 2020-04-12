@@ -3,17 +3,15 @@ import axios from "axios";
 import { TextField } from "@material-ui/core";
 import { DisplayPerson } from "./PeopleTable";
 
-export interface CommentProps {
+export interface HyperlinkAreaProps {
   person: DisplayPerson;
 }
 
-export interface CommentState {}
-
-export default function Comment(props: CommentProps) {
-  const [commentText, setCommentText] = React.useState<string>(props.person.comment);
+export default function HyperlinkArea(props: HyperlinkAreaProps) {
+  const [hyperlinkText, setHyperlinkText] = React.useState<string>(props.person.hyperlink);
 
   const updateCommentInServer = async () => {
-    props.person.comment = commentText;
+    props.person.hyperlink = hyperlinkText;
     try {
       await axios.put("/people", { newData: props.person });
     } catch (error) {
@@ -23,14 +21,10 @@ export default function Comment(props: CommentProps) {
 
   return (
     <TextField
-      label="Comment"
-      multiline
-      rows={1}
-      rowsMax={7}
-      fullWidth
-      value={commentText}
+      label="LinkedIn URL"
+      value={hyperlinkText}
       onChange={(event) => {
-        setCommentText(event.target.value);
+        setHyperlinkText(event.target.value);
       }}
       inputProps={{
         onBlur: () => {

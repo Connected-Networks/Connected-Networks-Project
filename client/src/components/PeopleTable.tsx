@@ -11,12 +11,15 @@ import HistoryTable from "./HistoryTable";
 import Comment from "./Comment";
 import FundsAutoComplete from "./FundsAutoComplete";
 import CompaniesAutoComplete from "./CompaniesAutoComplete";
+import HyperlinkArea from "./HyperlinkArea";
 
 interface PeopleTableState {
   data: DisplayPerson[];
   columns: Array<Column<DisplayPerson>>;
   funds: DisplayFund[];
   selectedFundID?: number;
+  selectedCompanyID?: number;
+  selectedCompany?: string;
   dialog?: JSX.Element;
 }
 
@@ -56,7 +59,16 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
         },
         render: (rowData) => (rowData ? this.findFund(rowData.fundID) : "Fund does not exist"),
       },
-      { title: "Name", field: "name" },
+      {
+        title: "Name",
+        field: "name",
+        render: (rowData) => {
+          if (rowData.hyperlink) {
+            return <a href={rowData.hyperlink}>{rowData.name}</a>;
+          }
+          return rowData.name;
+        },
+      },
       {
         title: "Company",
         field: "company",
@@ -66,7 +78,14 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
           }
 
           if (this.state.selectedFundID) {
-            return <CompaniesAutoComplete fundID={this.state.selectedFundID} />;
+            return (
+              <CompaniesAutoComplete
+                fundID={this.state.selectedFundID}
+                handleSelectCompany={(selectedCompanyID: number, selectedCompany: string) =>
+                  this.setState({ selectedCompanyID, selectedCompany })
+                }
+              />
+            );
           }
 
           return <> No fund selected </>;
@@ -109,7 +128,8 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
     | Array<DetailPanel<DisplayPerson> | ((rowData: DisplayPerson) => DetailPanel<DisplayPerson>)>
     | undefined = (rowData: DisplayPerson) => {
     return (
-      <div style={{ marginLeft: "60px" }}>
+      <div style={{ marginLeft: "60px", borderLeft: "1px solid lightgrey" }}>
+        <HyperlinkArea person={rowData} />
         <Comment person={rowData} />
         <HistoryTable person={rowData} />
       </div>
@@ -157,7 +177,7 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   updatePersonOnServer = async (newData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       axios
-        .put("/people", { newData: { ...newData, hyperlink: "" } })
+        .put("/people", { newData: { ...newData } })
         .then((response) => {
           if (response.status === 200) {
             resolve();
@@ -173,6 +193,8 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
 
   addRow = async (newData: DisplayPerson): Promise<void> => {
     newData.fundID = this.state.selectedFundID!;
+    newData.companyID = this.state.selectedCompanyID!;
+    newData.company = this.state.selectedCompany!;
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
@@ -189,7 +211,7 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   addPersonOnServer = async (newData: DisplayPerson) => {
     return new Promise((resolve, reject) => {
       axios
-        .post(`/people`, { newData: { ...newData, hyperlink: "hi" } })
+        .post(`/people`, { newData: { ...newData, hyperlink: "" } })
         .then((response) => {
           if (response.status === 200) {
             this.refreshTable();

@@ -5,6 +5,7 @@ import { TextField, Dialog, DialogTitle, DialogContent, DialogContentText, Dialo
 
 export interface CompaniesAutoCompleteProps {
   fundID: number;
+  handleSelectCompany: Function;
 }
 
 export interface CompaniesAutoCompleteState {
@@ -66,12 +67,15 @@ export default class CompaniesAutoComplete extends React.Component<CompaniesAuto
 
   handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    this.addNewFundToServer();
+    this.addNewCompanyToServer();
   };
 
-  addNewFundToServer = async () => {
+  addNewCompanyToServer = async () => {
     try {
-      const response = await Axios.post("/funds", { newData: this.state.dialogValue.name });
+      const response = await Axios.post("/company", {
+        newData: { name: this.state.dialogValue.name, fundID: this.props.fundID },
+      });
+
       this.loadCompanies();
       this.handleClose();
     } catch (error) {
@@ -100,6 +104,11 @@ export default class CompaniesAutoComplete extends React.Component<CompaniesAuto
             }
 
             this.setState({ value: newValue });
+            if (newValue) {
+              this.props.handleSelectCompany(newValue.id, newValue.name);
+            } else {
+              this.props.handleSelectCompany(undefined, undefined);
+            }
           }}
           filterOptions={(options, params) => {
             const filtered = this.filter(options, params) as CompanyOptionType[];

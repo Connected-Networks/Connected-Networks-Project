@@ -1,3 +1,5 @@
+import HistoryController from "./HistoryController";
+
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 export interface DisplayPerson {
@@ -174,10 +176,20 @@ export default class PeopleController {
       }
 
       console.log("\n\n" + JSON.stringify(person) + "\n\n");
-      await database.insertPerson(person.fundID, person.name, person.hyperlink, person.comment);
+      const insertedPerson = await database.insertPerson(person.fundID, person.name, person.hyperlink, person.comment);
+
+      const today = new Date();
+      const history = {
+        company: person.company,
+        position: person.position,
+        start: today,
+      };
+
+      await HistoryController.addHistoryToDatabase(history, { ...person, id: insertedPerson.IndividualID }, userID);
 
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
