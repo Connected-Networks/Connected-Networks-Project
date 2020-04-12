@@ -2,6 +2,8 @@ import EditableObject from "./EditableObject";
 import axios from "axios";
 import ATable from "./ATable";
 import { DisplayPerson } from "./PeopleTable";
+import CompaniesAutoComplete from "./CompaniesAutoComplete";
+import React from "react";
 
 interface TableProps {
   person: DisplayPerson;
@@ -19,7 +21,24 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
   state = {
     data: [],
     columns: [
-      { title: "Company", field: "company" },
+      {
+        title: "Company",
+        field: "company",
+        editComponent: (tableData: any) => {
+          if (tableData.rowData.id) {
+            return tableData.rowData.company;
+          }
+
+          return (
+            <CompaniesAutoComplete
+              fundID={this.props.person.fundID}
+              handleSelectCompany={(selectedID: number, selectedCompany: string) => {
+                tableData.rowData.company = selectedCompany;
+              }}
+            />
+          );
+        },
+      },
       { title: "Current Position", field: "position" },
       { title: "Start date", field: "start" },
       { title: "End date", field: "end" },
