@@ -93,7 +93,7 @@ export default class PeopleController {
 
   static async getPeopleByOriginalCompany(req, res) {
     try {
-      let companyID = req.params.id;
+      let companyID = req.params.companyID;
       let userID = req.user.UserID;
 
       if (!(await PeopleController.userSeesCompany(userID, companyID))) {
@@ -101,13 +101,16 @@ export default class PeopleController {
         res.sendStatus(401);
         return;
       }
+
       const people = await PeopleController.getPeopleByOriginalCompanyFromDatabase(companyID);
+      console.log(people);
       if (!people) {
         res.sendStatus(500);
       } else {
         res.send({ data: people });
       }
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -119,14 +122,14 @@ export default class PeopleController {
 
     return people.map((entry) => {
       let displayPerson: DisplayPerson = {
-        id: entry.Individual.IndividualID,
-        fundID: entry.Individual.FundID,
-        name: entry.Individual.Name,
+        id: entry.individual.IndividualID,
+        fundID: entry.individual.FundID,
+        name: entry.individual.Name,
         //should not be needed. If it ever is, the db function could easily be edited to include companies table, at the cost of running time.
         company: null,
         position: entry.PositionName,
-        comment: entry.Individual.Comments,
-        hyperlink: entry.Individual.LinkedInUrl,
+        comment: entry.individual.Comments,
+        hyperlink: entry.individual.LinkedInUrl,
       };
       return displayPerson;
     });
@@ -167,8 +170,6 @@ export default class PeopleController {
       let userID = req.user.UserID;
       let fundID = person.fundID;
 
-      console.log(person);
-
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add an individual to that fund");
         res.sendStatus(401);
@@ -177,6 +178,10 @@ export default class PeopleController {
 
       console.log("\n\n" + JSON.stringify(person) + "\n\n");
       const insertedPerson = await database.insertPerson(person.fundID, person.name, person.hyperlink, person.comment);
+
+      console.log("\n\n" + JSON.stringify(insertedPerson) + "\n\n");
+
+      await database.insertOriginalFundPosition(insertedPerson.IndividualID, person.companyID, person.position);
 
       const today = new Date();
       const history = {
@@ -200,6 +205,8 @@ export default class PeopleController {
       let userID = req.user.UserID;
       let fundID = (await database.retrieveIndividualByID(personID)).FundID;
 
+      console.log(personID);
+
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("User cannot delete the individual");
         res.sendStatus(401);
@@ -208,6 +215,7 @@ export default class PeopleController {
       await database.deleteIndividual(personID);
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }

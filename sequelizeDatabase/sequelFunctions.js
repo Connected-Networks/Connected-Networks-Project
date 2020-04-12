@@ -157,21 +157,14 @@ insertSharedFunds = (FundID, UserID) => {
     .catch((err) => console.error('Error in "insertSharedFunds", ', err));
 };
 
-insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
-  return models.Individuals.findOrCreate({
-    where: { LinkedInUrl: LinkedInUrl, FundID: FundID },
-    defaults: {
-      Name: Name,
-      Comments: Comments,
-    },
-  })
-    .spread((user, createdBoolean) => {
-      return user;
-    })
-    .catch((err) => {
-      console.error("Error in insertPerson", err);
-      throw err;
-    });
+insertPerson = async (FundID, Name, LinkedInUrl, Comments) => {
+  const insertedPerson = await models.Individuals.create({
+    LinkedInUrl: LinkedInUrl,
+    FundID: FundID,
+    Name: Name,
+    Comments: Comments,
+  });
+  return insertedPerson;
 };
 
 insertCompany = (companyName, fundID) => {
@@ -371,12 +364,6 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
 };
 
 deleteIndividual = (IndividualID) => {
-  // I can't get the delete for an individual to in turn
-  //   delete rows from EmployeeHistory, so I'm doing
-  //   this the long way until I can ask about Sequelize
-  //   Cascade. --Sean
-  //
-  // Modfying this to avoid a race condition -- Aaron
   return new Promise((resolve, reject) => {
     models.Individuals.destroy({
       where: {
@@ -388,7 +375,7 @@ deleteIndividual = (IndividualID) => {
         resolve(deletedIndividual);
       })
       .catch((err) => {
-        console.err("\n\n-->Error in deleteIndividual: ", err);
+        console.error("\n\n-->Error in deleteIndividual: ", err);
         reject(err);
       });
   });
@@ -749,4 +736,5 @@ module.exports = {
   insertSharedFunds,
   getAllSharedFunds,
   insertQuarterEmployment,
+  insertOriginalFundPosition,
 };

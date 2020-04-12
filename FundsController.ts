@@ -127,7 +127,7 @@ export default class FundsController {
     try {
       let fundID = req.body.fundId;
       let user = req.body.user;
-      await database.sharefund(fundID, user.UserID);
+      await database.sharefund(fundID, user.id);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
