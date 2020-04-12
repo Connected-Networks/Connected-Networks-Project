@@ -4,6 +4,9 @@ import ATable from "./ATable";
 import { DisplayPerson } from "./PeopleTable";
 import CompaniesAutoComplete from "./CompaniesAutoComplete";
 import React from "react";
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
+import "date-fns";
+import DateFnsUtils from "@date-io/date-fns";
 
 interface TableProps {
   person: DisplayPerson;
@@ -40,8 +43,40 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
         },
       },
       { title: "Current Position", field: "position" },
-      { title: "Start date", field: "start" },
-      { title: "End date", field: "end" },
+      {
+        title: "Start date",
+        field: "start",
+        editComponent: (tableData: any) => {
+          let currentDate;
+          if (tableData.rowData && tableData.rowData.start) {
+            currentDate = tableData.rowData.start;
+          } else {
+            currentDate = new Date();
+          }
+
+          return this.getDatePicker(currentDate, (newDate: Date, value: any) => {
+            console.log(value);
+            tableData.rowData.start = newDate.toString();
+          });
+        },
+      },
+      {
+        title: "End date",
+        field: "end",
+        editComponent: (tableData: any) => {
+          let currentDate;
+          if (tableData.rowData && tableData.rowData.end) {
+            currentDate = tableData.rowData.end;
+          } else {
+            currentDate = new Date();
+          }
+
+          return this.getDatePicker(currentDate, (newDate: Date, value: any) => {
+            console.log(value);
+            tableData.rowData.end = newDate.toString();
+          });
+        },
+      },
     ],
   };
 
@@ -60,6 +95,26 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
       onRowAdd: this.addRow,
     };
   }
+
+  getDatePicker = (selectedDate: Date, handleDateChange: any) => {
+    return (
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <KeyboardDatePicker
+          disableToolbar
+          variant="inline"
+          format="yyyy-MM-dd"
+          margin="normal"
+          id="date-picker-inline"
+          label="Date picker inline"
+          value={selectedDate}
+          onChange={handleDateChange}
+          KeyboardButtonProps={{
+            "aria-label": "change date",
+          }}
+        />
+      </MuiPickersUtilsProvider>
+    );
+  };
 
   updateRow = async (newData: DisplayHistory, oldData?: DisplayHistory | undefined): Promise<void> => {
     if (oldData) {

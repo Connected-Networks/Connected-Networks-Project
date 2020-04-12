@@ -1,12 +1,8 @@
 import axios from "axios";
-import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import React, { ReactNode } from "react";
 import MaterialTable, { Column, DetailPanel } from "material-table";
 import styled from "styled-components";
-import FundsDropdown from "./FundsDropdown";
-import CompaniesDropdown from "./CompaniesDropdown";
-import { DisplayCompany } from "./CompaniesTable";
 import HistoryTable from "./HistoryTable";
 import Comment from "./Comment";
 import FundsAutoComplete from "./FundsAutoComplete";
