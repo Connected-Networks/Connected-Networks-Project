@@ -3,41 +3,47 @@ import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete
 import Axios from "axios";
 import { TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
 
-export interface FundsAutoCompleteProps {
-  handleSelectFund: Function;
+export interface CompaniesAutoCompleteProps {
+  fundID: number;
 }
 
-export interface FundsAutoCompleteState {
-  value: FundOptionType | null;
+export interface CompaniesAutoCompleteState {
+  value: CompanyOptionType | null;
   openDialog: boolean;
-  dialogValue: FundOptionType;
-  funds: FundOptionType[];
+  dialogValue: CompanyOptionType;
+  companies: CompanyOptionType[];
 }
 
-interface FundOptionType {
+interface CompanyOptionType {
   inputValue?: string;
   name: string;
   id?: number;
 }
 
-export default class FundsAutoComplete extends React.Component<FundsAutoCompleteProps, FundsAutoCompleteState> {
-  filter = createFilterOptions<FundOptionType>();
+export default class CompaniesAutoComplete extends React.Component<CompaniesAutoCompleteProps, CompaniesAutoCompleteState> {
+  filter = createFilterOptions<CompanyOptionType>();
 
-  state: FundsAutoCompleteState = {
+  state: CompaniesAutoCompleteState = {
     value: null,
     openDialog: false,
     dialogValue: { name: "" },
-    funds: [],
+    companies: [],
   };
 
   componentDidMount() {
-    this.loadFunds();
+    this.loadCompanies();
   }
 
-  loadFunds = async () => {
+  componentDidUpdate(prevProps: CompaniesAutoCompleteProps) {
+    if (this.props.fundID !== prevProps.fundID) {
+      this.loadCompanies();
+    }
+  }
+
+  loadCompanies = async () => {
     try {
-      const response = await Axios.get("/funds");
-      this.setState({ funds: response.data.data });
+      const response = await Axios.get("/funds/" + this.props.fundID);
+      this.setState({ companies: response.data.data, value: null });
     } catch (error) {
       console.error(error);
     }
@@ -47,7 +53,7 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
     this.setState({ openDialog: open });
   };
 
-  setDialogValue = (fund: FundOptionType) => {
+  setDialogValue = (fund: CompanyOptionType) => {
     this.setState({ value: fund });
   };
 
@@ -66,7 +72,7 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
   addNewFundToServer = async () => {
     try {
       const response = await Axios.post("/funds", { newData: this.state.dialogValue.name });
-      this.loadFunds();
+      this.loadCompanies();
       this.handleClose();
     } catch (error) {
       console.error(error);
@@ -82,7 +88,7 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
       <>
         <Autocomplete
           value={this.state.value}
-          onChange={(event: any, newValue: FundOptionType | null) => {
+          onChange={(event: any, newValue: CompanyOptionType | null) => {
             if (typeof newValue === "string") {
               this.openDialog(newValue);
               return;
@@ -94,14 +100,9 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
             }
 
             this.setState({ value: newValue });
-            if (newValue) {
-              this.props.handleSelectFund(newValue.id);
-            } else {
-              this.props.handleSelectFund(undefined);
-            }
           }}
           filterOptions={(options, params) => {
-            const filtered = this.filter(options, params) as FundOptionType[];
+            const filtered = this.filter(options, params) as CompanyOptionType[];
 
             if (params.inputValue !== "") {
               filtered.push({
@@ -112,7 +113,7 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
 
             return filtered;
           }}
-          options={this.state.funds}
+          options={this.state.companies}
           getOptionLabel={(option) => {
             // e.g value selected with enter, right from the input
             if (typeof option === "string") {
@@ -125,19 +126,19 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
           }}
           renderOption={(option) => option.name}
           style={{ width: "100%" }}
-          renderInput={(params) => <TextField {...params} label="Fund" variant="outlined" style={{ width: "90%" }} />}
+          renderInput={(params) => <TextField {...params} label="Company" variant="outlined" style={{ width: "90%" }} />}
         />
         <Dialog open={this.state.openDialog} onClose={this.handleClose}>
           <form onSubmit={this.handleSubmit}>
-            <DialogTitle>Add a new Fund</DialogTitle>
+            <DialogTitle>Add a new Company</DialogTitle>
             <DialogContent>
-              <DialogContentText>Please type in the name of the fund to add</DialogContentText>
+              <DialogContentText>Please type in the name of the company to add</DialogContentText>
               <TextField
                 autoFocus
                 margin="dense"
                 value={this.state.dialogValue.name}
                 onChange={(event) => this.setState({ dialogValue: { ...this.state.dialogValue, name: event.target.value } })}
-                label="New Fund Name"
+                label="New Company Name"
                 type="text"
               />
             </DialogContent>

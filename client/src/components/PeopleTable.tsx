@@ -10,12 +10,13 @@ import { DisplayCompany } from "./CompaniesTable";
 import HistoryTable from "./HistoryTable";
 import Comment from "./Comment";
 import FundsAutoComplete from "./FundsAutoComplete";
+import CompaniesAutoComplete from "./CompaniesAutoComplete";
 
 interface PeopleTableState {
   data: DisplayPerson[];
   columns: Array<Column<DisplayPerson>>;
   funds: DisplayFund[];
-  selectedFundID: number;
+  selectedFundID?: number;
   dialog?: JSX.Element;
 }
 
@@ -48,60 +49,33 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
         title: "Fund",
         field: "fundID",
         editComponent: (tableData) => {
-          if (tableData.rowData.fundID && tableData.rowData.company) {
+          if (tableData.rowData.id) {
             return <> {this.findFund(tableData.rowData.fundID)} </>;
           }
-
-          // if (tableData.rowData.fundID) {
-          //   this.state.selectedFundID = tableData.rowData.fundID;
-          // }
-          // else {
-          this.state.selectedFundID = this.state.funds.length > 0 ? this.state.funds[0].id : -1;
-          // this.setState({ selectedFundID: this.state.funds.length > 0 ? this.state.funds[0].id : -1 });
-          // }
-
-          return (
-            // <FundsDropdown
-            //   fundsList={this.state.funds}
-            //   onSelect={(newFundID: number) => {
-            //     this.setState({ selectedFundID: newFundID });
-            //   }}
-            //   initialFundID={this.state.selectedFundID}
-            // />
-            <FundsAutoComplete />
-          );
+          return <FundsAutoComplete handleSelectFund={(selectedFundID: number) => this.setState({ selectedFundID })} />;
         },
-        render: (rowData) => {
-          return rowData ? this.findFund(rowData.fundID) : " ";
-        },
+        render: (rowData) => (rowData ? this.findFund(rowData.fundID) : "Fund does not exist"),
       },
       { title: "Name", field: "name" },
       {
         title: "Company",
         field: "company",
         editComponent: (tableData) => {
-          let fundID = this.state.selectedFundID;
-
-          if (fundID) {
-            return (
-              <CompaniesDropdown
-                fundID={fundID}
-                companyID={tableData.rowData.companyID}
-                onSelect={(newCompany: DisplayCompany) => {
-                  tableData.rowData.companyID = newCompany.id;
-                  tableData.rowData.company = newCompany.name;
-                }}
-              />
-            );
+          if (tableData.rowData.id) {
+            return <> {tableData.rowData.company} </>;
           }
 
-          return <> No fund available </>;
+          if (this.state.selectedFundID) {
+            return <CompaniesAutoComplete fundID={this.state.selectedFundID} />;
+          }
+
+          return <> No fund selected </>;
         },
       },
       { title: "Position", field: "position" },
     ],
     funds: [],
-    selectedFundID: -1,
+    selectedFundID: undefined,
   };
 
   findFund = (fundID: number): string => {
@@ -198,7 +172,7 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   };
 
   addRow = async (newData: DisplayPerson): Promise<void> => {
-    newData.fundID = this.state.selectedFundID;
+    newData.fundID = this.state.selectedFundID!;
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
