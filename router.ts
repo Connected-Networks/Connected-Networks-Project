@@ -24,6 +24,8 @@ router.post("/csv", ParsingController.handleCsvRequest);
 
 router.get("/people", PeopleController.getPeople);
 
+router.get("/people/recent", PeopleController.getRecentlyChangedPeople);
+
 router.get("/people/:companyID", PeopleController.getPeopleByCompany);
 
 router.get("/people/original/:companyID", PeopleController.getPeopleByOriginalCompany);

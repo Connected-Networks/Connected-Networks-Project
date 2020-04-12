@@ -56,6 +56,28 @@ export default class PeopleController {
     return displayPerson;
   }
 
+  static async getRecentlyChangedPeople(req, res) {
+    try {
+      const userID = req.user.UserID;
+      const people = await PeopleController.getPeopleFromDatabase(userID);
+      const recentPeople = PeopleController.filterRecentPeople(people);
+      res.send({ data: recentPeople });
+    } catch (error) {
+      res.sendStatus(500);
+    }
+  }
+
+  static filterRecentPeople(people: DisplayPerson[]) {
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 8);
+    return people.filter((person) => {
+      const today = new Date();
+      const dayOfLastChange = new Date(person.lastChanged);
+      return today.getDate() >= dayOfLastChange.getDate() && dayOfLastChange.getDate() >= lastWeek.getDate();
+    });
+  }
+
   //retrieve all individuals whose most recent employment was in the specified company
   //Sends a 401 result with null information if user cannot see the company
   static async getPeopleByCompany(req, res) {
