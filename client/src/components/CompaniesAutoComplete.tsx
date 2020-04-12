@@ -91,6 +91,7 @@ export default class CompaniesAutoComplete extends React.Component<CompaniesAuto
     return (
       <>
         <Autocomplete
+          blurOnSelect
           value={this.state.value}
           onChange={(event: any, newValue: CompanyOptionType | null) => {
             if (typeof newValue === "string") {

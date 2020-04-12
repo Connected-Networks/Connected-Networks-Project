@@ -64,7 +64,11 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
         field: "name",
         render: (rowData) => {
           if (rowData.hyperlink) {
-            return <a href={rowData.hyperlink}>{rowData.name}</a>;
+            return (
+              <a href={rowData.hyperlink} target="_blank">
+                {rowData.name}
+              </a>
+            );
           }
           return rowData.name;
         },

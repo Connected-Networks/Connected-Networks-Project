@@ -81,6 +81,7 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
     return (
       <>
         <Autocomplete
+          blurOnSelect
           value={this.state.value}
           onChange={(event: any, newValue: FundOptionType | null) => {
             if (typeof newValue === "string") {
