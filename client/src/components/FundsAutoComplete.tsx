@@ -18,6 +18,7 @@ interface FundOptionType {
   inputValue?: string;
   name: string;
   id?: number;
+  shared?: boolean;
 }
 
 export default class FundsAutoComplete extends React.Component<FundsAutoCompleteProps, FundsAutoCompleteState> {
@@ -37,7 +38,8 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
   loadFunds = async () => {
     try {
       const response = await Axios.get("/funds");
-      this.setState({ funds: response.data.data });
+      const ownedFunds = response.data.data.filter((fund: FundOptionType) => !fund.shared!);
+      this.setState({ funds: ownedFunds });
     } catch (error) {
       console.error(error);
     }
