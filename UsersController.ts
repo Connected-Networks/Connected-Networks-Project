@@ -1,36 +1,31 @@
 const database = require("./sequelizeDatabase/sequelFunctions");
 
-interface SimpleUser {
-  id: number;
-  username: string;
-}
-
 export default class UsersController {
   static async getOtherUsers(req, res) {
-    let userID = req.user.UserID;
-    this.getOtherUsersFromDatabase(userID)
-      .then((users) => {
-        res.json({ users });
-      })
-      .catch((error) => {
-        console.error("An error occurred while retrieving users");
-        console.error(error);
-      });
+    try {
+      let userID = req.user.UserID;
+      const users = await UsersController.getOtherUsersFromDatabase(userID);
+
+      console.log(users);
+
+      res.send({ users });
+    } catch (error) {
+      console.error("An error occurred while retrieving users");
+      console.error(error);
+      res.sendStatus(500);
+    }
   }
 
   static async getOtherUsersFromDatabase(currentUserID) {
-    return new Promise<SimpleUser[]>((resolve, reject) => {
-      database
-        .getAllUsers()
-        .then((users) => {
-          let filteredList = users.filter((user) => {
-            return user.UserID == currentUserID;
-          });
-          resolve(filteredList);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+    const users = await database.getAllUsers();
+    let filteredList = users.filter((user) => {
+      return user.UserID !== currentUserID;
     });
+
+    const mappedUsers = filteredList.map((user) => {
+      return { id: user.UserID, name: user.Username };
+    });
+
+    return mappedUsers;
   }
 }

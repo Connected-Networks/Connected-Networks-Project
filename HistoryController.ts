@@ -16,14 +16,15 @@ export default class HistoryController {
       let individualID = req.params.id;
       let userID = req.user.UserID;
 
-      if (!(await this.userCanSeeIndividual(userID, individualID))) {
+      if (!(await HistoryController.userCanSeeIndividual(userID, individualID))) {
         console.error("User cannot see history of individual " + individualID);
         res.sendStatus(401);
         return;
       }
-      let history = await this.getHistoryFromDatabase(individualID);
+      let history = await HistoryController.getHistoryFromDatabase(individualID);
       res.send({ data: history });
     } catch (error) {
+      console.log(error);
       res.sendStatus(500);
     }
   }
@@ -39,8 +40,8 @@ export default class HistoryController {
 
     return history.map((entry) => {
       let history: DisplayHistory = {
-        id: entry.id,
-        company: entry.Company.CompanyName,
+        id: entry.HistoryID,
+        company: entry.company.CompanyName,
         position: entry.PositionName,
         start: entry.StartDate,
         end: entry.EndDate,
@@ -51,27 +52,33 @@ export default class HistoryController {
 
   static async addHistory(req, res) {
     try {
-      let history = req.body;
+      let history = req.body.newData;
       let userID = req.user.UserID;
-      let individual = req.employee;
+      let individual = req.body.employee;
 
-      if (!(await this.userCanChangeIndividual(userID, individual.individualID))) {
-        console.error("User cannot add history to individual " + individual.IndividualID);
+      if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
+        console.error("User cannot add history to individual " + individual.id);
         res.sendStatus(401);
         return;
       }
-      await this.addHistoryToDatabase(history, individual, userID);
+
+      await HistoryController.addHistoryToDatabase(history, individual, userID);
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
 
   static async addHistoryToDatabase(history, individual, userID) {
-    let fundID = individual.FundID;
+    let fundID = individual.fundID;
     const company = await database.retrieveCompanyByName(history.company, fundID);
 
-    await database.insertEmployeeHistory(userID, history.id, company.CompanyID, history.position, history.start, history.end);
+    if (!company) {
+      throw new Error();
+    }
+
+    await database.insertEmployeeHistory(userID, individual.id, company.CompanyID, history.position, history.start, history.end);
   }
 
   static async userCanChangeIndividual(userID, individualID): Promise<boolean> {
@@ -82,18 +89,21 @@ export default class HistoryController {
 
   static async updateHistory(req, res) {
     try {
-      let history = req.body;
-      let individual = req.employee;
+      let history = req.body.newData;
+      let individual = req.body.employee;
       let userID = req.user.UserID;
 
-      if (!(await this.userCanChangeIndividual(userID, individual.individualID))) {
-        console.error("User cannot edit history of individual " + individual.IndividualID);
+      console.log(history);
+
+      if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
+        console.error("User cannot edit history of individual " + individual.id);
         res.sendStatus(401);
         return;
       }
-      await this.updateHistoryInDatabase(history, individual, userID);
+      await HistoryController.updateHistoryInDatabase(history, individual, userID);
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -102,17 +112,36 @@ export default class HistoryController {
   //This function assumes that the individualID part of employeeHistory may change, but the details about the individual will not be changed here,
   //there is a seperate function for that. Similarly, this function assumes that the companyID may change, but the name of the specified company is not changing.
   static async updateHistoryInDatabase(history, individual, userID) {
-    let fundID = individual.FundID;
+    let fundID = individual.fundID;
     const company = await database.retrieveCompanyByName(history.company, fundID);
 
-    await database.updateHistory(
-      history.HistoryID,
+    await database.updateEmployeeHistory(
+      history.id,
       userID,
-      individual.IndividualID,
+      individual.id,
       company.CompanyID,
       history.position,
       history.start,
       history.end
     );
+  }
+
+  static async deleteHistory(req, res) {
+    try {
+      let historyID = req.params.id;
+      let individual = req.body.employee;
+      let userID = req.user.UserID;
+
+      if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
+        console.error("User cannot edit history of individual " + individual.id);
+        res.sendStatus(401);
+        return;
+      }
+      await database.deleteEmployeeHistory(historyID);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
   }
 }

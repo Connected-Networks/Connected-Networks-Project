@@ -1,12 +1,13 @@
+import axios from "axios";
 import * as React from "react";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import CompanyDetailsTable from "./CompanyDetailsTable";
-import { User } from "../LoginPage";
 import ShareFundDialog from "./ShareFundDialog";
+import AlertDialog from "./AlertDialog";
 
 interface FundTableProps {
-  fundId: string;
+  fundID: number;
   fundName: string;
 }
 
@@ -16,11 +17,10 @@ interface DisplayFundCompany {
 }
 
 export default class FundTable extends ATable<DisplayFundCompany, FundTableProps> {
-  readonly DATA_END_POINT = "/funds/" + this.props.fundId;
-
   state: TableState<DisplayFundCompany> = {
     data: [],
-    columns: [{ title: "Company", field: "name" }]
+    funds: [],
+    columns: [{ title: "Company", field: "name" }],
   };
 
   get name(): string {
@@ -28,45 +28,161 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
   }
 
   get dataEndPoint(): string {
-    return this.DATA_END_POINT;
+    return "/funds/" + this.props.fundID;
   }
 
-  actions = [
-    {
-      icon: "person_add",
-      tooltip: "Share fund",
-      isFreeAction: true,
-      onClick: () => this.showShareDialog()
+  isOwnedByUser = (): boolean => {
+    if (this.state.funds && this.state.funds.length > 0) {
+      const fundOfCompany = this.state.funds.find((fund) => {
+        return fund.id === this.props.fundID;
+      });
+      return fundOfCompany ? !fundOfCompany.shared : false;
     }
-  ];
+    return false;
+  };
+
+  onMount = () => {};
+
+  componentDidUpdate(prevProps: FundTableProps, prevState: TableState<DisplayFundCompany>) {
+    if (this.props.fundID !== prevProps.fundID) {
+      this.setState({ data: [] });
+      this.refreshTable();
+      this.updateActions();
+    }
+
+    if (this.state.funds && this.state.funds.length > 0) {
+      this.updateActions();
+    }
+  }
+
+  updateActions = () => {
+    this.actions = this.isOwnedByUser()
+      ? [
+          {
+            icon: "person_add",
+            tooltip: "Share fund",
+            isFreeAction: true,
+            onClick: () => this.showShareDialog(),
+          },
+          {
+            icon: "delete",
+            tooltip: "Delete fund",
+            isFreeAction: true,
+            onClick: () => this.showDeleteDialog(),
+          },
+        ]
+      : [];
+  };
 
   showShareDialog = () => {
-    this.setState({ dialog: <ShareFundDialog fundId={this.props.fundId} handleClose={this.handleCloseDialog} /> });
+    this.setState({
+      dialog: <ShareFundDialog fundId={this.props.fundID} handleClose={this.handleCloseDialog} />,
+    });
+  };
+
+  showDeleteDialog = () => {
+    this.setState({
+      dialog: (
+        <AlertDialog
+          title={"Delete this fund?"}
+          description={`This action is permanent. Are you sure you want to delete the fund ${this.props.fundName}?`}
+          agreeOptionText={"Delete"}
+          handleAgreeOption={this.deleteFund}
+          handleClose={this.handleCloseDialog}
+        />
+      ),
+    });
   };
 
   get editableObject(): EditableObject<DisplayFundCompany> {
-    return {
-      onRowAdd: this.addRow,
-      onRowUpdate: this.updateRow,
-      onRowDelete: this.deleteRow
-    };
+    if (this.isOwnedByUser()) {
+      return {
+        onRowAdd: this.addRow,
+        onRowUpdate: this.updateRow,
+        onRowDelete: this.deleteRow,
+      };
+    }
+    return {};
   }
+
+  deleteFund = () => {
+    axios
+      .delete(`/funds/${this.props.fundID}`)
+      .then((response) => {
+        window.location.reload(false);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
   addRow = async (newData: DisplayFundCompany): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
-      resolve();
+      axios
+        .post(`/company`, {
+          newData: { ...newData, fundID: this.props.fundID },
+        })
+        .then((response) => {
+          console.log({ ...newData, fundID: this.props.fundID });
+          console.log(this.props.fundID);
+
+          if (response.status === 200) {
+            this.refreshTable();
+            resolve();
+          } else if (response.status === 401) {
+            console.error("User does not have permission to edit this fund.");
+          } else {
+            this.refreshTable();
+            reject();
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
   };
 
   updateRow = async (newData: DisplayFundCompany, oldData?: DisplayFundCompany | undefined): Promise<void> => {
-    return new Promise(resolve => {
-      resolve();
+    return new Promise<void>((resolve, reject) => {
+      axios
+        .put(`/company`, {
+          newData: { ...newData, fundID: this.props.fundID },
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            this.refreshTable();
+            resolve();
+          } else if (response.status === 401) {
+            console.error("User does not have permission to edit this fund.");
+          } else {
+            this.refreshTable();
+            reject();
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
   };
 
   deleteRow = async (oldData: DisplayFundCompany): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      resolve();
+    return new Promise<void>((resolve, reject) => {
+      axios
+        .delete(`/company/${oldData.id}`)
+        .then((response) => {
+          if (response.status === 200) {
+            this.refreshTable();
+            resolve();
+          } else if (response.status === 401) {
+            console.error("User does not have permission to delete in this fund.");
+          } else {
+            this.refreshTable();
+            reject();
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
   };
 

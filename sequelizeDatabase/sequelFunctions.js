@@ -157,21 +157,14 @@ insertSharedFunds = (FundID, UserID) => {
     .catch((err) => console.error('Error in "insertSharedFunds", ', err));
 };
 
-insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
-  return models.Individuals.findOrCreate({
-    where: { LinkedInUrl: LinkedInUrl, FundID: FundID },
-    defaults: {
-      Name: Name,
-      Comments: Comments,
-    },
-  })
-    .spread((user, createdBoolean) => {
-      return user;
-    })
-    .catch((err) => {
-      console.error("Error in insertPerson", err);
-      throw err;
-    });
+insertPerson = async (FundID, Name, LinkedInUrl, Comments) => {
+  const insertedPerson = await models.Individuals.create({
+    LinkedInUrl: LinkedInUrl,
+    FundID: FundID,
+    Name: Name,
+    Comments: Comments,
+  });
+  return insertedPerson;
 };
 
 insertCompany = (companyName, fundID) => {
@@ -213,7 +206,10 @@ insertEmployeeHistory = (UserID, IndividualID, CompanyID, PositionName, StartDat
       //console.log('History Added: ', history);
       return history;
     })
-    .catch((err) => console.error("Error in insertEmployeeHistory", err));
+    .catch((err) => {
+      console.error("Error in insertEmployeeHistory", err);
+      throw err;
+    });
 };
 
 updateEmployeeHistory = (historyID, userID, individualID, companyID, positionName, startDate, endDate) => {
@@ -368,12 +364,6 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
 };
 
 deleteIndividual = (IndividualID) => {
-  // I can't get the delete for an individual to in turn
-  //   delete rows from EmployeeHistory, so I'm doing
-  //   this the long way until I can ask about Sequelize
-  //   Cascade. --Sean
-  //
-  // Modfying this to avoid a race condition -- Aaron
   return new Promise((resolve, reject) => {
     models.Individuals.destroy({
       where: {
@@ -385,7 +375,7 @@ deleteIndividual = (IndividualID) => {
         resolve(deletedIndividual);
       })
       .catch((err) => {
-        console.err("\n\n-->Error in deleteIndividual: ", err);
+        console.error("\n\n-->Error in deleteIndividual: ", err);
         reject(err);
       });
   });
@@ -553,8 +543,8 @@ retrieveIndividualsByOriginalCompany = (companyID) => {
     ],
   });
 };
-retrieveIndividualByID = (individualID) => {
-  return models.Individuals.findAll({
+retrieveIndividualByID = async (individualID) => {
+  return await models.Individuals.findOne({
     where: { IndividualID: individualID },
   });
 };
@@ -586,26 +576,18 @@ sharefund = (fundID, userID) => {
 };
 
 //Assumes company names are unique in a fund, or companies in the same fund with the same name are substitutable
-retrieveCompanyByName = (companyName, fundID) => {
-  return new Promise((resolve, reject) => {
-    models.Companies.find({
-      where: {
-        FundID: fundID,
-        CompanyName: companyName,
-      },
-    })
-      .then((result) => {
-        resolve(result);
-      })
-      .catch((error) => {
-        reject(error);
-      });
+retrieveCompanyByName = async (companyName, fundID) => {
+  return await models.Companies.findOne({
+    where: {
+      FundID: fundID,
+      CompanyName: companyName,
+    },
   });
 };
 
 retrieveCompanyByID = (companyID) => {
   return new Promise((resolve, reject) => {
-    models.Companies.find({
+    models.Companies.findOne({
       where: {
         CompanyID: companyID,
       },
@@ -705,6 +687,21 @@ getAllUsersRelatedToFund = async (FundID) => {
   return await models.User.findAll({ where: { UserID: allFundUsersIds } });
 };
 
+getSharedWithUsers = async (FundID) => {
+  const sharedWithIds = (await models.SharedFunds.findAll({ where: { FundID } })).map((sharedFund) => sharedFund.UserID);
+  return await models.User.findAll({ where: { UserID: sharedWithIds } });
+};
+
+getFundsOwnedByUser = async (UserID) => {
+  return models.Funds.findAll({ where: { UserID } });
+};
+
+getFundsSharedWithUser = async (UserID) => {
+  const sharedFundsIDs = await models.SharedFunds.findAll({ where: { UserID } }).map((sharedFund) => sharedFund.FundID);
+
+  return models.Funds.findAll({ where: { FundID: sharedFundsIDs } });
+};
+
 module.exports = {
   getAllUsers,
   getAllIndividuals,
@@ -753,4 +750,8 @@ module.exports = {
   insertSharedFunds,
   getAllSharedFunds,
   insertQuarterEmployment,
+  insertOriginalFundPosition,
+  getSharedWithUsers,
+  getFundsOwnedByUser,
+  getFundsSharedWithUser,
 };

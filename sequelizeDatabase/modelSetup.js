@@ -2,23 +2,23 @@ const Sequelize = require("sequelize");
 let result = require("dotenv").config();
 
 const sequelize = new Sequelize(process.env.DATABASE, process.env.USER, process.env.PASSWORD, {
-  //logging: false,
   host: process.env.HOST,
   dialect: "mysql",
   define: {
-    freezeTableName: true
-  }
+    freezeTableName: true,
+  },
+  logging: false,
 });
 
 //Temp until we find a better way
 //TODO: find a better way
-sequelize.connect = function() {
+sequelize.connect = function () {
   sequelize
     .authenticate()
     .then(() => {
       console.log("Connection has been established successfully.");
     })
-    .catch(err => {
+    .catch((err) => {
       console.error("Unable to connect to the database:", err);
     });
 };
@@ -30,23 +30,23 @@ const User = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     Username: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     Password: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     Email: {
       type: Sequelize.STRING,
-      allowNull: false
-    }
+      allowNull: false,
+    },
   },
   {
-    timestamps: false
+    timestamps: false,
   }
 );
 
@@ -57,23 +57,23 @@ const Funds = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     FundName: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     UserID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: User,
-        key: "UserID"
-      }
-    }
+        key: "UserID",
+      },
+    },
   },
   {
     //Options
-    timestamps: false
+    timestamps: false,
   }
 );
 
@@ -88,29 +88,29 @@ const Individuals = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     FundID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: Funds,
-        key: "FundID"
-      }
+        key: "FundID",
+      },
     },
     Name: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     LinkedInUrl: {
-      type: Sequelize.STRING(500)
+      type: Sequelize.STRING(500),
     },
     Comments: {
-      type: Sequelize.STRING(500)
-    }
+      type: Sequelize.STRING(500),
+    },
   },
   {
     //options:
-    timestamps: false
+    timestamps: false,
   }
 );
 
@@ -124,28 +124,28 @@ const SharedFunds = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     FundID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: Funds,
-        key: "FundID"
-      }
+        key: "FundID",
+      },
     },
     UserID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: User,
-        key: "UserID"
-      }
-    }
+        key: "UserID",
+      },
+    },
   },
   {
     //options:
-    timestamps: false
+    timestamps: false,
   }
 );
 
@@ -156,23 +156,23 @@ const Companies = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     FundID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: Funds,
-        key: "FundID"
-      }
+        key: "FundID",
+      },
     },
     CompanyName: {
-      type: Sequelize.STRING
-    }
+      type: Sequelize.STRING,
+    },
   },
   {
     //Options: (These options relate to some Sequelize features.)
-    timestamps: false
+    timestamps: false,
   }
 );
 
@@ -183,44 +183,44 @@ const EmployeeHistory = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     UserID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: User,
-        key: "UserID"
-      }
+        key: "UserID",
+      },
     },
     IndividualID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: Individuals,
-        key: "IndividualID"
-      }
+        key: "IndividualID",
+      },
     },
     CompanyID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: Companies,
-        key: "CompanyID"
-      }
+        key: "CompanyID",
+      },
     },
     PositionName: {
-      type: Sequelize.STRING
+      type: Sequelize.STRING,
     },
     StartDate: {
-      type: Sequelize.DATEONLY
+      type: Sequelize.DATEONLY,
     },
     EndDate: {
-      type: Sequelize.DATEONLY
-    }
+      type: Sequelize.DATEONLY,
+    },
   },
   {
-    timestamps: false
+    timestamps: false,
   }
 );
 
@@ -238,30 +238,30 @@ const OriginalFundPosition = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     IndividualID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: Individuals,
-        key: "IndividualID"
-      }
+        key: "IndividualID",
+      },
     },
     CompanyID: {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: Companies,
-        key: "CompanyID"
-      }
+        key: "CompanyID",
+      },
     },
     PositionName: {
-      type: Sequelize.STRING
-    }
+      type: Sequelize.STRING,
+    },
   },
   {
-    timestamps: false
+    timestamps: false,
   }
 );
 
@@ -277,5 +277,5 @@ module.exports = {
   Companies,
   EmployeeHistory,
   OriginalFundPosition,
-  sequelize
+  sequelize,
 };

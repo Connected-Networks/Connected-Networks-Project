@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -18,7 +19,7 @@ app.use(
     secret: "http://bitly.com/98K8eH",
     store: new SessionStore({ db: models.sequelize }),
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
   })
 );
 app.use(Passport.initialize());
