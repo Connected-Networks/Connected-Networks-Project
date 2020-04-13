@@ -168,7 +168,7 @@ insertPerson = (FundID, Name, LinkedInUrl, Comments) => {
     .spread((user, createdBoolean) => {
       return user;
     })
-    .catch(err => {
+    .catch((err) => {
       console.error("Error in insertPerson", err);
       throw err;
     });
@@ -361,7 +361,7 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
       });
       return individual;
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       throw err;
     });
@@ -736,7 +736,6 @@ module.exports = {
   checkUsageofEmail,
   createAccount,
   retrieveFundName,
-  insertFund,
   getUserByUsername,
   getUserByEmail,
   insertUser,
