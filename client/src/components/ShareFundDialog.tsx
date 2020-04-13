@@ -6,7 +6,7 @@ import SharedWithDialog from "./SharedWithDialog";
 import styled from "styled-components";
 
 export interface ShareFundDialogProps {
-  fundId: string;
+  fundId: number;
   handleClose: Function;
 }
 

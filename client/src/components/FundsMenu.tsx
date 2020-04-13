@@ -14,7 +14,6 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Divider,
-  Button,
   Menu,
   MenuItem,
 } from "@material-ui/core";

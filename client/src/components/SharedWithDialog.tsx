@@ -17,7 +17,7 @@ import Axios from "axios";
 
 export interface SharedWithDialogProps {
   open: boolean;
-  fundId: string;
+  fundId: number;
   handleClose: Function;
 }
 

@@ -4,8 +4,6 @@ import DetailsTable from "./DetailsTable";
 import EditableObject from "./EditableObject";
 
 export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
-  readonly TABLE_NAME = "People in Company";
-
   state = {
     data: [],
     columns: [
@@ -15,7 +13,7 @@ export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
   };
 
   get name(): string {
-    return this.TABLE_NAME;
+    return this.props.name ? "People in " + this.props.name : "";
   }
 
   get editableObject(): EditableObject<DisplayPerson> {

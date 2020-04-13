@@ -16,11 +16,13 @@ export default class CompaniesTable extends ATable<DisplayCompany> {
 
   state: TableState<DisplayCompany> = {
     data: [],
+    funds: [],
     columns: [{ title: "Name", field: "name" }],
   };
 
   get editableObject(): EditableObject<DisplayCompany> {
     return {
+      isEditable: this.isOwnedByUser,
       onRowUpdate: this.updateRow,
     };
   }
@@ -33,10 +35,18 @@ export default class CompaniesTable extends ATable<DisplayCompany> {
     return this.DATA_END_POINT;
   }
 
+  isOwnedByUser = (company: DisplayCompany): boolean => {
+    if (this.state.funds) {
+      const fundOfCompany = this.state.funds.find((fund) => fund.id === company.fundID);
+      return fundOfCompany ? !fundOfCompany.shared : false;
+    }
+    return false;
+  };
+
   getDetailPanel = (rowData: DisplayCompany) => {
     return (
       <div style={{ marginLeft: "60px" }}>
-        <CompanyDetailsTable dataEndPoint={"/people/" + rowData.id} />
+        <CompanyDetailsTable name={rowData.name} dataEndPoint={"/people/" + rowData.id} />
       </div>
     );
   };

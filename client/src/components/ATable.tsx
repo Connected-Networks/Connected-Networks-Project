@@ -4,11 +4,13 @@ import styled from "styled-components";
 import EditableObject from "./EditableObject";
 import axios from "axios";
 import { TablePagination } from "@material-ui/core";
+import { DisplayFund } from "./PeopleTable";
 
 export interface TableState<T extends Object> {
   data: T[];
   columns: Array<Column<T>>;
   dialog?: JSX.Element;
+  funds?: DisplayFund[];
 }
 
 export default abstract class ATable<T extends Object, TableProps = {}> extends React.Component<TableProps, TableState<T>> {
@@ -24,7 +26,28 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
     return undefined;
   };
 
+  parseFunds = () => {
+    return new Promise((resolve, reject) => {
+      axios
+        .get("/funds")
+        .then((response) => {
+          if (response.status === 200) {
+            this.setState({ funds: response.data.data });
+            resolve();
+          } else {
+            reject();
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
+  };
+
   componentDidMount() {
+    if (this.state.funds) {
+      this.parseFunds();
+    }
     this.refreshTable();
   }
 

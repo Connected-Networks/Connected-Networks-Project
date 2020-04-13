@@ -3,6 +3,7 @@ import { Components } from "material-table";
 
 export interface TableProps {
   dataEndPoint: string;
+  name?: string;
 }
 
 export default abstract class DetailsTable<RowData extends Object> extends ATable<RowData, TableProps> {

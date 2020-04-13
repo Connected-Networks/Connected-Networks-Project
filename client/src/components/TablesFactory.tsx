@@ -23,7 +23,7 @@ class TablesFactory {
   };
 
   getFundTableWithId = (fundId: string, fundName: string = "Name not found") => {
-    return <FundTable fundID={fundId} fundName={fundName} />;
+    return <FundTable fundID={Number(fundId)} fundName={fundName} />;
   };
 
   getDefaultTableType() {

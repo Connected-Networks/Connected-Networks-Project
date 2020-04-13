@@ -3,11 +3,10 @@ import * as React from "react";
 import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import CompanyDetailsTable from "./CompanyDetailsTable";
-import { User } from "../LoginPage";
 import ShareFundDialog from "./ShareFundDialog";
 
 interface FundTableProps {
-  fundID: string;
+  fundID: number;
   fundName: string;
 }
 
@@ -19,6 +18,7 @@ interface DisplayFundCompany {
 export default class FundTable extends ATable<DisplayFundCompany, FundTableProps> {
   state: TableState<DisplayFundCompany> = {
     data: [],
+    funds: [],
     columns: [{ title: "Company", field: "name" }],
   };
 
@@ -52,12 +52,23 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
     });
   };
 
+  isOwnedByUser = (): boolean => {
+    if (this.state.funds) {
+      const fundOfCompany = this.state.funds.find((fund) => fund.id === this.props.fundID);
+      return fundOfCompany ? !fundOfCompany.shared : false;
+    }
+    return false;
+  };
+
   get editableObject(): EditableObject<DisplayFundCompany> {
-    return {
-      onRowAdd: this.addRow,
-      onRowUpdate: this.updateRow,
-      onRowDelete: this.deleteRow,
-    };
+    if (this.isOwnedByUser()) {
+      return {
+        onRowAdd: this.addRow,
+        onRowUpdate: this.updateRow,
+        onRowDelete: this.deleteRow,
+      };
+    }
+    return {};
   }
 
   addRow = async (newData: DisplayFundCompany): Promise<void> => {
