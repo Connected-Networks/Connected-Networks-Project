@@ -4,7 +4,7 @@ import ATable from "./ATable";
 import { DisplayPerson } from "./PeopleTable";
 import CompaniesAutoComplete from "./CompaniesAutoComplete";
 import React from "react";
-import DatePicker from "./DatePicker";
+import HistoryDatePicker from "./DatePicker";
 
 interface TableProps {
   person: DisplayPerson;
@@ -52,11 +52,10 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
           }
 
           return (
-            <DatePicker
+            <HistoryDatePicker
               label={"Start date"}
               initialDate={currentDate}
-              handleDateChange={(newDate: any, value: any) => {
-                console.log("I HAVE CHANGED - START");
+              handleDateChange={(value: string) => {
                 tableData.rowData.start = value;
               }}
             />
@@ -73,11 +72,10 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
           }
 
           return (
-            <DatePicker
+            <HistoryDatePicker
               label={"End date"}
               initialDate={currentDate}
-              handleDateChange={(newDate: any, value: any) => {
-                console.log("I HAVE CHANGED - END");
+              handleDateChange={(value: string) => {
                 tableData.rowData.end = value;
               }}
             />
