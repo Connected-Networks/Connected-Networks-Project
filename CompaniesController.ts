@@ -14,6 +14,7 @@ export default class CompaniesController {
       const companies = await CompaniesController.getCompaniesFromDatabase(userID);
       res.send({ data: companies });
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -61,7 +62,7 @@ export default class CompaniesController {
         res.sendStatus(401);
         return;
       }
-      await database.insertCompany(company.name);
+      await database.insertCompany(company.name, fundID);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
@@ -79,6 +80,7 @@ export default class CompaniesController {
         res.sendStatus(401);
         return;
       }
+
       await database.deleteCompany(companyID);
       res.sendStatus(200);
     } catch (error) {

@@ -24,6 +24,8 @@ router.post("/csv", ParsingController.handleCsvRequest);
 
 router.get("/people", PeopleController.getPeople);
 
+router.get("/people/recent", PeopleController.getRecentlyChangedPeople);
+
 router.get("/people/:companyID", PeopleController.getPeopleByCompany);
 
 router.get("/people/original/:companyID", PeopleController.getPeopleByOriginalCompany);
@@ -54,11 +56,15 @@ router.delete("/funds/:id", FundsController.deleteFund);
 
 router.post("/shareFund", FundsController.shareFund);
 
+router.get("/shareFund/:id", FundsController.getUsersSharedWith);
+
 router.get("/history/:id", HistoryController.getHistory);
 
 router.put("/history", HistoryController.updateHistory);
 
-router.post("/history/:id", HistoryController.addHistory);
+router.post("/history", HistoryController.addHistory);
+
+router.delete("/history/:id", HistoryController.deleteHistory);
 
 router.post("/updates", UpdatesController.receiveUpdates);
 

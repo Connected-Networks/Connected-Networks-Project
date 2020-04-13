@@ -1,10 +1,12 @@
 import PeopleController from "./PeopleController";
 import { DisplayCompany } from "./CompaniesController";
+import { RSA_NO_PADDING } from "constants";
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface DisplayFund {
   id: number;
   name: string;
+  shared: boolean;
 }
 
 export default class FundsController {
@@ -15,24 +17,25 @@ export default class FundsController {
       let funds = await FundsController.getFundsFromDatabase(userID);
       res.send({ data: funds });
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
 
   //returns a promise boolean representing if the operation was successful
   static async getFundsFromDatabase(userID): Promise<DisplayFund[]> {
-    const fundIdsUserCanSee = await database.getFundsUserCanSee(userID);
+    const fundsOwnedByUser = await database.getFundsOwnedByUser(userID);
+    const fundsSharedWithUser = await database.getFundsSharedWithUser(userID);
 
-    const allFunds = await database.getAllFunds();
-    let list: DisplayFund[] = allFunds.map((element) => {
-      let fund: DisplayFund = {
-        id: element.FundID,
-        name: element.FundName,
-      };
-      return fund;
-    });
+    return [...FundsController.mapFunds(fundsOwnedByUser, false), ...FundsController.mapFunds(fundsSharedWithUser, true)];
+  }
 
-    return list.filter((x) => fundIdsUserCanSee.includes(x.id.toString()));
+  static mapFunds(funds, shared: boolean): DisplayFund[] {
+    return funds.map((element) => ({
+      id: element.FundID,
+      name: element.FundName,
+      shared,
+    }));
   }
 
   static async updateFund(req, res) {
@@ -94,8 +97,9 @@ export default class FundsController {
 
   static async addFund(req, res) {
     try {
-      let fund = req.body.newData;
-      await database.insertFund(fund.name);
+      let newFundName = req.body.newData;
+      let userID = req.user.UserID;
+      await database.insertFund(newFundName, userID);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
@@ -124,9 +128,30 @@ export default class FundsController {
     try {
       let fundID = req.body.fundId;
       let user = req.body.user;
-      await database.sharefund(fundID, user.UserID);
+      await database.sharefund(fundID, user.id);
       res.sendStatus(200);
     } catch (error) {
+      res.sendStatus(500);
+    }
+  }
+
+  static async getUsersSharedWith(req, res) {
+    try {
+      const fundID = req.params.id;
+      const userID = req.user.UserID;
+
+      if (!(await FundsController.userSeesFund(userID, fundID))) {
+        console.error("User " + userID + " cannot see Fund " + fundID);
+        res.sendStatus(401);
+        return;
+      }
+
+      const usersSharedWith = await database.getSharedWithUsers(fundID);
+      const mappedUsers = usersSharedWith.map((user) => ({ username: user.Username }));
+
+      res.send({ users: mappedUsers });
+    } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }

@@ -1,3 +1,5 @@
+import HistoryController from "./HistoryController";
+
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 export interface DisplayPerson {
@@ -8,15 +10,14 @@ export interface DisplayPerson {
   position: string;
   comment: string;
   hyperlink: string;
+  lastChanged?: string;
 }
 
 export default class PeopleController {
   static async getPeople(req, res) {
     try {
-      console.log("started");
       const userID = req.user.UserID;
       const people = await PeopleController.getPeopleFromDatabase(userID);
-      console.log("checkpoint1");
       res.send({ data: people });
     } catch (error) {
       res.sendStatus(500);
@@ -43,7 +44,8 @@ export default class PeopleController {
       company: "",
       position: "",
       hyperlink: individual.LinkedInUrl,
-      comment: individual.comments,
+      comment: individual.Comments,
+      lastChanged: employment.StartDate,
     };
 
     if (employment != null) {
@@ -52,6 +54,28 @@ export default class PeopleController {
     }
 
     return displayPerson;
+  }
+
+  static async getRecentlyChangedPeople(req, res) {
+    try {
+      const userID = req.user.UserID;
+      const people = await PeopleController.getPeopleFromDatabase(userID);
+      const recentPeople = PeopleController.filterRecentPeople(people);
+      res.send({ data: recentPeople });
+    } catch (error) {
+      res.sendStatus(500);
+    }
+  }
+
+  static filterRecentPeople(people: DisplayPerson[]) {
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 8);
+    return people.filter((person) => {
+      const today = new Date();
+      const dayOfLastChange = new Date(person.lastChanged);
+      return today.getDate() >= dayOfLastChange.getDate() && dayOfLastChange.getDate() >= lastWeek.getDate();
+    });
   }
 
   //retrieve all individuals whose most recent employment was in the specified company
@@ -93,7 +117,7 @@ export default class PeopleController {
 
   static async getPeopleByOriginalCompany(req, res) {
     try {
-      let companyID = req.params.id;
+      let companyID = req.params.companyID;
       let userID = req.user.UserID;
 
       if (!(await PeopleController.userSeesCompany(userID, companyID))) {
@@ -108,6 +132,7 @@ export default class PeopleController {
         res.send({ data: people });
       }
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -119,14 +144,14 @@ export default class PeopleController {
 
     return people.map((entry) => {
       let displayPerson: DisplayPerson = {
-        id: entry.Individual.IndividualID,
-        fundID: entry.Individual.FundID,
-        name: entry.Individual.Name,
+        id: entry.individual.IndividualID,
+        fundID: entry.individual.FundID,
+        name: entry.individual.Name,
         //should not be needed. If it ever is, the db function could easily be edited to include companies table, at the cost of running time.
         company: null,
         position: entry.PositionName,
-        comment: entry.Individual.Comments,
-        hyperlink: entry.Individual.LinkedInUrl,
+        comment: entry.individual.Comments,
+        hyperlink: entry.individual.LinkedInUrl,
       };
       return displayPerson;
     });
@@ -144,9 +169,10 @@ export default class PeopleController {
         return;
       }
 
-      await database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
+      await database.modifyIndividual(person.id, person.name, person.position, person.hyperlink, person.comment);
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -171,9 +197,25 @@ export default class PeopleController {
         return;
       }
 
-      await database.insertPerson(person.name, person.fundID, person.position, person.hyperlink, person.comment);
+      console.log("\n\n" + JSON.stringify(person) + "\n\n");
+      const insertedPerson = await database.insertPerson(person.fundID, person.name, person.hyperlink, person.comment);
+
+      console.log("\n\n" + JSON.stringify(insertedPerson) + "\n\n");
+
+      await database.insertOriginalFundPosition(insertedPerson.IndividualID, person.companyID, person.position);
+
+      const today = new Date();
+      const history = {
+        company: person.company,
+        position: person.position,
+        start: today,
+      };
+
+      await HistoryController.addHistoryToDatabase(history, { ...person, id: insertedPerson.IndividualID }, userID);
+
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -184,6 +226,8 @@ export default class PeopleController {
       let userID = req.user.UserID;
       let fundID = (await database.retrieveIndividualByID(personID)).FundID;
 
+      console.log(personID);
+
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("User cannot delete the individual");
         res.sendStatus(401);
@@ -192,6 +236,7 @@ export default class PeopleController {
       await database.deleteIndividual(personID);
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
