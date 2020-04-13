@@ -114,6 +114,8 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
     ],
     funds: [],
     selectedFundID: undefined,
+    selectedCompanyID: undefined,
+    selectedCompany: undefined,
   };
 
   findFund = (fundID: number): string => {

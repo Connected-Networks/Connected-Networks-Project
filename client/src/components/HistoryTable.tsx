@@ -4,9 +4,7 @@ import ATable from "./ATable";
 import { DisplayPerson } from "./PeopleTable";
 import CompaniesAutoComplete from "./CompaniesAutoComplete";
 import React from "react";
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
-import "date-fns";
-import DateFnsUtils from "@date-io/date-fns";
+import DatePicker from "./DatePicker";
 
 interface TableProps {
   person: DisplayPerson;
@@ -50,14 +48,18 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
           let currentDate;
           if (tableData.rowData && tableData.rowData.start) {
             currentDate = tableData.rowData.start;
-          } else {
-            currentDate = new Date();
           }
 
-          return this.getDatePicker(currentDate, (newDate: Date, value: any) => {
-            console.log(value);
-            tableData.rowData.start = newDate.toString();
-          });
+          return (
+            <DatePicker
+              label={"Start date"}
+              initialDate={currentDate}
+              handleDateChange={(newDate: any, value: any) => {
+                console.log("I HAVE CHANGED - START");
+                tableData.rowData.start = value;
+              }}
+            />
+          );
         },
       },
       {
@@ -67,14 +69,18 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
           let currentDate;
           if (tableData.rowData && tableData.rowData.end) {
             currentDate = tableData.rowData.end;
-          } else {
-            currentDate = new Date();
           }
 
-          return this.getDatePicker(currentDate, (newDate: Date, value: any) => {
-            console.log(value);
-            tableData.rowData.end = newDate.toString();
-          });
+          return (
+            <DatePicker
+              label={"End date"}
+              initialDate={currentDate}
+              handleDateChange={(newDate: any, value: any) => {
+                console.log("I HAVE CHANGED - END");
+                tableData.rowData.end = value;
+              }}
+            />
+          );
         },
       },
     ],
@@ -95,26 +101,6 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
       onRowAdd: this.addRow,
     };
   }
-
-  getDatePicker = (selectedDate: Date, handleDateChange: any) => {
-    return (
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <KeyboardDatePicker
-          disableToolbar
-          variant="inline"
-          format="yyyy-MM-dd"
-          margin="normal"
-          id="date-picker-inline"
-          label="Date picker inline"
-          value={selectedDate}
-          onChange={handleDateChange}
-          KeyboardButtonProps={{
-            "aria-label": "change date",
-          }}
-        />
-      </MuiPickersUtilsProvider>
-    );
-  };
 
   updateRow = async (newData: DisplayHistory, oldData?: DisplayHistory | undefined): Promise<void> => {
     if (oldData) {

@@ -31,7 +31,7 @@ export default function HyperlinkArea(props: HyperlinkAreaProps) {
           updateCommentInServer();
         },
       }}
-      style={{ marginLeft: "10px", width: "95%" }}
+      style={{ margin: "10px 0px 5px 10px", width: "95%" }}
     />
   );
 }

@@ -37,7 +37,7 @@ export default function Comment(props: CommentProps) {
           updateCommentInServer();
         },
       }}
-      style={{ marginLeft: "10px", width: "95%" }}
+      style={{ margin: "5px 0px 5px 10px", width: "95%" }}
     />
   );
 }
