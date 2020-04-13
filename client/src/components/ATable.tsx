@@ -48,8 +48,11 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
     if (this.state.funds) {
       this.parseFunds();
     }
+    this.onMount();
     this.refreshTable();
   }
+
+  onMount = () => {};
 
   refreshTable = () => {
     this.getData()

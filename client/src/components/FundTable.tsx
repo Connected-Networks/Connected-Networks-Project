@@ -32,35 +32,47 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
   }
 
   isOwnedByUser = (): boolean => {
-    if (this.state.funds) {
-      const fundOfCompany = this.state.funds.find((fund) => fund.id === this.props.fundID);
+    if (this.state.funds && this.state.funds.length > 0) {
+      const fundOfCompany = this.state.funds.find((fund) => {
+        return fund.id === this.props.fundID;
+      });
       return fundOfCompany ? !fundOfCompany.shared : false;
     }
     return false;
   };
 
-  actions = [
-    {
-      icon: "person_add",
-      tooltip: "Share fund",
-      isFreeAction: true,
-      onClick: () => this.showShareDialog(),
-    },
-    {
-      icon: "delete",
-      tooltip: "Delete fund",
-      isFreeAction: true,
-      onClick: () => this.showDeleteDialog(),
-      disable: !this.isOwnedByUser(),
-    },
-  ];
+  onMount = () => {};
 
-  componentDidUpdate(prevProps: FundTableProps) {
+  componentDidUpdate(prevProps: FundTableProps, prevState: TableState<DisplayFundCompany>) {
     if (this.props.fundID !== prevProps.fundID) {
       this.setState({ data: [] });
       this.refreshTable();
+      this.updateActions();
+    }
+
+    if (this.state.funds && this.state.funds.length > 0) {
+      this.updateActions();
     }
   }
+
+  updateActions = () => {
+    this.actions = this.isOwnedByUser()
+      ? [
+          {
+            icon: "person_add",
+            tooltip: "Share fund",
+            isFreeAction: true,
+            onClick: () => this.showShareDialog(),
+          },
+          {
+            icon: "delete",
+            tooltip: "Delete fund",
+            isFreeAction: true,
+            onClick: () => this.showDeleteDialog(),
+          },
+        ]
+      : [];
+  };
 
   showShareDialog = () => {
     this.setState({
@@ -98,7 +110,7 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
     axios
       .delete(`/funds/${this.props.fundID}`)
       .then((response) => {
-        this.refreshTable();
+        window.location.reload(false);
       })
       .catch(function (error) {
         console.log(error);
