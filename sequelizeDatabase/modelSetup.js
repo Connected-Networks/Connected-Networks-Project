@@ -1,9 +1,8 @@
 const Sequelize = require("sequelize");
 let result = require("dotenv").config();
 
-const sequelize = new Sequelize("heroku_2396736b79200ba", "b526d0b3a6365b", "b0e2b398", {
-  //logging: false,
-  host: "us-cdbr-iron-east-05.cleardb.net",
+const sequelize = new Sequelize(process.env.DATABASE, process.env.USER, process.env.PASSWORD, {
+  host: process.env.HOST,
   dialect: "mysql",
   define: {
     freezeTableName: true,
