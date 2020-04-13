@@ -171,7 +171,8 @@ export default class ParsingController {
 
   static async processQuarter(quarterString, quarterNumber, individualID, userID, fundID, year): Promise<boolean> {
     if (quarterString == null || quarterString == "") return false;
-    let quarterDates = [year + "/01/01", year + "/04/01", year + "/07/01", year + "/10/01"];
+    let quarterStartDates = [year + "/01/01", year + "/04/01", year + "/07/01", year + "/10/01"];
+    let quarterEndDates = [year + "/03/031", year + "/06/30", year + "/09/30", year + "/12/31"];
     let positionName = "";
     let companyName = "";
     let p = quarterString.indexOf(" at ");
@@ -192,7 +193,7 @@ export default class ParsingController {
       fundID,
       companyName,
       positionName,
-      quarterDates[quarterNumber - 1]
+      quarterStartDates[quarterNumber - 1]
     );
     return true;
   }

@@ -12,7 +12,7 @@ export default class FundsController {
     //return type should be an Array of SideMenuFund objects as defined in App.tsx.
     try {
       let userID = req.user.UserID;
-      let funds = await this.getFundsFromDatabase(userID);
+      let funds = await FundsController.getFundsFromDatabase(userID);
       res.send({ data: funds });
     } catch (error) {
       res.sendStatus(500);
@@ -58,13 +58,13 @@ export default class FundsController {
       let userID = req.user.UserID;
       let fundID = req.params.id;
 
-      if (!(await this.userSeesFund(userID, fundID))) {
+      if (!(await FundsController.userSeesFund(userID, fundID))) {
         console.error("User " + userID + " cannot see Fund " + fundID);
         res.sendStatus(401);
         return;
       }
 
-      const companies = await this.getCompaniesFromFund(fundID);
+      const companies = await FundsController.getCompaniesFromFund(fundID);
       res.send({ data: companies });
     } catch (error) {
       res.sendStatus(500);

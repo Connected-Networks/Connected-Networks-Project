@@ -16,12 +16,12 @@ export default class HistoryController {
       let individualID = req.params.id;
       let userID = req.user.UserID;
 
-      if (!(await this.userCanSeeIndividual(userID, individualID))) {
+      if (!(await HistoryController.userCanSeeIndividual(userID, individualID))) {
         console.error("User cannot see history of individual " + individualID);
         res.sendStatus(401);
         return;
       }
-      let history = await this.getHistoryFromDatabase(individualID);
+      let history = await HistoryController.getHistoryFromDatabase(individualID);
       res.send({ data: history });
     } catch (error) {
       res.sendStatus(500);
@@ -55,12 +55,12 @@ export default class HistoryController {
       let userID = req.user.UserID;
       let individual = req.employee;
 
-      if (!(await this.userCanChangeIndividual(userID, individual.individualID))) {
+      if (!(await HistoryController.userCanChangeIndividual(userID, individual.individualID))) {
         console.error("User cannot add history to individual " + individual.IndividualID);
         res.sendStatus(401);
         return;
       }
-      await this.addHistoryToDatabase(history, individual, userID);
+      await HistoryController.addHistoryToDatabase(history, individual, userID);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);
@@ -86,12 +86,12 @@ export default class HistoryController {
       let individual = req.employee;
       let userID = req.user.UserID;
 
-      if (!(await this.userCanChangeIndividual(userID, individual.individualID))) {
+      if (!(await HistoryController.userCanChangeIndividual(userID, individual.individualID))) {
         console.error("User cannot edit history of individual " + individual.IndividualID);
         res.sendStatus(401);
         return;
       }
-      await this.updateHistoryInDatabase(history, individual, userID);
+      await HistoryController.updateHistoryInDatabase(history, individual, userID);
       res.sendStatus(200);
     } catch (error) {
       res.sendStatus(500);

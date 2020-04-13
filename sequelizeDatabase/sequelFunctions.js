@@ -308,17 +308,19 @@ insertQuarterEmployment = (userID, individualID, fundID, companyName, positionNa
   return new Promise((resolve, reject) => {
     insertCompany(companyName, fundID)
       .then((company) => {
-        this.insertEmployeeHistory(userID, individualID, company.CompanyID, positionName, startDate, "")
+        insertEmployeeHistory(userID, individualID, company.CompanyID, positionName, startDate, null)
           .then(() => {
             resolve();
           })
           .catch((error) => {
             console.error("An error occurred while adding employee history from quarter columns");
+            console.error(error);
             reject();
           });
       })
       .catch((error) => {
         console.error("An error occurred while finding the company " + companyName);
+        console.error(error);
         reject();
       });
   });

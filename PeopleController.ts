@@ -13,8 +13,10 @@ export interface DisplayPerson {
 export default class PeopleController {
   static async getPeople(req, res) {
     try {
+      console.log("started");
       const userID = req.user.UserID;
-      const people = await this.getPeopleFromDatabase(userID);
+      const people = await PeopleController.getPeopleFromDatabase(userID);
+      console.log("checkpoint1");
       res.send({ data: people });
     } catch (error) {
       res.sendStatus(500);
@@ -26,7 +28,7 @@ export default class PeopleController {
 
     return Promise.all(
       individuals.map(async (individual) => {
-        return await this.processIndividualForDisplay(individual);
+        return await PeopleController.processIndividualForDisplay(individual);
       })
     );
   }
@@ -59,7 +61,7 @@ export default class PeopleController {
       let userID = req.user.UserID;
       let companyID = req.params.companyID;
 
-      if (!(await this.userSeesCompany(userID, companyID))) {
+      if (!(await PeopleController.userSeesCompany(userID, companyID))) {
         res.sendStatus(401);
         return;
       }
@@ -94,12 +96,12 @@ export default class PeopleController {
       let companyID = req.params.id;
       let userID = req.user.UserID;
 
-      if (!(await this.userSeesCompany(userID, companyID))) {
+      if (!(await PeopleController.userSeesCompany(userID, companyID))) {
         console.error("User " + userID + " cannot view company " + companyID);
         res.sendStatus(401);
         return;
       }
-      const people = await this.getPeopleByOriginalCompanyFromDatabase(companyID);
+      const people = await PeopleController.getPeopleByOriginalCompanyFromDatabase(companyID);
       if (!people) {
         res.sendStatus(500);
       } else {
@@ -136,7 +138,7 @@ export default class PeopleController {
       const userID = req.user.UserID;
       const fundID = person.fundID;
 
-      if (!(await this.userCanChangeFund(userID, fundID))) {
+      if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot update in the specified fund");
         res.sendStatus(401);
         return;
@@ -163,7 +165,7 @@ export default class PeopleController {
       let person = req.body.newData;
       let userID = req.user.UserID;
       let fundID = person.fundID;
-      if (!(await this.userCanChangeFund(userID, fundID))) {
+      if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add an individual to that fund");
         res.sendStatus(401);
         return;
@@ -182,7 +184,7 @@ export default class PeopleController {
       let userID = req.user.UserID;
       let fundID = (await database.retrieveIndividualByID(personID)).FundID;
 
-      if (!(await this.userCanChangeFund(userID, fundID))) {
+      if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("User cannot delete the individual");
         res.sendStatus(401);
         return;
