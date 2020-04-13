@@ -140,8 +140,11 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   };
 
   isOwnedByUser = (person: DisplayPerson) => {
-    const fundOfPerson = this.state.funds.find((fund) => fund.id === person.fundID);
-    return fundOfPerson ? !fundOfPerson.shared : false;
+    if (person) {
+      const fundOfPerson = this.state.funds.find((fund) => fund.id === person.fundID);
+      return fundOfPerson ? !fundOfPerson.shared : false;
+    }
+    return true;
   };
 
   get editableObject(): EditableObject<DisplayPerson> {

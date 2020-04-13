@@ -11,7 +11,7 @@ export interface CommentProps {
 export interface CommentState {}
 
 export default function Comment(props: CommentProps) {
-  const [commentText, setCommentText] = React.useState<string>(props.person.comment);
+  const [commentText, setCommentText] = React.useState<string>(props.person.comment ? props.person.comment : "");
 
   const updateCommentInServer = async () => {
     props.person.comment = commentText;
