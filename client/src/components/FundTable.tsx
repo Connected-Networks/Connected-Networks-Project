@@ -4,6 +4,7 @@ import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import CompanyDetailsTable from "./CompanyDetailsTable";
 import ShareFundDialog from "./ShareFundDialog";
+import AlertDialog from "./AlertDialog";
 
 interface FundTableProps {
   fundID: number;
@@ -30,12 +31,27 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
     return "/funds/" + this.props.fundID;
   }
 
+  isOwnedByUser = (): boolean => {
+    if (this.state.funds) {
+      const fundOfCompany = this.state.funds.find((fund) => fund.id === this.props.fundID);
+      return fundOfCompany ? !fundOfCompany.shared : false;
+    }
+    return false;
+  };
+
   actions = [
     {
       icon: "person_add",
       tooltip: "Share fund",
       isFreeAction: true,
       onClick: () => this.showShareDialog(),
+    },
+    {
+      icon: "delete",
+      tooltip: "Delete fund",
+      isFreeAction: true,
+      onClick: () => this.showDeleteDialog(),
+      disable: !this.isOwnedByUser(),
     },
   ];
 
@@ -52,12 +68,18 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
     });
   };
 
-  isOwnedByUser = (): boolean => {
-    if (this.state.funds) {
-      const fundOfCompany = this.state.funds.find((fund) => fund.id === this.props.fundID);
-      return fundOfCompany ? !fundOfCompany.shared : false;
-    }
-    return false;
+  showDeleteDialog = () => {
+    this.setState({
+      dialog: (
+        <AlertDialog
+          title={"Delete this fund?"}
+          description={`This action is permanent. Are you sure you want to delete the fund ${this.props.fundName}?`}
+          agreeOptionText={"Delete"}
+          handleAgreeOption={this.deleteFund}
+          handleClose={this.handleCloseDialog}
+        />
+      ),
+    });
   };
 
   get editableObject(): EditableObject<DisplayFundCompany> {
@@ -70,6 +92,18 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
     }
     return {};
   }
+
+  deleteFund = () => {
+    console.log("I RAN");
+    axios
+      .delete(`/funds/${this.props.fundID}`)
+      .then((response) => {
+        this.refreshTable();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
   addRow = async (newData: DisplayFundCompany): Promise<void> => {
     return new Promise<void>((resolve, reject) => {

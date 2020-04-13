@@ -116,6 +116,14 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
                   >
                     Edit
                   </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      // fund.isEditable = true;
+                      // this.setModes(true);
+                    }}
+                  >
+                    Delete
+                  </MenuItem>
                 </Menu>
               </>
             )}
@@ -180,6 +188,17 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     const newFund = { ...fund, name: newFundName };
     axios
       .put("/funds", { fund: newFund })
+      .then((response) => {
+        this.refresh();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  deleteFund = (fund: SideMenuFund) => {
+    axios
+      .delete(`/funds/${fund.id}`)
       .then((response) => {
         this.refresh();
       })
