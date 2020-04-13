@@ -18,10 +18,10 @@ export default class NotificationController {
   });
 
   static async notify(changes: Change[]) {
-    const usersToChanges = await this.mapUsersToChanges(changes);
+    const usersToChanges = await NotificationController.mapUsersToChanges(changes);
 
     for (const user of Array.from(usersToChanges.keys())) {
-      await this.notifyUser(user, usersToChanges.get(user));
+      await NotificationController.notifyUser(user, usersToChanges.get(user));
     }
   }
 
@@ -29,8 +29,8 @@ export default class NotificationController {
     const usersToChanges = new Map<User, Change[]>();
 
     for (const change of changes) {
-      const users = await this.getUsersToNotify(change);
-      this.addUsersAndChanges(usersToChanges, users, change);
+      const users = await NotificationController.getUsersToNotify(change);
+      NotificationController.addUsersAndChanges(usersToChanges, users, change);
     }
 
     return usersToChanges;
@@ -52,9 +52,9 @@ export default class NotificationController {
   }
 
   static async notifyUser(user: User, changes: Change[]) {
-    const mailOptions = await this.getMailOptions(user, changes);
+    const mailOptions = await NotificationController.getMailOptions(user, changes);
 
-    const info = await this.transporter.sendMail(mailOptions);
+    const info = await NotificationController.transporter.sendMail(mailOptions);
 
     console.log(info);
   }
@@ -64,14 +64,14 @@ export default class NotificationController {
       from: "Connected Networks Notifications <ConnectedNetworksNodeMailer@gmail.com>",
       to: `${user.username} <${user.email}>`,
       subject: "New Changes Detected",
-      html: await this.getHtmlString(changes),
+      html: await NotificationController.getHtmlString(changes),
     };
   }
 
   static async getHtmlString(changes: Change[]) {
     let htmlString = "<ul>";
     for (const change of changes) {
-      htmlString += await this.getChangeHtmlString(change);
+      htmlString += await NotificationController.getChangeHtmlString(change);
     }
     htmlString += "</ul>";
     return htmlString;
@@ -81,7 +81,7 @@ export default class NotificationController {
     let changeString = "";
     changeString += "<li>";
     changeString += `<a href="${change.employee.linkedInUrl}">${change.employee.name}</a> (
-      ${await this.getFundName(change.employee.fundId)}
+      ${await NotificationController.getFundName(change.employee.fundId)}
       )`;
     changeString += ` moved from ${change.from.company} (${change.from.position})`;
     changeString += ` to ${change.to.company} (${change.to.position})`;
