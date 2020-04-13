@@ -12,10 +12,11 @@ export interface AlertDialogProps {
   agreeOptionText: string;
   handleAgreeOption: Function;
   handleClose: any;
+  open?: boolean;
 }
 
 export default function AlertDialog(props: AlertDialogProps) {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(props.open ? props.open : true);
 
   const handleAgreeSuper = () => {
     props.handleAgreeOption();

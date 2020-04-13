@@ -18,6 +18,7 @@ import {
   MenuItem,
 } from "@material-ui/core";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
+import AlertDialog from "./AlertDialog";
 
 interface SideMenuFund {
   id: number;
@@ -36,6 +37,7 @@ export interface FundsMenuState {
   addMode: boolean;
   editMode: boolean;
   newFundName: string;
+  dialog?: JSX.Element;
 }
 
 export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenuState> {
@@ -118,8 +120,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
-                      // fund.isEditable = true;
-                      // this.setModes(true);
+                      this.showDeleteDialog(fund);
                     }}
                   >
                     Delete
@@ -132,6 +133,33 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
       </ListItemSecondaryAction>
     </ListItem>
   );
+
+  showDeleteDialog = (fund: SideMenuFund) => {
+    this.setState({
+      dialog: (
+        <AlertDialog
+          title={"Delete this fund?"}
+          description={`This action is permanent. Are you sure you want to delete the fund ${fund.name}?`}
+          agreeOptionText={"Delete"}
+          handleAgreeOption={() => this.deleteFund(fund.id)}
+          handleClose={() => {
+            this.setState({ dialog: undefined });
+          }}
+        />
+      ),
+    });
+  };
+
+  deleteFund = (fundID: number) => {
+    axios
+      .delete(`/funds/${fundID}`)
+      .then((response) => {
+        window.location.reload(false);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
   getFundEditableItem = (fund: SideMenuFund) => {
     this.setModes(true);
@@ -196,17 +224,6 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
       });
   };
 
-  deleteFund = (fund: SideMenuFund) => {
-    axios
-      .delete(`/funds/${fund.id}`)
-      .then((response) => {
-        this.refresh();
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
-
   getNewEditableFund = () => {
     return { id: -1, name: "New Fund", isEditable: true, shared: false };
   };
@@ -229,6 +246,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
           {this.state.funds.map((fund) => (fund.isEditable ? this.getFundEditableItem(fund) : this.getFundListItem(fund)))}
           {this.state.addMode ? this.getFundEditableItem(this.getNewEditableFund()) : null}
         </List>
+        {this.state.dialog}
       </>
     );
   }

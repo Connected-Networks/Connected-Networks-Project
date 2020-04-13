@@ -106,7 +106,6 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
   }
 
   deleteFund = () => {
-    console.log("I RAN");
     axios
       .delete(`/funds/${this.props.fundID}`)
       .then((response) => {
