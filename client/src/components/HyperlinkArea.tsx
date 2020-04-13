@@ -5,11 +5,11 @@ import { DisplayPerson } from "./PeopleTable";
 
 export interface HyperlinkAreaProps {
   person: DisplayPerson;
+  isOwned: boolean;
 }
 
 export default function HyperlinkArea(props: HyperlinkAreaProps) {
   const [hyperlinkText, setHyperlinkText] = React.useState<string>(props.person.hyperlink);
-
   const updateCommentInServer = async () => {
     props.person.hyperlink = hyperlinkText;
     try {
@@ -30,8 +30,14 @@ export default function HyperlinkArea(props: HyperlinkAreaProps) {
         onBlur: () => {
           updateCommentInServer();
         },
+        onKeyDown: (event) => {
+          if (event.key === "Enter" && document) {
+            (document.activeElement as HTMLElement).blur();
+          }
+        },
       }}
       style={{ marginLeft: "10px", width: "95%" }}
+      disabled={!props.isOwned}
     />
   );
 }

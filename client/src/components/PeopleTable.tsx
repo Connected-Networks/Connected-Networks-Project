@@ -1,18 +1,15 @@
 import axios from "axios";
-import ATable, { TableState } from "./ATable";
 import EditableObject from "./EditableObject";
 import React, { ReactNode } from "react";
 import MaterialTable, { Column, DetailPanel } from "material-table";
 import styled from "styled-components";
-import FundsDropdown from "./FundsDropdown";
-import CompaniesDropdown from "./CompaniesDropdown";
-import { DisplayCompany } from "./CompaniesTable";
 import HistoryTable from "./HistoryTable";
 import Comment from "./Comment";
 import FundsAutoComplete from "./FundsAutoComplete";
 import CompaniesAutoComplete from "./CompaniesAutoComplete";
 import HyperlinkArea from "./HyperlinkArea";
 import { TablePagination } from "@material-ui/core";
+import SharedIcon from "@material-ui/icons/People";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -29,6 +26,7 @@ interface PeopleTableProps {}
 export interface DisplayFund {
   id: number;
   name: string;
+  shared: boolean;
 }
 
 export interface DisplayPerson {
@@ -41,6 +39,7 @@ export interface DisplayPerson {
   comment: string;
   hyperlink: string;
   lastChanged: string;
+  shared?: boolean;
 }
 
 export default class PeopleTable extends React.Component<PeopleTableProps, PeopleTableState> {
@@ -50,17 +49,6 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   state: PeopleTableState = {
     data: [],
     columns: [
-      {
-        title: "Fund",
-        field: "fundID",
-        editComponent: (tableData) => {
-          if (tableData.rowData.id) {
-            return <> {this.findFund(tableData.rowData.fundID)} </>;
-          }
-          return <FundsAutoComplete handleSelectFund={(selectedFundID: number) => this.setState({ selectedFundID })} />;
-        },
-        render: (rowData) => (rowData ? this.findFund(rowData.fundID) : "Fund does not exist"),
-      },
       {
         title: "Name",
         field: "name",
@@ -74,6 +62,17 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
           }
           return rowData.name;
         },
+      },
+      {
+        title: "Fund",
+        field: "fundID",
+        editComponent: (tableData) => {
+          if (tableData.rowData.id) {
+            return <> {this.findFund(tableData.rowData.fundID)} </>;
+          }
+          return <FundsAutoComplete handleSelectFund={(selectedFundID: number) => this.setState({ selectedFundID })} />;
+        },
+        render: (rowData) => (rowData ? this.findFund(rowData.fundID) : "Fund does not exist"),
       },
       {
         title: "Company",
@@ -115,6 +114,16 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
           }
         },
       },
+      {
+        title: "Shared",
+        field: "shared",
+        editable: "never",
+        render: (rowData: DisplayPerson) => {
+          if (!this.isOwnedByUser(rowData)) {
+            return <SharedIcon />;
+          }
+        },
+      },
     ],
     funds: [],
     selectedFundID: undefined,
@@ -128,10 +137,15 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
     return found ? found.name : " ";
   };
 
-  createLookupTable = () => {};
+  isOwnedByUser = (person: DisplayPerson) => {
+    const fundOfPerson = this.state.funds.find((fund) => fund.id === person.fundID);
+    return fundOfPerson ? !fundOfPerson.shared : false;
+  };
 
   get editableObject(): EditableObject<DisplayPerson> {
     return {
+      isEditable: this.isOwnedByUser,
+      isDeletable: this.isOwnedByUser,
       onRowAdd: this.addRow,
       onRowUpdate: this.updateRow,
       onRowDelete: this.deleteRow,
@@ -150,11 +164,12 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
     | ((rowData: DisplayPerson) => ReactNode)
     | Array<DetailPanel<DisplayPerson> | ((rowData: DisplayPerson) => DetailPanel<DisplayPerson>)>
     | undefined = (rowData: DisplayPerson) => {
+    const isOwnedByUser = this.isOwnedByUser(rowData);
     return (
       <div style={{ marginLeft: "60px", borderLeft: "1px solid lightgrey" }}>
-        <HyperlinkArea person={rowData} />
-        <Comment person={rowData} />
-        <HistoryTable person={rowData} />
+        <HyperlinkArea person={rowData} isOwned={isOwnedByUser} />
+        <Comment person={rowData} isOwned={isOwnedByUser} />
+        <HistoryTable person={rowData} isOwned={isOwnedByUser} />
       </div>
     );
   };

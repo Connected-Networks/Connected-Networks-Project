@@ -6,6 +6,7 @@ const database = require("./sequelizeDatabase/sequelFunctions");
 interface DisplayFund {
   id: number;
   name: string;
+  shared: boolean;
 }
 
 export default class FundsController {
@@ -23,18 +24,20 @@ export default class FundsController {
 
   //returns a promise boolean representing if the operation was successful
   static async getFundsFromDatabase(userID): Promise<DisplayFund[]> {
-    const fundIdsUserCanSee = await database.getFundsUserCanSee(userID);
+    const fundsOwnedByUser = await database.getFundsOwnedByUser(userID);
+    const fundsSharedWithUser = await database.getFundsSharedWithUser(userID);
 
-    const allFunds = await database.getAllFunds();
-    let list: DisplayFund[] = allFunds.map((element) => {
-      let fund: DisplayFund = {
-        id: element.FundID,
-        name: element.FundName,
-      };
-      return fund;
-    });
+    console.log(fundsSharedWithUser);
 
-    return list.filter((fund) => fundIdsUserCanSee.includes(fund.id.toString()));
+    return [...FundsController.mapFunds(fundsOwnedByUser, false), ...FundsController.mapFunds(fundsSharedWithUser, true)];
+  }
+
+  static mapFunds(funds, shared: boolean): DisplayFund[] {
+    return funds.map((element) => ({
+      id: element.FundID,
+      name: element.FundName,
+      shared,
+    }));
   }
 
   static async updateFund(req, res) {
