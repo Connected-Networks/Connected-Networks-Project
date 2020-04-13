@@ -4,7 +4,7 @@ import DetailsTable from "./DetailsTable";
 import EditableObject from "./EditableObject";
 
 export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
-  readonly TABLE_NAME = "Companies";
+  readonly TABLE_NAME = "People in Company";
 
   state = {
     data: [],
