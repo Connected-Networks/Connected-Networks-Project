@@ -8,6 +8,7 @@ import DatePicker from "./DatePicker";
 
 interface TableProps {
   person: DisplayPerson;
+  isOwned: boolean;
 }
 
 interface DisplayHistory {
@@ -95,11 +96,13 @@ export default class HistoryTable extends ATable<DisplayHistory, TableProps> {
   }
 
   get editableObject(): EditableObject<DisplayHistory> {
-    return {
-      onRowUpdate: this.updateRow,
-      onRowDelete: this.deleteRow,
-      onRowAdd: this.addRow,
-    };
+    return this.props.isOwned
+      ? {
+          onRowUpdate: this.updateRow,
+          onRowDelete: this.deleteRow,
+          onRowAdd: this.addRow,
+        }
+      : {};
   }
 
   updateRow = async (newData: DisplayHistory, oldData?: DisplayHistory | undefined): Promise<void> => {

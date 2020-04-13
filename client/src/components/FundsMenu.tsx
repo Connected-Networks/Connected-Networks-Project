@@ -4,6 +4,8 @@ import AddIcon from "@material-ui/icons/Add";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import OptionIcon from "@material-ui/icons/MoreVert";
+import SharedIcon from "@material-ui/icons/People";
+
 import {
   ListItem,
   TextField,
@@ -21,6 +23,7 @@ import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 interface SideMenuFund {
   id: number;
   name: string;
+  shared: boolean;
   isEditable?: boolean;
 }
 
@@ -36,10 +39,7 @@ export interface FundsMenuState {
   newFundName: string;
 }
 
-export default class FundsMenu extends React.Component<
-  FundsMenuProps,
-  FundsMenuState
-> {
+export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenuState> {
   state: FundsMenuState = {
     funds: [],
     addMode: false,
@@ -96,34 +96,32 @@ export default class FundsMenu extends React.Component<
   };
 
   getFundListItem = (fund: SideMenuFund) => (
-    <ListItem
-      button
-      key={fund.id}
-      onClick={() =>
-        this.props.handleSwitchTable(fund.id.toString(), fund.name)
-      }
-    >
+    <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString(), fund.name)}>
       <ListItemText primary={fund.name} />
       <ListItemSecondaryAction>
-        <PopupState variant="popover">
-          {(popupState) => (
-            <>
-              <IconButton edge="end" {...bindTrigger(popupState)}>
-                <OptionIcon />
-              </IconButton>
-              <Menu {...bindMenu(popupState)}>
-                <MenuItem
-                  onClick={() => {
-                    fund.isEditable = true;
-                    this.setModes(true);
-                  }}
-                >
-                  Edit
-                </MenuItem>
-              </Menu>
-            </>
-          )}
-        </PopupState>
+        {fund.shared ? (
+          <SharedIcon style={{ color: "grey" }} />
+        ) : (
+          <PopupState variant="popover">
+            {(popupState) => (
+              <>
+                <IconButton edge="end" {...bindTrigger(popupState)}>
+                  <OptionIcon />
+                </IconButton>
+                <Menu {...bindMenu(popupState)}>
+                  <MenuItem
+                    onClick={() => {
+                      fund.isEditable = true;
+                      this.setModes(true);
+                    }}
+                  >
+                    Edit
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </PopupState>
+        )}
       </ListItemSecondaryAction>
     </ListItem>
   );
@@ -142,9 +140,7 @@ export default class FundsMenu extends React.Component<
           label="Fund Name"
           placeholder={fund.name}
           autoFocus
-          onChange={(event) =>
-            this.setState({ newFundName: event.target.value })
-          }
+          onChange={(event) => this.setState({ newFundName: event.target.value })}
         />
         <IconButton
           edge="end"
@@ -194,7 +190,7 @@ export default class FundsMenu extends React.Component<
   };
 
   getNewEditableFund = () => {
-    return { id: -1, name: "New Fund", isEditable: true };
+    return { id: -1, name: "New Fund", isEditable: true, shared: false };
   };
 
   render() {
@@ -212,14 +208,8 @@ export default class FundsMenu extends React.Component<
         </List>
         <Divider />
         <List>
-          {this.state.funds.map((fund) =>
-            fund.isEditable
-              ? this.getFundEditableItem(fund)
-              : this.getFundListItem(fund)
-          )}
-          {this.state.addMode
-            ? this.getFundEditableItem(this.getNewEditableFund())
-            : null}
+          {this.state.funds.map((fund) => (fund.isEditable ? this.getFundEditableItem(fund) : this.getFundListItem(fund)))}
+          {this.state.addMode ? this.getFundEditableItem(this.getNewEditableFund()) : null}
         </List>
       </>
     );

@@ -5,6 +5,7 @@ import { DisplayPerson } from "./PeopleTable";
 
 export interface CommentProps {
   person: DisplayPerson;
+  isOwned: boolean;
 }
 
 export interface CommentState {}
@@ -38,6 +39,7 @@ export default function Comment(props: CommentProps) {
         },
       }}
       style={{ margin: "5px 0px 5px 10px", width: "95%" }}
+      disabled={!props.isOwned}
     />
   );
 }
