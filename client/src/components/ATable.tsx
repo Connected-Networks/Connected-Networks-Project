@@ -22,9 +22,7 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
 
   actions: (Action<T> | ((rowData: T) => Action<T>))[] | undefined = undefined;
 
-  getDetailPanel: ((rowData: T) => ReactNode) | Array<DetailPanel<T> | ((rowData: T) => DetailPanel<T>)> | undefined = () => {
-    return undefined;
-  };
+  getDetailPanel: ((rowData: T) => ReactNode) | undefined = undefined;
 
   parseFunds = () => {
     return new Promise((resolve, reject) => {
@@ -101,7 +99,7 @@ export default abstract class ATable<T extends Object, TableProps = {}> extends 
               })
             }
             detailPanel={this.getDetailPanel}
-            onRowClick={this.getDetailPanel ? (event, rowData, togglePanel) => togglePanel!() : undefined}
+            onRowClick={(event, rowData, togglePanel) => (this.getDetailPanel ? togglePanel!() : undefined)}
             options={{
               actionsColumnIndex: -1,
             }}
