@@ -98,14 +98,46 @@ export default class FundTable extends ATable<DisplayFundCompany, FundTableProps
   };
 
   updateRow = async (newData: DisplayFundCompany, oldData?: DisplayFundCompany | undefined): Promise<void> => {
-    return new Promise((resolve) => {
-      resolve();
+    return new Promise<void>((resolve, reject) => {
+      axios
+        .put(`/company`, {
+          newData: { ...newData, fundID: this.props.fundID },
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            this.refreshTable();
+            resolve();
+          } else if (response.status === 401) {
+            console.error("User does not have permission to edit this fund.");
+          } else {
+            this.refreshTable();
+            reject();
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
   };
 
   deleteRow = async (oldData: DisplayFundCompany): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      resolve();
+    return new Promise<void>((resolve, reject) => {
+      axios
+        .delete(`/company/${oldData.id}`)
+        .then((response) => {
+          if (response.status === 200) {
+            this.refreshTable();
+            resolve();
+          } else if (response.status === 401) {
+            console.error("User does not have permission to delete in this fund.");
+          } else {
+            this.refreshTable();
+            reject();
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
   };
 
