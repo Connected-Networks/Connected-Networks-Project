@@ -29,10 +29,9 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
 
   handleUpload = () => {
     if (this.state.selectedFile) {
-      console.log(this.state.selectedFile.name);
       try {
         this.readFile(this.state.selectedFile).then(fileData => {
-          this.upload(fileData, this.getFileNameWithoutExtension(this.state.selectedFile!));
+          this.upload(fileData);
           this.handleClose();
         });
       } catch (error) {
@@ -40,11 +39,6 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
       }
     }
   };
-
-  getFileNameWithoutExtension(selectedFile: File): string {
-    const fileName = selectedFile.name;
-    return fileName.substr(0, fileName.lastIndexOf("."));
-  }
 
   async readFile(file: File): Promise<string> {
     let reader = new FileReader();
@@ -61,11 +55,10 @@ export default class UploadDialog extends React.Component<UploadDialogProps, Upl
     });
   }
 
-  upload = (fileData: string, fileName: string) => {
+  upload = (fileData: string) => {
     axios
       .post("/csv", {
-        data: fileData,
-        fileName
+        data: fileData
       })
       .then(function(response) {
         console.log(response);

@@ -4,24 +4,29 @@ import DetailsTable from "./DetailsTable";
 import EditableObject from "./EditableObject";
 
 export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
+  readonly TABLE_NAME = "Companies";
+
   state = {
     data: [],
     columns: [
       { title: "Name", field: "name" },
-      { title: "Current Position", field: "position" },
-    ],
+      { title: "Current Position", field: "position" }
+    ]
   };
 
   get name(): string {
-    return this.props.name ? "People in " + this.props.name : "";
+    return this.TABLE_NAME;
   }
 
   get editableObject(): EditableObject<DisplayPerson> {
-    return {};
+    return {
+      onRowUpdate: this.updateRow,
+      onRowDelete: this.deleteRow
+    };
   }
 
   updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => {
         if (oldData) {
           console.log(newData);
@@ -38,14 +43,14 @@ export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
     return new Promise((resolve, reject) => {
       axios
         .put("/people", person)
-        .then((response) => {
+        .then(response => {
           if (response.status === 200) {
             resolve();
           } else {
             reject();
           }
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
         });
     });
@@ -68,7 +73,7 @@ export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
     return new Promise((resolve, reject) => {
       axios
         .post(`/people`, { newData })
-        .then((response) => {
+        .then(response => {
           if (response.status === 200) {
             this.refreshTable();
             resolve();
@@ -77,7 +82,7 @@ export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
             reject();
           }
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
         });
     });
@@ -104,11 +109,11 @@ export default class CompanyDetailsTable extends DetailsTable<DisplayPerson> {
       const personID = oldData.id; //Temp until we make ids for people
       axios
         .delete(`/people/${personID}`)
-        .then((response) => {
+        .then(response => {
           console.log("status: " + response.status);
           resolve();
         })
-        .catch(function (error) {
+        .catch(function(error) {
           console.log(error);
           reject();
         });

@@ -2,13 +2,13 @@ import * as React from "react";
 import PeopleTable from "./PeopleTable";
 import CompaniesTable from "./CompaniesTable";
 import FundTable from "./FundTable";
-import RecentTable from "./RecentTable";
 
 class TablesFactory {
   tableTypes = new Map([
-    ["Recent", <RecentTable />],
+    ["Recent", undefined],
+    ["Starred", undefined],
     ["People", <PeopleTable />],
-    ["Companies", <CompaniesTable />],
+    ["Companies", <CompaniesTable />]
   ]);
 
   getAvailableTables = () => {
@@ -23,7 +23,7 @@ class TablesFactory {
   };
 
   getFundTableWithId = (fundId: string, fundName: string = "Name not found") => {
-    return <FundTable fundID={Number(fundId)} fundName={fundName} />;
+    return <FundTable fundId={fundId} fundName={fundName} />;
   };
 
   getDefaultTableType() {
