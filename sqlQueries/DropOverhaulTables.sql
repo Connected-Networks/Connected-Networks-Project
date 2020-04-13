@@ -11,5 +11,3 @@ DROP TABLE if EXISTS sharedfunds;
 DROP TABLE if EXISTS funds;
 
 DROP TABLE if EXISTS user;
-
-DROP TABLE if EXISTS Session;

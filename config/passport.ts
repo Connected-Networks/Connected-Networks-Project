@@ -1,11 +1,34 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-import PassportController from "./PassportController";
+const database = require("../sequelizeDatabase/sequelFunctions");
+const bcrypt = require("bcryptjs");
 
-passport.use(new LocalStrategy(PassportController.localStrategy));
+const strategy = new LocalStrategy((username, password, done) => {
+  database
+    .getUserByUsername(username)
+    .then(user => {
+      if (bcrypt.compareSync(user.Password, password)) {
+        return done(null, false, { message: "Incorrect password" });
+      }
 
-passport.serializeUser(PassportController.serializeUser);
+      return done(null, user);
+    })
+    .catch(err => {
+      return done(err);
+    });
+});
 
-passport.deserializeUser(PassportController.deserializeUser);
+passport.serializeUser((user, done) => {
+  done(null, { id: user.UserID });
+});
 
-export default passport;
+passport.deserializeUser((user, done) => {
+  database
+    .getUserById(user.id)
+    .then(user => done(null, user))
+    .catch(err => done(err));
+});
+
+passport.use(strategy);
+
+module.exports = passport;

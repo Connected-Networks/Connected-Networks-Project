@@ -4,8 +4,6 @@ import AddIcon from "@material-ui/icons/Add";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import OptionIcon from "@material-ui/icons/MoreVert";
-import SharedIcon from "@material-ui/icons/People";
-
 import {
   ListItem,
   TextField,
@@ -14,16 +12,15 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Divider,
+  Button,
   Menu,
-  MenuItem,
+  MenuItem
 } from "@material-ui/core";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
-import AlertDialog from "./AlertDialog";
 
 interface SideMenuFund {
   id: number;
   name: string;
-  shared: boolean;
   isEditable?: boolean;
 }
 
@@ -37,45 +34,35 @@ export interface FundsMenuState {
   addMode: boolean;
   editMode: boolean;
   newFundName: string;
-  dialog?: JSX.Element;
 }
 
 export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenuState> {
-  state: FundsMenuState = {
-    funds: [],
-    addMode: false,
-    editMode: false,
-    newFundName: "",
-  };
+  state: FundsMenuState = { funds: [], addMode: false, editMode: false, newFundName: "" };
 
   componentDidMount() {
     this.refresh();
   }
 
   refresh = () => {
-    this.getFunds().then((funds) => {
-      // console.log(funds)
-      if (!Object.keys(funds).length) {
-        funds = [];
-      }
-      this.setState({
-        funds,
-        addMode: false,
-        editMode: false,
-        newFundName: "",
-      });
-    });
+    const funds = [{ id: 0, name: "Mock Fund" }];
+    this.setState({ funds, addMode: false, editMode: false, newFundName: "" });
+
+    // this.getFunds().then(funds => {
+    //   if (!Object.keys(funds).length) {
+    //     funds = [];
+    //   }
+    //   console.log(funds);
+    //   funds = [{ id: 0, name: "Mock Fund" }];
+    //   this.setState({ funds, addMode: false, editMode: false, newFundName: "" });
+    // });
   };
 
   getFunds = async () => {
-    return new Promise<SideMenuFund[]>((resolve) => {
+    return new Promise<SideMenuFund[]>(resolve => {
       axios
         .get("/funds")
-        .then((response) => {
-          console.log(response);
-          resolve(response.data.data);
-        })
-        .catch(function (error) {
+        .then(response => resolve(response.data.data))
+        .catch(function(error) {
           console.log(error);
         });
     });
@@ -87,11 +74,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
       if (isAddMode === undefined) {
         this.setState({ editMode: isEditMode, newFundName: "" });
       } else {
-        this.setState({
-          editMode: isEditMode,
-          addMode: isAddMode,
-          newFundName: "",
-        });
+        this.setState({ editMode: isEditMode, addMode: isAddMode, newFundName: "" });
       }
     }
   };
@@ -100,66 +83,28 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     <ListItem button key={fund.id} onClick={() => this.props.handleSwitchTable(fund.id.toString(), fund.name)}>
       <ListItemText primary={fund.name} />
       <ListItemSecondaryAction>
-        {fund.shared ? (
-          <SharedIcon style={{ color: "grey" }} />
-        ) : (
-          <PopupState variant="popover">
-            {(popupState) => (
-              <>
-                <IconButton edge="end" {...bindTrigger(popupState)}>
-                  <OptionIcon />
-                </IconButton>
-                <Menu {...bindMenu(popupState)}>
-                  <MenuItem
-                    onClick={() => {
-                      fund.isEditable = true;
-                      this.setModes(true);
-                    }}
-                  >
-                    Edit
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      this.showDeleteDialog(fund);
-                    }}
-                  >
-                    Delete
-                  </MenuItem>
-                </Menu>
-              </>
-            )}
-          </PopupState>
-        )}
+        <PopupState variant="popover">
+          {popupState => (
+            <>
+              <IconButton edge="end" {...bindTrigger(popupState)}>
+                <OptionIcon />
+              </IconButton>
+              <Menu {...bindMenu(popupState)}>
+                <MenuItem
+                  onClick={() => {
+                    fund.isEditable = true;
+                    this.setModes(true);
+                  }}
+                >
+                  Edit
+                </MenuItem>
+              </Menu>
+            </>
+          )}
+        </PopupState>
       </ListItemSecondaryAction>
     </ListItem>
   );
-
-  showDeleteDialog = (fund: SideMenuFund) => {
-    this.setState({
-      dialog: (
-        <AlertDialog
-          title={"Delete this fund?"}
-          description={`This action is permanent. Are you sure you want to delete the fund ${fund.name}?`}
-          agreeOptionText={"Delete"}
-          handleAgreeOption={() => this.deleteFund(fund.id)}
-          handleClose={() => {
-            this.setState({ dialog: undefined });
-          }}
-        />
-      ),
-    });
-  };
-
-  deleteFund = (fundID: number) => {
-    axios
-      .delete(`/funds/${fundID}`)
-      .then((response) => {
-        window.location.reload(false);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
 
   getFundEditableItem = (fund: SideMenuFund) => {
     this.setModes(true);
@@ -170,16 +115,16 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
             onBlur: () => {
               fund.isEditable = false;
               this.setModes(false, false);
-            },
+            }
           }}
           label="Fund Name"
           placeholder={fund.name}
           autoFocus
-          onChange={(event) => this.setState({ newFundName: event.target.value })}
+          onChange={event => this.setState({ newFundName: event.target.value })}
         />
         <IconButton
           edge="end"
-          onMouseDown={(event) => event.preventDefault()}
+          onMouseDown={event => event.preventDefault()}
           onClick={() => {
             this.applyNewName(this.state.newFundName, fund);
           }}
@@ -201,13 +146,13 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     }
   };
 
-  addFund = (newData: string) => {
+  addFund = (newFundName: string) => {
     axios
-      .post("/funds", { newData })
-      .then((response) => {
+      .post("/funds", { newFundName })
+      .then(response => {
         this.refresh();
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log(error);
       });
   };
@@ -216,16 +161,16 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     const newFund = { ...fund, name: newFundName };
     axios
       .put("/funds", { fund: newFund })
-      .then((response) => {
+      .then(response => {
         this.refresh();
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log(error);
       });
   };
 
   getNewEditableFund = () => {
-    return { id: -1, name: "New Fund", isEditable: true, shared: false };
+    return { id: -1, name: "New Fund", isEditable: true };
   };
 
   render() {
@@ -243,10 +188,9 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
         </List>
         <Divider />
         <List>
-          {this.state.funds.map((fund) => (fund.isEditable ? this.getFundEditableItem(fund) : this.getFundListItem(fund)))}
+          {this.state.funds.map(fund => (fund.isEditable ? this.getFundEditableItem(fund) : this.getFundListItem(fund)))}
           {this.state.addMode ? this.getFundEditableItem(this.getNewEditableFund()) : null}
         </List>
-        {this.state.dialog}
       </>
     );
   }

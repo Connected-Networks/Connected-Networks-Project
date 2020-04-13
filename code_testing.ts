@@ -13,13 +13,14 @@ function test_date_parser() {
 }
 
 function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function test_new_function() {
-  let object = new Array();
-  object["a"] = "a";
-  object["b"] = "b";
-  console.log(object.keys());
+  let be = new BackendProcessing();
+  be.getAllUsers().then(users => {
+    console.log(users);
+  });
 }
+
 test_new_function();
