@@ -733,7 +733,6 @@ module.exports = {
   checkUsageofEmail,
   createAccount,
   retrieveFundName,
-  insertFund,
   getUserByUsername,
   getUserByEmail,
   insertUser,
