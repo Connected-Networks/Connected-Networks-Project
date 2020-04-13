@@ -57,13 +57,16 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
     return (
       <Container>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
-        <TitleBar toggleOpen={this.toggleSideMenu} handleUpload={this.openUploadDialog} />
+        <TitleBar
+          toggleOpen={this.toggleSideMenu}
+          handleUpload={this.openUploadDialog}
+          handleLogout={this.props.handleLogout}
+        />
         <Content>
           <SideMenu
             open={this.state.openSideMenu}
             tableTypes={this.tablesFactory.getAvailableTables()}
             handleSwitchTable={this.switchTables}
-            handleLogout={this.props.handleLogout}
           />
           {this.tablesFactory.getTableComponent(this.state.tableType, this.state.fundName)}
         </Content>
