@@ -65,6 +65,7 @@ export default class HistoryController {
       await HistoryController.addHistoryToDatabase(history, individual, userID);
       res.sendStatus(200);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -91,6 +92,8 @@ export default class HistoryController {
       let history = req.body.newData;
       let individual = req.body.employee;
       let userID = req.user.UserID;
+
+      console.log(history);
 
       if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
         console.error("User cannot edit history of individual " + individual.id);

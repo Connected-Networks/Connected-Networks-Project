@@ -27,8 +27,6 @@ export default class FundsController {
     const fundsOwnedByUser = await database.getFundsOwnedByUser(userID);
     const fundsSharedWithUser = await database.getFundsSharedWithUser(userID);
 
-    console.log(fundsSharedWithUser);
-
     return [...FundsController.mapFunds(fundsOwnedByUser, false), ...FundsController.mapFunds(fundsSharedWithUser, true)];
   }
 
@@ -101,7 +99,6 @@ export default class FundsController {
     try {
       let newFundName = req.body.newData;
       let userID = req.user.UserID;
-      console.log(req.body.newData);
       await database.insertFund(newFundName, userID);
       res.sendStatus(200);
     } catch (error) {
