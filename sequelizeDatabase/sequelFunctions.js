@@ -1,4 +1,6 @@
 const models = require("./modelSetup");
+const moment = require("../node_modules/moment");
+
 
 //---------------FindAll: Get all data from the table --------------//
 //--------NOTE: These functions return Promises. Use ".then()" after calling them.
@@ -286,8 +288,8 @@ insertFromCsvLine = (
                     newPerson.IndividualID,
                     newCompany.CompanyID,
                     CurrentPostion,
-                    OriginalStartDate,
-                    OriginalEndDate
+                    moment(new Date()).format("YYYY-MM-DD"),
+                    null
                   ).then(() => {
                     resolve(newPerson.IndividualID);
                   });
@@ -352,8 +354,8 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
   })
     .then((individual) => {
       individual.update({
-        IndividualName: newName,
-        OriginalPostion: newPosition, //TODO: Update this.
+        IndividualName: newName, //<--TODO: Change "IndividualName" to "Name" to match new SQL Table. 4/14/20
+        OriginalPostion: newPosition, //TODO: Update this. <<--TODO: April 14th: This still needs to be changed.
         LinkedInUrl: newUrl,
         Comments: newComments,
       });
