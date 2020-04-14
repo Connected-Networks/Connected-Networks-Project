@@ -671,8 +671,8 @@ getUserById = (id) => {
   });
 };
 
-getIndividualByLinkedIn = async (LinkedInUrl) => {
-  return await models.Individuals.findOne({ where: { LinkedInUrl } });
+getIndividualsByLinkedIn = async (LinkedInUrl) => {
+  return await models.Individuals.findAll({ where: { LinkedInUrl } });
 };
 
 getCompanyById = async (CompanyID) => {
@@ -700,6 +700,10 @@ getFundsSharedWithUser = async (UserID) => {
   const sharedFundsIDs = await models.SharedFunds.findAll({ where: { UserID } }).map((sharedFund) => sharedFund.FundID);
 
   return models.Funds.findAll({ where: { FundID: sharedFundsIDs } });
+};
+
+getFundById = async (FundID) => {
+  return await models.Funds.findOne({ where: { FundID } });
 };
 
 module.exports = {
@@ -737,7 +741,7 @@ module.exports = {
   getUserByEmail,
   insertUser,
   getUserById,
-  getIndividualByLinkedIn,
+  getIndividualsByLinkedIn,
   getCompanyById,
   getAllUsersRelatedToFund,
   updateEmployeeHistory,
@@ -754,4 +758,5 @@ module.exports = {
   getSharedWithUsers,
   getFundsOwnedByUser,
   getFundsSharedWithUser,
+  getFundById,
 };

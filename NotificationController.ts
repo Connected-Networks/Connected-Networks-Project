@@ -17,16 +17,20 @@ export default class NotificationController {
     },
   });
 
+  private static usernameToEmail: Map<string, string> = new Map();
+
   static async notify(changes: Change[]) {
     const usersToChanges = await this.mapUsersToChanges(changes);
+    console.log(usersToChanges);
 
-    for (const user of Array.from(usersToChanges.keys())) {
-      await this.notifyUser(user, usersToChanges.get(user));
+    for (const username of Array.from(usersToChanges.keys())) {
+      const user = { username, email: this.usernameToEmail.get(username) };
+      await this.notifyUser(user, usersToChanges.get(user.username));
     }
   }
 
-  static async mapUsersToChanges(changes: Change[]): Promise<Map<User, Change[]>> {
-    const usersToChanges = new Map<User, Change[]>();
+  static async mapUsersToChanges(changes: Change[]): Promise<Map<string, Change[]>> {
+    const usersToChanges = new Map<string, Change[]>();
 
     for (const change of changes) {
       const users = await this.getUsersToNotify(change);
@@ -42,12 +46,13 @@ export default class NotificationController {
     return users.map((user) => ({ username: user.Username, email: user.Email }));
   }
 
-  private static addUsersAndChanges(usersToChanges: Map<User, Change[]>, users: User[], change: Change) {
+  private static addUsersAndChanges(usersToChanges: Map<string, Change[]>, users: User[], change: Change) {
     for (const user of users) {
-      if (!usersToChanges.has(user)) {
-        usersToChanges.set(user, []);
+      if (!usersToChanges.has(user.username)) {
+        usersToChanges.set(user.username, []);
+        this.usernameToEmail.set(user.username, user.email);
       }
-      usersToChanges.get(user).push(change);
+      usersToChanges.get(user.username).push(change);
     }
   }
 
@@ -90,6 +95,6 @@ export default class NotificationController {
   }
 
   static async getFundName(fundId) {
-    await database.retrieveFundName(fundId);
+    return await database.retrieveFundName(fundId);
   }
 }

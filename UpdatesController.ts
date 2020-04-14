@@ -1,4 +1,6 @@
 import NotificationController from "./NotificationController";
+import HistoryController from "./HistoryController";
+import * as moment from "moment";
 const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface Update {
@@ -21,6 +23,7 @@ interface Employment {
 }
 
 interface Employee {
+  id: number;
   name: string;
   fundId: number;
   linkedInUrl: string;
@@ -28,10 +31,19 @@ interface Employee {
 
 export default class UpdatesController {
   static async receiveUpdates(req, res) {
-    const { updates } = req.body;
-    const changes = await UpdatesController.detectChanges(updates);
-    if (changes.length > 0) {
-      NotificationController.notify(changes);
+    try {
+      const updates: Update[] = req.body.updates;
+      const changes = await UpdatesController.detectChanges(updates);
+
+      if (changes.length > 0) {
+        await HistoryController.applyChanges(changes);
+        await NotificationController.notify(changes);
+      }
+
+      res.sendStatus(200);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
     }
   }
 
@@ -39,12 +51,14 @@ export default class UpdatesController {
     const changes = [];
 
     for (const update of updates) {
-      const employee = await database.getIndividualByLinkedIn(update.linkedInUrl);
-      const currentEmployment = await UpdatesController.getCurrentEmployment(employee.IndividualID);
+      const employees = await database.getIndividualsByLinkedIn(update.linkedInUrl);
+      for (const employee of employees) {
+        const currentEmployment = await UpdatesController.getCurrentEmployment(employee.IndividualID);
 
-      if (update.company !== currentEmployment.company || update.position !== currentEmployment.position) {
-        const change = await UpdatesController.getChangeObject(employee, currentEmployment, update);
-        changes.push(change);
+        if (update.company !== currentEmployment.company || update.position !== currentEmployment.position) {
+          const change = await UpdatesController.getChangeObject(employee, currentEmployment, update);
+          changes.push(change);
+        }
       }
     }
 
@@ -60,7 +74,7 @@ export default class UpdatesController {
       company: currentCompany.CompanyName,
       position: foundCurrentEmployment.PositionName,
       startDate: foundCurrentEmployment.StartDate,
-      endDate: foundCurrentEmployment.EndDate
+      endDate: foundCurrentEmployment.EndDate,
     };
 
     return currentEmployment;
@@ -68,9 +82,10 @@ export default class UpdatesController {
 
   static async getChangeObject(changedEmployee, currentEmployment: Employment, update: Update) {
     const employee: Employee = {
+      id: changedEmployee.IndividualID,
       name: changedEmployee.Name,
       fundId: changedEmployee.FundID,
-      linkedInUrl: changedEmployee.LinkedInUrl
+      linkedInUrl: changedEmployee.LinkedInUrl,
     };
 
     const from: Employment = { ...currentEmployment, endDate: UpdatesController.getTodaysDate() };
@@ -80,6 +95,6 @@ export default class UpdatesController {
   }
 
   static getTodaysDate(): string {
-    return "6969-06-09";
+    return moment(new Date()).format("YYYY-MM-DD");
   }
 }
