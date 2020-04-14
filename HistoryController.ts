@@ -1,6 +1,8 @@
 const database = require("./sequelizeDatabase/sequelFunctions");
 import FundsController from "./FundsController";
 import PeopleController from "./PeopleController";
+import { Change } from "./UpdatesController";
+import * as moment from "moment";
 
 interface DisplayHistory {
   id: number;
@@ -142,6 +144,33 @@ export default class HistoryController {
     } catch (error) {
       console.error(error);
       res.sendStatus(500);
+    }
+  }
+
+  static async applyChanges(changes: Change[]) {
+    for (const change of changes) {
+      try {
+        const { employee, to } = change;
+        const company = await database.insertCompany(to.company, employee.fundId);
+        const fundOwnerID = (await database.getFundById(employee.fundId)).UserID;
+
+        const currentEmployment = await database.getIndividualCurrentEmployement(employee.id);
+        if (currentEmployment) {
+          await database.updateEmployeeHistory(
+            currentEmployment.HistoryID,
+            currentEmployment.UserID,
+            currentEmployment.IndividualID,
+            currentEmployment.CompanyID,
+            currentEmployment.PositionName,
+            currentEmployment.StartDate,
+            moment(new Date()).format("YYYY-MM-DD")
+          );
+        }
+
+        await database.insertEmployeeHistory(fundOwnerID, employee.id, company.CompanyID, to.position, to.startDate, to.endDate);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 }
