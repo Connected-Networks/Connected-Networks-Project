@@ -8,5 +8,8 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function test_new_function() {}
+function test_new_function() {
+  let n = 5;
+  db.insertQuarterEmployment(1, 1, 1, "company " + n, "position " + n, "2020-01-01");
+}
 test_new_function();

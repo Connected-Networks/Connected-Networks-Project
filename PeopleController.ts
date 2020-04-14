@@ -125,9 +125,7 @@ export default class PeopleController {
         res.sendStatus(401);
         return;
       }
-
       const people = await PeopleController.getPeopleByOriginalCompanyFromDatabase(companyID);
-      console.log(people);
       if (!people) {
         res.sendStatus(500);
       } else {
@@ -193,7 +191,6 @@ export default class PeopleController {
       let person = req.body.newData;
       let userID = req.user.UserID;
       let fundID = person.fundID;
-
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add an individual to that fund");
         res.sendStatus(401);
