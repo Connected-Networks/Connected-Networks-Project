@@ -4,10 +4,10 @@
 # Database Connection
 Credentials for the database are stored in a file named ".env" on the same level as all the Controller files.
 The ".env" file should contain 5 lines:
-DATABASE = <Database name>
-HOST = <Host name>
-USER = <Username in the database system>
-PASSWORD = <Password for the user in the database>
+DATABASE = {Database name}
+HOST = {Host name}
+USER = {Username in the database system}
+PASSWORD = {Password for the user in the database}
 BLUEBIRD_W_FORGOTTEN_RETURN = 0 (suppresses a warning related to promise syntax)
   
 # Changing Databases
