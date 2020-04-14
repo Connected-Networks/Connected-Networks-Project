@@ -4,23 +4,12 @@
 import BackendProcessing from "./backend-processing";
 const db = require("./sequelizeDatabase/sequelFunctions");
 
-function test_date_parser() {
-  let input = "June-December 2017";
-  let be = new BackendProcessing();
-  let answer = be.convertDates(input);
-  //be.end_connection()
-  console.log(answer);
-}
-
 function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function test_new_function() {
-  let be = new BackendProcessing();
-  be.getAllUsers().then(users => {
-    console.log(users);
-  });
+  let n = 5;
+  db.insertQuarterEmployment(1, 1, 1, "company " + n, "position " + n, "2020-01-01");
 }
-
 test_new_function();

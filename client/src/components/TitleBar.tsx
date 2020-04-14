@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AppBar, Toolbar, IconButton } from "@material-ui/core";
+import { AppBar, Toolbar, IconButton, Button } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import styled from "styled-components";
 import { ReactComponent as ImportIcon } from "./resources/file-upload.svg";
@@ -11,6 +11,7 @@ const Title = styled.h1`
 export interface TitleBarProps {
   toggleOpen: Function;
   handleUpload: Function;
+  handleLogout: Function;
 }
 
 export interface TitleBarState {}
@@ -24,6 +25,9 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
             <MenuIcon />
           </IconButton>
           <Title style={{ flexGrow: 1 }}>Connected Networks</Title>
+          <Button variant="outlined" color="inherit" onClick={() => this.props.handleLogout()}>
+            Log out
+          </Button>
           <IconButton color="inherit" onClick={() => this.props.handleUpload()} style={{}}>
             <ImportIcon fill={"white"} />
           </IconButton>
