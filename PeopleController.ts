@@ -169,7 +169,7 @@ export default class PeopleController {
         return;
       }
 
-      await database.modifyIndividual(person.id, person.name, person.position, person.hyperlink, person.comment);
+      await database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
       res.sendStatus(200);
     } catch (error) {
       console.error(error);
