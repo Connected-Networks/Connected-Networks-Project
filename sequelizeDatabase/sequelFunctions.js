@@ -346,7 +346,7 @@ getIndividualCurrentEmployement = (IndividualID) => {
 
 //---------------Modify Existing Data Functions----------//
 //FundID should not be changeable.
-modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
+modifyIndividual = (IndividualID, newName, newUrl, newComments) => {
   return models.Individuals.findOne({
     where: {
       IndividualID: IndividualID,
@@ -354,8 +354,7 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
   })
     .then((individual) => {
       individual.update({
-        IndividualName: newName, //<--TODO: Change "IndividualName" to "Name" to match new SQL Table. 4/14/20
-        OriginalPostion: newPosition, //TODO: Update this. <<--TODO: April 14th: This still needs to be changed.
+        Name: newName, //<--DONE: Change "IndividualName" to "Name" to match new SQL Table. 4/14/20
         LinkedInUrl: newUrl,
         Comments: newComments,
       });
