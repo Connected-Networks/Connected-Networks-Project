@@ -32,6 +32,11 @@ interface Employee {
 export default class UpdatesController {
   static async receiveUpdates(req, res) {
     try {
+      if (!req.user) {
+        res.sendStatus(401);
+        return;
+      }
+
       const updates: Update[] = req.body.updates;
       const changes = await UpdatesController.detectChanges(updates);
 
