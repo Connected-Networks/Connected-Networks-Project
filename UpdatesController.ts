@@ -5,6 +5,7 @@ const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface Update {
   linkedInUrl: string;
+  fundName?: string;
   company: string;
   position: string;
 }
@@ -56,7 +57,7 @@ export default class UpdatesController {
     const changes = [];
 
     for (const update of updates) {
-      const employees = await database.getIndividualsForUpdates(user.UserID, update.linkedInUrl);
+      const employees = await database.getIndividualsForUpdates(user.UserID, update.linkedInUrl, update.fundName);
 
       for (const employee of employees) {
         const currentEmployment = await UpdatesController.getCurrentEmployment(employee.IndividualID);

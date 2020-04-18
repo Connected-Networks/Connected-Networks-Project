@@ -673,8 +673,10 @@ getUserById = (id) => {
   });
 };
 
-getIndividualsForUpdates = async (UserID, LinkedInUrl) => {
-  const userFundIDs = (await models.Funds.findAll({ where: { UserID } })).map((fund) => fund.FundID);
+getIndividualsForUpdates = async (UserID, LinkedInUrl, FundName) => {
+  const userFunds = await models.Funds.findAll({ where: FundName ? { UserID, FundName } : { UserID } });
+  const userFundIDs = userFunds.map((fund) => fund.FundID);
+
   return await models.Individuals.findAll({ where: { LinkedInUrl, FundID: userFundIDs } });
 };
 
