@@ -1,7 +1,6 @@
 const models = require("./modelSetup");
 const moment = require("../node_modules/moment");
 
-
 //---------------FindAll: Get all data from the table --------------//
 //--------NOTE: These functions return Promises. Use ".then()" after calling them.
 
@@ -674,8 +673,9 @@ getUserById = (id) => {
   });
 };
 
-getIndividualsByLinkedIn = async (LinkedInUrl) => {
-  return await models.Individuals.findAll({ where: { LinkedInUrl } });
+getIndividualsForUpdates = async (UserID, LinkedInUrl) => {
+  const userFundIDs = (await models.Funds.findAll({ where: { UserID } })).map((fund) => fund.FundID);
+  return await models.Individuals.findAll({ where: { LinkedInUrl, FundID: userFundIDs } });
 };
 
 getCompanyById = async (CompanyID) => {
@@ -744,7 +744,7 @@ module.exports = {
   getUserByEmail,
   insertUser,
   getUserById,
-  getIndividualsByLinkedIn,
+  getIndividualsForUpdates,
   getCompanyById,
   getAllUsersRelatedToFund,
   updateEmployeeHistory,

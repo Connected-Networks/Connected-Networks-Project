@@ -38,7 +38,7 @@ export default class UpdatesController {
       }
 
       const updates: Update[] = req.body.updates;
-      const changes = await UpdatesController.detectChanges(updates);
+      const changes = await UpdatesController.detectChanges(updates, req.user);
 
       if (changes.length > 0) {
         await HistoryController.applyChanges(changes);
@@ -52,11 +52,12 @@ export default class UpdatesController {
     }
   }
 
-  static async detectChanges(updates: Update[]): Promise<Change[]> {
+  static async detectChanges(updates: Update[], user: any): Promise<Change[]> {
     const changes = [];
 
     for (const update of updates) {
-      const employees = await database.getIndividualsByLinkedIn(update.linkedInUrl);
+      const employees = await database.getIndividualsForUpdates(user.UserID, update.linkedInUrl);
+
       for (const employee of employees) {
         const currentEmployment = await UpdatesController.getCurrentEmployment(employee.IndividualID);
 
