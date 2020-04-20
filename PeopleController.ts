@@ -197,24 +197,26 @@ export default class PeopleController {
         return;
       }
 
-      console.log("\n\n" + JSON.stringify(person) + "\n\n");
+      //console.log("\n\n" + JSON.stringify(person) + "\n\n");
       const insertedPerson = await database.insertPerson(person.fundID, person.name, person.hyperlink, person.comment);
 
-      console.log("\n\n" + JSON.stringify(insertedPerson) + "\n\n");
+      //console.log("\n\n" + JSON.stringify(insertedPerson) + "\n\n");
 
       await database.insertOriginalFundPosition(insertedPerson.IndividualID, person.companyID, person.position);
 
+      console.log(1);
       const today = new Date();
       const history = {
         company: person.company,
         position: person.position,
         start: today,
       };
-
+      console.log(2);
       await HistoryController.addHistoryToDatabase(history, { ...person, id: insertedPerson.IndividualID }, userID);
-
+      console.log(3);
       res.sendStatus(200);
     } catch (error) {
+      console.error("An error occurred in addPerson");
       console.error(error);
       res.sendStatus(500);
     }

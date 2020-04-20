@@ -10,7 +10,7 @@ describe("GetFunds", () => {
     const mockReq = { user: { UserID: mockUserID } };
     const mockSend = jest.fn();
     const mockRes = { send: mockSend };
-    const mockFunds = [{ id: 123, name: "Mock" }];
+    const mockFunds = [{ id: 123, name: "Mock", shared: false }];
 
     const mockGetFundsFromDatabase = jest.spyOn(FundsController, "getFundsFromDatabase").mockResolvedValue(mockFunds);
 
@@ -40,27 +40,39 @@ describe("GetFunds", () => {
 describe("GetFundsFromDatabase", () => {
   it("should only return funds user can see and should return as DisplayFunds", async () => {
     const mockUserID = 12345;
-    const mockFundsUserCanSee = ["321"];
-    const mockAllFunds = [
+    const mockFundsUserCanSee = [
       {
         FundID: 123,
         FundName: "Mock",
       },
+    ];
+    const mockFundsUserOwns = [
       {
         FundID: 321,
         FundName: "Mock2",
       },
     ];
 
-    const mockGetAllFunds = jest.spyOn(database, "getAllFunds").mockResolvedValue(mockAllFunds);
-    const mockGetFundsUserCanSee = jest.spyOn(database, "getFundsUserCanSee").mockResolvedValue(mockFundsUserCanSee);
+    const mockGetFundsUserCanSee = jest.spyOn(database, "getFundsSharedWithUser").mockResolvedValue(mockFundsUserCanSee);
+    const mockGetFundsOwnedByUser = jest.spyOn(database, "getFundsOwnedByUser").mockResolvedValue(mockFundsUserOwns);
 
     const returnedFunds = await FundsController.getFundsFromDatabase(mockUserID);
 
-    expect(mockGetAllFunds).toBeCalledTimes(1);
     expect(mockGetFundsUserCanSee).toBeCalledWith(mockUserID);
+    expect(mockGetFundsOwnedByUser).toBeCalledWith(mockUserID);
 
-    const expectedFunds = [{ id: 321, name: "Mock2" }];
+    const expectedFunds = [
+      {
+        id: 321,
+        name: "Mock2",
+        shared: false,
+      },
+      {
+        id: 123,
+        name: "Mock",
+        shared: true,
+      },
+    ];
     expect(returnedFunds).toEqual(expectedFunds);
   });
 });

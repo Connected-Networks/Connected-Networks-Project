@@ -8,7 +8,7 @@ describe("GetPeopleByOriginalCompany", () => {
   it("should respond with 401 if user is not authorized to see the company", async () => {
     const mockUserID = 12345;
     const mockCompanyID = 54321;
-    const mockReq = { user: { UserID: mockUserID }, params: { id: mockCompanyID } };
+    const mockReq = { user: { UserID: mockUserID }, params: { companyID: mockCompanyID } };
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
@@ -24,7 +24,7 @@ describe("GetPeopleByOriginalCompany", () => {
   it("should respond with people gotten from database", async () => {
     const mockUserID = 12345;
     const mockCompanyID = 54321;
-    const mockReq = { user: { UserID: mockUserID }, params: { id: mockCompanyID } };
+    const mockReq = { user: { UserID: mockUserID }, params: { companyID: mockCompanyID } };
     const mockSend = jest.fn();
     const mockRes = { send: mockSend };
 
@@ -44,7 +44,7 @@ describe("GetPeopleByOriginalCompany", () => {
   it("should respond with 500 if database throws an error", async () => {
     const mockUserID = 12345;
     const mockCompanyID = 54321;
-    const mockReq = { user: { UserID: mockUserID }, params: { id: mockCompanyID } };
+    const mockReq = { user: { UserID: mockUserID }, params: { companyID: mockCompanyID } };
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
@@ -61,10 +61,10 @@ describe("GetPeopleByOriginalCompany", () => {
 
 describe("getPeopleByOriginalCompanyFromDatabase", () => {
   it("should get people from database, map them to DisplayPerson and then return", async () => {
-    const mockUserID = 12345;
+    const mockCompanyID = 12345;
     const mockPeople = [
       {
-        Individual: {
+        individual: {
           IndividualID: 123,
           FundID: 1,
           Name: "Mock",
@@ -75,7 +75,7 @@ describe("getPeopleByOriginalCompanyFromDatabase", () => {
         PositionName: "",
       },
       {
-        Individual: {
+        individual: {
           IndividualID: 321,
           FundID: 2,
           Name: "Mock2",
@@ -91,9 +91,9 @@ describe("getPeopleByOriginalCompanyFromDatabase", () => {
       .spyOn(database, "retrieveIndividualsByOriginalCompany")
       .mockResolvedValue(mockPeople);
 
-    const returnedPeople = await PeopleController.getPeopleByOriginalCompanyFromDatabase(mockUserID);
+    const returnedPeople = await PeopleController.getPeopleByOriginalCompanyFromDatabase(mockCompanyID);
 
-    expect(mockRetrieveIndividualsByOriginalCompany).toBeCalledWith(mockUserID);
+    expect(mockRetrieveIndividualsByOriginalCompany).toBeCalledWith(mockCompanyID);
 
     const expectedPeople = [
       { id: 123, fundID: 1, name: "Mock", company: null, position: "", hyperlink: "Mock", comment: "" },
