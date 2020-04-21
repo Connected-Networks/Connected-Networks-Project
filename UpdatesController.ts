@@ -5,6 +5,7 @@ const database = require("./sequelizeDatabase/sequelFunctions");
 
 interface Update {
   linkedInUrl: string;
+  fundName?: string | string[];
   company: string;
   position: string;
 }
@@ -32,8 +33,13 @@ interface Employee {
 export default class UpdatesController {
   static async receiveUpdates(req, res) {
     try {
+      if (!req.user) {
+        res.sendStatus(401);
+        return;
+      }
+
       const updates: Update[] = req.body.updates;
-      const changes = await UpdatesController.detectChanges(updates);
+      const changes = await UpdatesController.detectChanges(updates, req.user);
 
       if (changes.length > 0) {
         await HistoryController.applyChanges(changes);
@@ -47,11 +53,12 @@ export default class UpdatesController {
     }
   }
 
-  static async detectChanges(updates: Update[]): Promise<Change[]> {
+  static async detectChanges(updates: Update[], user: any): Promise<Change[]> {
     const changes = [];
 
     for (const update of updates) {
-      const employees = await database.getIndividualsByLinkedIn(update.linkedInUrl);
+      const employees = await database.getIndividualsForUpdates(user.UserID, update.linkedInUrl, update.fundName);
+
       for (const employee of employees) {
         const currentEmployment = await UpdatesController.getCurrentEmployment(employee.IndividualID);
 
