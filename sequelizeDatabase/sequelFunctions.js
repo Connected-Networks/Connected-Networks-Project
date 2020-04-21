@@ -1,5 +1,5 @@
 const models = require("./modelSetup");
-const moment = require("../node_modules/moment");
+const moment = require("moment");
 
 //---------------FindAll: Get all data from the table --------------//
 //--------NOTE: These functions return Promises. Use ".then()" after calling them.
