@@ -6,7 +6,7 @@ export default class UsersController {
       let userID = req.user.UserID;
       const users = await UsersController.getOtherUsersFromDatabase(userID);
 
-      console.log(users);
+      //console.log(users);
 
       res.send({ users });
     } catch (error) {

@@ -116,7 +116,7 @@ export default class HistoryController {
   static async updateHistoryInDatabase(history, individual, userID) {
     let fundID = individual.fundID;
     const company = await database.retrieveCompanyByName(history.company, fundID);
-
+    if (!company) throw new Error("Cannot locate the company " + history.company);
     await database.updateEmployeeHistory(
       history.id,
       userID,
