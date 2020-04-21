@@ -80,7 +80,7 @@ describe("processIndividualForDisplay", () => {
       company: "",
       position: "",
       LinkedInUrl: "Mock",
-      comments: "",
+      Comments: "",
     };
 
     const mockCompanyName = "MockCompany";
@@ -101,6 +101,6 @@ describe("processIndividualForDisplay", () => {
     expect(returnedPerson.company).toBe(mockCompanyName);
     expect(returnedPerson.position).toBe(mockPositionName);
     expect(returnedPerson.hyperlink).toBe(mockIndividual.LinkedInUrl);
-    expect(returnedPerson.comment).toBe(mockIndividual.comments);
+    expect(returnedPerson.comment).toBe(mockIndividual.Comments);
   });
 });

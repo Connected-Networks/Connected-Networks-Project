@@ -7,8 +7,8 @@ import FundsController from "../../FundsController";
 describe("AddFund", () => {
   it("should add the fund to database and respond with 200", async () => {
     const mockUserID = 12345;
-    const mockFund = { name: "Mock" };
-    const mockReq = { user: { UserID: mockUserID }, body: { newData: mockFund } };
+    const mockFundName = "Mock";
+    const mockReq = { user: { UserID: mockUserID }, body: { newData: mockFundName } };
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
@@ -16,14 +16,14 @@ describe("AddFund", () => {
 
     await FundsController.addFund(mockReq, mockRes);
 
-    expect(mockInsertFund).toBeCalledWith(mockFund.name);
+    expect(mockInsertFund).toBeCalledWith(mockFundName, mockUserID);
     expect(mockSendStatus).toBeCalledWith(200);
   });
 
   it("should respond with 500 if database throws an error", async () => {
     const mockUserID = 12345;
-    const mockFund = { name: "Mock" };
-    const mockReq = { user: { UserID: mockUserID }, body: { newData: mockFund } };
+    const mockFundName = "Mock";
+    const mockReq = { user: { UserID: mockUserID }, body: { newData: mockFundName } };
     const mockSendStatus = jest.fn();
     const mockRes = { sendStatus: mockSendStatus };
 
@@ -31,7 +31,7 @@ describe("AddFund", () => {
 
     await FundsController.addFund(mockReq, mockRes);
 
-    expect(mockInsertFund).toBeCalledWith(mockFund.name);
+    expect(mockInsertFund).toBeCalledWith(mockFundName, mockUserID);
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });

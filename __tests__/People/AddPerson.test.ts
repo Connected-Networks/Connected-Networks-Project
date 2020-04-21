@@ -3,6 +3,7 @@ require("mysql2/node_modules/iconv-lite").encodingExists("foo"); //Required due 
 jest.mock("../../sequelizeDatabase/sequelFunctions");
 const database = require("../../sequelizeDatabase/sequelFunctions");
 import PeopleController from "../../PeopleController";
+import HistoryController from "../../HistoryController";
 
 describe("AddPerson", () => {
   it("should respond with 401 if user is not authorized to change the fund", async () => {
@@ -25,10 +26,11 @@ describe("AddPerson", () => {
   it("should update the person in database and respond with 200", async () => {
     const mockUserID = 12345;
     const mockPerson = {
-      id: 123,
+      IndividualID: 123,
       fundID: 54321,
       name: "Mock",
       company: "",
+      companyID: 1,
       position: "MockPosition",
       hyperlink: "MockLink",
       comment: "",
@@ -38,18 +40,17 @@ describe("AddPerson", () => {
     const mockRes = { sendStatus: mockSendStatus };
 
     const mockUserCanChangeFund = jest.spyOn(PeopleController, "userCanChangeFund").mockResolvedValue(true);
+    const mockInsertHistory = jest.spyOn(HistoryController, "addHistoryToDatabase").mockReturnValue(null);
 
-    const mockInsertPerson = jest.spyOn(database, "insertPerson").mockResolvedValue(null);
+    const mockInsertPerson = jest.spyOn(database, "insertPerson").mockResolvedValue(mockPerson);
+    const mockInsertFundPosition = jest.spyOn(database, "insertOriginalFundPosition");
 
     await PeopleController.addPerson(mockReq, mockRes);
 
-    expect(mockInsertPerson).toBeCalledWith(
-      mockPerson.name,
-      mockPerson.fundID,
-      mockPerson.position,
-      mockPerson.hyperlink,
-      mockPerson.comment
-    );
+    expect(mockInsertPerson).toBeCalledWith(mockPerson.fundID, mockPerson.name, mockPerson.hyperlink, mockPerson.comment);
+    expect(mockInsertFundPosition).toBeCalledWith(mockPerson.IndividualID, mockPerson.companyID, mockPerson.position);
+    expect(mockInsertHistory).toBeCalledTimes(1);
+
     expect(mockSendStatus).toBeCalledWith(200);
   });
 
@@ -66,13 +67,7 @@ describe("AddPerson", () => {
 
     await PeopleController.addPerson(mockReq, mockRes);
 
-    expect(mockInsertPerson).toBeCalledWith(
-      mockPerson.name,
-      mockPerson.fundID,
-      mockPerson.position,
-      mockPerson.hyperlink,
-      mockPerson.comment
-    );
+    expect(mockInsertPerson).toBeCalledWith(mockPerson.fundID, mockPerson.name, mockPerson.hyperlink, mockPerson.comment);
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });
