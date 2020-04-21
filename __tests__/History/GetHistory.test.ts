@@ -100,3 +100,36 @@ describe("userCanSeeIndividual", () => {
     expect(returnedValue).toBe(false);
   });
 });
+
+describe("getHistoryFromDatabase", () => {
+  it("should process values returned from database", async () => {
+    const mockHistory = [
+      {
+        HistoryID: 1,
+        company: { CompanyName: "mock company 1" },
+        PositionName: "mock position 1",
+        StartDate: "SD1",
+        EndDate: "ED1",
+      },
+      {
+        HistoryID: 2,
+        company: { CompanyName: "mock company 2" },
+        PositionName: "mock position 2",
+        StartDate: "SD2",
+        EndDate: "ED2",
+      },
+    ];
+    const expectedResults = [
+      { id: 1, company: "mock company 1", position: "mock position 1", start: "SD1", end: "ED1" },
+      { id: 2, company: "mock company 2", position: "mock position 2", start: "SD2", end: "ED2" },
+    ];
+    const mockIndividualID = 123;
+
+    const mockLookup = jest.spyOn(database, "getIndividualEmployeeHistory").mockResolvedValue(mockHistory);
+
+    let results = await HistoryController.getHistoryFromDatabase(mockIndividualID);
+
+    expect(mockLookup).toBeCalledWith(mockIndividualID);
+    expect(results).toEqual(expectedResults);
+  });
+});

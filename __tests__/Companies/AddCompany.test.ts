@@ -36,7 +36,7 @@ describe("AddCompany", () => {
 
     await CompaniesController.addCompany(mockReq, mockRes);
 
-    expect(mockInsertCompany).toBeCalledWith(mockCompany.name);
+    expect(mockInsertCompany).toBeCalledWith(mockCompany.name, mockCompany.fundID);
     expect(mockSendStatus).toBeCalledWith(200);
   });
 
@@ -53,7 +53,7 @@ describe("AddCompany", () => {
 
     await CompaniesController.addCompany(mockReq, mockRes);
 
-    expect(mockInsertCompany).toBeCalledWith(mockCompany.name);
+    expect(mockInsertCompany).toBeCalledWith(mockCompany.name, mockCompany.fundID);
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });
