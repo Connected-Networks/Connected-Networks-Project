@@ -35,13 +35,7 @@ describe("UpdatePerson", () => {
 
     await PeopleController.updatePerson(mockReq, mockRes);
 
-    expect(mockModifyIndividual).toBeCalledWith(
-      mockPerson.id,
-      mockPerson.name,
-      mockPerson.position,
-      mockPerson.hyperlink,
-      mockPerson.comment
-    );
+    expect(mockModifyIndividual).toBeCalledWith(mockPerson.id, mockPerson.name, mockPerson.hyperlink, mockPerson.comment);
     expect(mockSendStatus).toBeCalledWith(200);
   });
 
@@ -58,13 +52,7 @@ describe("UpdatePerson", () => {
 
     await PeopleController.updatePerson(mockReq, mockRes);
 
-    expect(mockModifyIndividual).toBeCalledWith(
-      mockPerson.id,
-      mockPerson.name,
-      mockPerson.position,
-      mockPerson.hyperlink,
-      mockPerson.comment
-    );
+    expect(mockModifyIndividual).toBeCalledWith(mockPerson.id, mockPerson.name, mockPerson.hyperlink, mockPerson.comment);
     expect(mockSendStatus).toBeCalledWith(500);
   });
 });
