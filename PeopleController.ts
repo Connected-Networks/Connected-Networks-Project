@@ -204,16 +204,14 @@ export default class PeopleController {
 
       await database.insertOriginalFundPosition(insertedPerson.IndividualID, person.companyID, person.position);
 
-      console.log(1);
       const today = new Date();
       const history = {
         company: person.company,
         position: person.position,
         start: today,
       };
-      console.log(2);
       await HistoryController.addHistoryToDatabase(history, { ...person, id: insertedPerson.IndividualID }, userID);
-      console.log(3);
+
       res.sendStatus(200);
     } catch (error) {
       console.error("An error occurred in addPerson");
@@ -228,7 +226,7 @@ export default class PeopleController {
       let userID = req.user.UserID;
       let fundID = (await database.retrieveIndividualByID(personID)).FundID;
 
-      console.log(personID);
+      //console.log(personID);
 
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("User cannot delete the individual");
