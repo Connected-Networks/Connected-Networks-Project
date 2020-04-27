@@ -38,6 +38,7 @@ export interface FundsMenuState {
   editMode: boolean;
   newFundName: string;
   dialog?: JSX.Element;
+  adding: boolean;
 }
 
 export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenuState> {
@@ -46,6 +47,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
     addMode: false,
     editMode: false,
     newFundName: "",
+    adding: false,
   };
 
   componentDidMount() {
@@ -63,6 +65,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
         addMode: false,
         editMode: false,
         newFundName: "",
+        adding: false,
       });
     });
   };
@@ -181,8 +184,10 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
           edge="end"
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => {
+            this.setState({ adding: true });
             this.applyNewName(this.state.newFundName, fund);
           }}
+          disabled={this.state.adding}
         >
           <CheckIcon />
         </IconButton>
@@ -215,7 +220,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
   editFund = (newFundName: string, fund: SideMenuFund) => {
     const newFund = { ...fund, name: newFundName };
     axios
-      .put("/funds", { fund: newFund })
+      .put("/funds", { newData: newFund })
       .then((response) => {
         this.refresh();
       })

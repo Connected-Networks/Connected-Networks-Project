@@ -77,7 +77,7 @@ export default class HistoryController {
     const company = await database.retrieveCompanyByName(history.company, fundID);
 
     if (!company) {
-      throw new Error();
+      throw new Error("Provided history has an invalid company");
     }
 
     await database.insertEmployeeHistory(userID, individual.id, company.CompanyID, history.position, history.start, history.end);
@@ -95,7 +95,7 @@ export default class HistoryController {
       let individual = req.body.employee;
       let userID = req.user.UserID;
 
-      console.log(history);
+      //console.log(history);
 
       if (!(await HistoryController.userCanChangeIndividual(userID, individual.id))) {
         console.error("User cannot edit history of individual " + individual.id);
@@ -116,7 +116,7 @@ export default class HistoryController {
   static async updateHistoryInDatabase(history, individual, userID) {
     let fundID = individual.fundID;
     const company = await database.retrieveCompanyByName(history.company, fundID);
-
+    if (!company) throw new Error("Cannot locate the company " + history.company);
     await database.updateEmployeeHistory(
       history.id,
       userID,

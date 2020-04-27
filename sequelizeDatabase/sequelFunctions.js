@@ -1,6 +1,5 @@
 const models = require("./modelSetup");
-const moment = require("../node_modules/moment");
-
+const moment = require("moment");
 
 //---------------FindAll: Get all data from the table --------------//
 //--------NOTE: These functions return Promises. Use ".then()" after calling them.
@@ -346,7 +345,7 @@ getIndividualCurrentEmployement = (IndividualID) => {
 
 //---------------Modify Existing Data Functions----------//
 //FundID should not be changeable.
-modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => {
+modifyIndividual = (IndividualID, newName, newUrl, newComments) => {
   return models.Individuals.findOne({
     where: {
       IndividualID: IndividualID,
@@ -354,8 +353,7 @@ modifyIndividual = (IndividualID, newName, newPosition, newUrl, newComments) => 
   })
     .then((individual) => {
       individual.update({
-        IndividualName: newName, //<--TODO: Change "IndividualName" to "Name" to match new SQL Table. 4/14/20
-        OriginalPostion: newPosition, //TODO: Update this. <<--TODO: April 14th: This still needs to be changed.
+        Name: newName, //<--DONE: Change "IndividualName" to "Name" to match new SQL Table. 4/14/20
         LinkedInUrl: newUrl,
         Comments: newComments,
       });
@@ -402,23 +400,9 @@ modifyCompany = (CompanyID, alteredCompanyName) => {
 };
 
 //---------------Modify Fund---------------//
-modifyFund = (FundID, alteredFundName) => {
-  return new Promise((resolve, reject) => {
-    models.Funds.findOne({
-      where: {
-        FundID: FundID,
-      },
-    })
-      .then((fund) => {
-        fund
-          .update({
-            FundName: alteredFundName,
-          })
-          .then(resolve(true))
-          .catch(reject());
-      })
-      .catch(reject());
-  });
+modifyFund = async (FundID, alteredFundName) => {
+  const fund = await models.Funds.findOne({ where: { FundID: FundID } });
+  await fund.update({ FundName: alteredFundName });
 };
 
 deleteCompany = (CompanyID) => {
@@ -675,8 +659,11 @@ getUserById = (id) => {
   });
 };
 
-getIndividualsByLinkedIn = async (LinkedInUrl) => {
-  return await models.Individuals.findAll({ where: { LinkedInUrl } });
+getIndividualsForUpdates = async (UserID, LinkedInUrl, FundName) => {
+  const userFunds = await models.Funds.findAll({ where: FundName ? { UserID, FundName } : { UserID } });
+  const userFundIDs = userFunds.map((fund) => fund.FundID);
+
+  return await models.Individuals.findAll({ where: { LinkedInUrl, FundID: userFundIDs } });
 };
 
 getCompanyById = async (CompanyID) => {
@@ -745,7 +732,7 @@ module.exports = {
   getUserByEmail,
   insertUser,
   getUserById,
-  getIndividualsByLinkedIn,
+  getIndividualsForUpdates,
   getCompanyById,
   getAllUsersRelatedToFund,
   updateEmployeeHistory,

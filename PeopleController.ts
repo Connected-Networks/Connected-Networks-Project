@@ -169,7 +169,7 @@ export default class PeopleController {
         return;
       }
 
-      await database.modifyIndividual(person.id, person.name, person.position, person.hyperlink, person.comment);
+      await database.modifyIndividual(person.id, person.name, person.hyperlink, person.comment);
       res.sendStatus(200);
     } catch (error) {
       console.error(error);
@@ -191,16 +191,14 @@ export default class PeopleController {
       let person = req.body.newData;
       let userID = req.user.UserID;
       let fundID = person.fundID;
+
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add an individual to that fund");
         res.sendStatus(401);
         return;
       }
 
-      console.log("\n\n" + JSON.stringify(person) + "\n\n");
       const insertedPerson = await database.insertPerson(person.fundID, person.name, person.hyperlink, person.comment);
-
-      console.log("\n\n" + JSON.stringify(insertedPerson) + "\n\n");
 
       await database.insertOriginalFundPosition(insertedPerson.IndividualID, person.companyID, person.position);
 
@@ -210,11 +208,11 @@ export default class PeopleController {
         position: person.position,
         start: today,
       };
-
       await HistoryController.addHistoryToDatabase(history, { ...person, id: insertedPerson.IndividualID }, userID);
 
       res.sendStatus(200);
     } catch (error) {
+      console.error("An error occurred in addPerson");
       console.error(error);
       res.sendStatus(500);
     }
@@ -225,8 +223,6 @@ export default class PeopleController {
       let personID = req.params.id;
       let userID = req.user.UserID;
       let fundID = (await database.retrieveIndividualByID(personID)).FundID;
-
-      console.log(personID);
 
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("User cannot delete the individual");

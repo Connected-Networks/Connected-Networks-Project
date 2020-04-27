@@ -147,7 +147,7 @@ export default class FundsAutoComplete extends React.Component<FundsAutoComplete
               <Button onClick={this.handleClose} color="primary">
                 Cancel
               </Button>
-              <Button type="submit" color="primary">
+              <Button type="submit" color="primary" disabled={this.state.dialogValue.name === ""}>
                 Add
               </Button>
             </DialogActions>
