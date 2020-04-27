@@ -191,6 +191,7 @@ export default class PeopleController {
       let person = req.body.newData;
       let userID = req.user.UserID;
       let fundID = person.fundID;
+      console.log(person);
       if (!(await PeopleController.userCanChangeFund(userID, fundID))) {
         console.error("user cannot add an individual to that fund");
         res.sendStatus(401);

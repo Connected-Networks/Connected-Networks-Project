@@ -8,8 +8,9 @@ import Comment from "./Comment";
 import FundsAutoComplete from "./FundsAutoComplete";
 import CompaniesAutoComplete from "./CompaniesAutoComplete";
 import HyperlinkArea from "./HyperlinkArea";
-import { TablePagination } from "@material-ui/core";
+import { TablePagination, Snackbar } from "@material-ui/core";
 import SharedIcon from "@material-ui/icons/People";
+import Alert from "@material-ui/lab/Alert";
 
 interface PeopleTableState {
   data: DisplayPerson[];
@@ -19,6 +20,8 @@ interface PeopleTableState {
   selectedCompanyID?: number;
   selectedCompany?: string;
   dialog?: JSX.Element;
+  alertMessage?: string;
+  openAlert: boolean;
 }
 
 interface PeopleTableProps {}
@@ -129,6 +132,7 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
     selectedFundID: undefined,
     selectedCompanyID: undefined,
     selectedCompany: undefined,
+    openAlert: false,
   };
 
   findFund = (fundID: number): string => {
@@ -205,15 +209,13 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
    */
   updateRow = async (newData: DisplayPerson, oldData?: DisplayPerson | undefined): Promise<void> => {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        if (oldData) {
-          console.log(newData);
-          this.updatePersonOnServer(newData).then(() => {
-            this.refreshTable();
-            resolve();
-          });
-        }
-      }, 600);
+      if (oldData) {
+        console.log(newData);
+        this.updatePersonOnServer(newData).then(() => {
+          this.refreshTable();
+          resolve();
+        });
+      }
     });
   };
 
@@ -235,19 +237,22 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
   };
 
   addRow = async (newData: DisplayPerson): Promise<void> => {
-    newData.fundID = this.state.selectedFundID!;
-    newData.companyID = this.state.selectedCompanyID!;
-    newData.company = this.state.selectedCompany!;
-
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        if (newData) {
-          console.log(newData);
-          this.addPersonOnServer(newData).then(() => {
-            resolve();
-          });
-        }
-      }, 1000);
+      if (!this.state.selectedFundID || !this.state.selectedCompanyID) {
+        this.notifyUser("Fund or company were not selected");
+        reject();
+        return;
+      }
+      newData.fundID = this.state.selectedFundID!;
+      newData.companyID = this.state.selectedCompanyID!;
+      newData.company = this.state.selectedCompany!;
+
+      if (newData) {
+        console.log(newData);
+        this.addPersonOnServer(newData).then(() => {
+          resolve();
+        });
+      }
     });
   };
 
@@ -302,6 +307,10 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
     });
   };
 
+  notifyUser = (message: string) => {
+    this.setState({ alertMessage: message, openAlert: true });
+  };
+
   componentDidMount() {
     this.parseFunds();
     this.refreshTable();
@@ -324,10 +333,6 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
           console.log(error);
         });
     });
-  };
-
-  handleCloseDialog = () => {
-    this.setState({ dialog: undefined });
   };
 
   render() {
@@ -356,7 +361,11 @@ export default class PeopleTable extends React.Component<PeopleTableProps, Peopl
             }}
           />
         </Container>
-        {this.state.dialog}
+        <Snackbar open={this.state.openAlert} autoHideDuration={6000} onClose={() => this.setState({ openAlert: false })}>
+          <Alert variant="filled" onClose={() => this.setState({ openAlert: false })} severity="error">
+            {this.state.alertMessage}
+          </Alert>
+        </Snackbar>
       </>
     );
   }
