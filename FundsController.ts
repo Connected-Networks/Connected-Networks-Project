@@ -45,6 +45,7 @@ export default class FundsController {
     try {
       let userID = req.user.UserID;
       let fund = req.body.newData;
+      console.log(fund);
 
       if (!(await PeopleController.userCanChangeFund(userID, fund.id))) {
         console.error("User cannot update the fund");

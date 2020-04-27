@@ -400,23 +400,9 @@ modifyCompany = (CompanyID, alteredCompanyName) => {
 };
 
 //---------------Modify Fund---------------//
-modifyFund = (FundID, alteredFundName) => {
-  return new Promise((resolve, reject) => {
-    models.Funds.findOne({
-      where: {
-        FundID: FundID,
-      },
-    })
-      .then((fund) => {
-        fund
-          .update({
-            FundName: alteredFundName,
-          })
-          .then(resolve(true))
-          .catch(reject());
-      })
-      .catch(reject());
-  });
+modifyFund = async (FundID, alteredFundName) => {
+  const fund = await models.Funds.findOne({ where: { FundID: FundID } });
+  await fund.update({ FundName: alteredFundName });
 };
 
 deleteCompany = (CompanyID) => {

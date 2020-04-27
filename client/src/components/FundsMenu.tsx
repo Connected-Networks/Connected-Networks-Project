@@ -220,7 +220,7 @@ export default class FundsMenu extends React.Component<FundsMenuProps, FundsMenu
   editFund = (newFundName: string, fund: SideMenuFund) => {
     const newFund = { ...fund, name: newFundName };
     axios
-      .put("/funds", { fund: newFund })
+      .put("/funds", { newData: newFund })
       .then((response) => {
         this.refresh();
       })
