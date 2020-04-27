@@ -27,9 +27,6 @@ export default class FundsController {
     const fundsOwnedByUser = await database.getFundsOwnedByUser(userID);
     const fundsSharedWithUser = await database.getFundsSharedWithUser(userID);
 
-    //console.log(JSON.stringify(fundsOwnedByUser));
-    //console.log(JSON.stringify(fundsSharedWithUser));
-
     return [...FundsController.mapFunds(fundsOwnedByUser, false), ...FundsController.mapFunds(fundsSharedWithUser, true)];
   }
 
