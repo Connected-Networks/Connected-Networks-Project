@@ -79,6 +79,8 @@ Please note that most deployment services will automatically run npm install and
 
 Before running the project make sure to build the backend and frontend first (See Deployment)
 
+You can also modify the `.env` file to use the local MySQL database
+
 #### To run the backend
 
 `npm start`
