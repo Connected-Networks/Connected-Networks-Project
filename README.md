@@ -4,7 +4,7 @@
 
 ### Required Tools
 
-- NodeJS (https://nodejs.org/en/)
+- [NodeJS](https://nodejs.org/en/)
 
 ### Recommended Tools
 
@@ -16,7 +16,7 @@
 
 #### Installing MySQL
 
-1. Go to https://www.mysql.com/products/workbench/ and download MySQL installer.
+1. Get [MySQL installer](https://www.mysql.com/products/workbench/).
 2. Run the Installer. Select MySQL workbench and MySQL Server.
 3. For the MySQL Server, use the Old Authentication method.
 4. For setting up Users:
